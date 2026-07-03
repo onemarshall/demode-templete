@@ -1,4 +1,4 @@
-import { env as privateEnv } from "$env/dynamic/private";
+import { DIRECTUS_TOKEN } from "$app/env/private";
 import {
   SiteDataSchema,
   PageBuilderModelSchema,
@@ -56,12 +56,12 @@ export const createDirectusContentProvider = (): ContentProvider => {
           await fetchCategoryBySlug(
             filters.categorySlug,
             globalThis.fetch,
-            privateEnv.DIRECTUS_TOKEN,
+            DIRECTUS_TOKEN,
           )
         )?.id
       : undefined;
     const tagIds = filters.tagSlugs?.length
-      ? await fetchTagsBySlugs(filters.tagSlugs, globalThis.fetch, privateEnv.DIRECTUS_TOKEN)
+      ? await fetchTagsBySlugs(filters.tagSlugs, globalThis.fetch, DIRECTUS_TOKEN)
       : undefined;
     return { categoryId, tagIds };
   };
@@ -75,10 +75,10 @@ export const createDirectusContentProvider = (): ContentProvider => {
         { tree: copyrightTree, error: copyrightNavigationError },
         directusGlobals,
       ] = await Promise.all([
-        fetchDirectusNavigationTree(globalThis.fetch, "main", privateEnv.DIRECTUS_TOKEN),
-        fetchDirectusNavigationTree(globalThis.fetch, "footer", privateEnv.DIRECTUS_TOKEN),
-        fetchDirectusNavigationTree(globalThis.fetch, "copyright", privateEnv.DIRECTUS_TOKEN),
-        fetchDirectusGlobals(globalThis.fetch, privateEnv.DIRECTUS_TOKEN),
+        fetchDirectusNavigationTree(globalThis.fetch, "main", DIRECTUS_TOKEN),
+        fetchDirectusNavigationTree(globalThis.fetch, "footer", DIRECTUS_TOKEN),
+        fetchDirectusNavigationTree(globalThis.fetch, "copyright", DIRECTUS_TOKEN),
+        fetchDirectusGlobals(globalThis.fetch, DIRECTUS_TOKEN),
       ]);
 
       if (headerNavigationError || footerNavigationError) {
@@ -106,7 +106,7 @@ export const createDirectusContentProvider = (): ContentProvider => {
           path,
           options?.postPages,
           globalThis.fetch,
-          privateEnv.DIRECTUS_TOKEN,
+          DIRECTUS_TOKEN,
         );
         if (!pageData) return null;
         return PageBuilderModelSchema.parse({
@@ -126,7 +126,7 @@ export const createDirectusContentProvider = (): ContentProvider => {
           slug,
           options,
           globalThis.fetch,
-          privateEnv.DIRECTUS_TOKEN,
+          DIRECTUS_TOKEN,
         );
         if (!post) return null;
         return PostDetailSchema.parse(post);
@@ -136,7 +136,7 @@ export const createDirectusContentProvider = (): ContentProvider => {
         return (await fetchRelatedPosts(
           postId,
           globalThis.fetch,
-          privateEnv.DIRECTUS_TOKEN,
+          DIRECTUS_TOKEN,
         )) as PostSummary[];
       }),
     getPaginatedPosts: async (page: number, limit: number, filters?: PostFilters) =>
@@ -153,7 +153,7 @@ export const createDirectusContentProvider = (): ContentProvider => {
             tagIds,
           },
           globalThis.fetch,
-          privateEnv.DIRECTUS_TOKEN,
+          DIRECTUS_TOKEN,
         )) as PostSummary[];
       }),
     getTotalPostCount: async (filters?: PostFilters) =>
@@ -164,7 +164,7 @@ export const createDirectusContentProvider = (): ContentProvider => {
             (v) => v === undefined || v === null || (Array.isArray(v) && v.length === 0),
           )
         ) {
-          return fetchTotalPostCount(globalThis.fetch, privateEnv.DIRECTUS_TOKEN);
+          return fetchTotalPostCount(globalThis.fetch, DIRECTUS_TOKEN);
         }
         const { categoryId, tagIds } = await resolveFilterIds(filters);
         return fetchPostsCount(
@@ -175,16 +175,16 @@ export const createDirectusContentProvider = (): ContentProvider => {
             postType: filters.postType as Post["post_type"] | undefined,
             tagIds,
           },
-          privateEnv.DIRECTUS_TOKEN,
+          DIRECTUS_TOKEN,
         );
       }),
     getAvailableCategories: async () =>
       withDirectusFallback("getAvailableCategories", [], async () =>
-        fetchAvailableCategories(globalThis.fetch, privateEnv.DIRECTUS_TOKEN),
+        fetchAvailableCategories(globalThis.fetch, DIRECTUS_TOKEN),
       ),
     getAvailablePostTypes: async () =>
       withDirectusFallback("getAvailablePostTypes", [], async () =>
-        fetchAvailablePostTypes(globalThis.fetch, privateEnv.DIRECTUS_TOKEN),
+        fetchAvailablePostTypes(globalThis.fetch, DIRECTUS_TOKEN),
       ),
   };
 };

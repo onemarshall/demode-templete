@@ -6,6 +6,7 @@
  */
 import type { FormField } from "$lib/types/directus-schema";
 import { createScopedLogger } from "$lib/shared/logger";
+import { PUBLIC_DIRECTUS_URL } from "$app/env/public";
 
 const log = createScopedLogger(["Directus", "Forms"]);
 
@@ -22,7 +23,7 @@ export async function fetchNewsletterForm(
   token?: string,
 ): Promise<NewsletterForm | null> {
   try {
-    const directusUrl = process.env.DIRECTUS_URL || "http://localhost:8701";
+    const directusUrl = PUBLIC_DIRECTUS_URL || "http://localhost:8701";
     const response = await fetch(
       `${directusUrl}/items/forms/5da3d356-d818-434f-b225-db35c418bbb6?fields=*,fields.*`,
       {

@@ -6,8 +6,8 @@
  * when SEO data is missing or in static mode.
  */
 import { readItems } from "@directus/sdk";
-import { env as privateEnv } from "$env/dynamic/private";
-import { env as publicEnv } from "$env/dynamic/public";
+import { CMS_PROVIDER, DIRECTUS_TOKEN } from "$app/env/private";
+import { PUBLIC_CMS_PROVIDER } from "$app/env/public";
 import { createDirectusClient } from "./shared";
 import type { ExtensionSeoMetadata } from "$lib/types/directus-schema";
 import { buildPermalinkCandidates } from "./page-fetcher";
@@ -24,14 +24,14 @@ async function fetchPageSeo(
   permalink: string,
 ): Promise<ExtensionSeoMetadata | null> {
   // Check if we're in static mode
-  const cmsProvider = privateEnv.CMS_PROVIDER ?? publicEnv.PUBLIC_CMS_PROVIDER ?? "static";
+  const cmsProvider = CMS_PROVIDER ?? PUBLIC_CMS_PROVIDER ?? "static";
   if (cmsProvider === "static") {
     log.info(`Static mode: skipping SEO fetch for page "${permalink}"`);
     return null;
   }
 
   try {
-    const client = createDirectusClient(fetch, privateEnv.DIRECTUS_TOKEN);
+    const client = createDirectusClient(fetch, DIRECTUS_TOKEN);
 
     const result = (await client.request(
       readItems("pages", {
@@ -63,14 +63,14 @@ async function fetchPostSeo(
   slug: string,
 ): Promise<ExtensionSeoMetadata | null> {
   // Check if we're in static mode
-  const cmsProvider = privateEnv.CMS_PROVIDER ?? publicEnv.PUBLIC_CMS_PROVIDER ?? "static";
+  const cmsProvider = CMS_PROVIDER ?? PUBLIC_CMS_PROVIDER ?? "static";
   if (cmsProvider === "static") {
     log.info(`Static mode: skipping SEO fetch for post "${slug}"`);
     return null;
   }
 
   try {
-    const client = createDirectusClient(fetch, privateEnv.DIRECTUS_TOKEN);
+    const client = createDirectusClient(fetch, DIRECTUS_TOKEN);
 
     const result = (await client.request(
       readItems("posts", {

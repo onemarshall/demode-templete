@@ -1,28 +1,48 @@
-import Directors from "svg/ocae/Directors.svg?component";
-import ResearchFellows from "svg/ocae/ResearchFellows.svg?component";
-import OurResearch from "svg/ocae/OurResearch.svg?component";
-import OurNews from "svg/ocae/OurNews.svg?component";
-import Aims from "svg/ocae/Aims.svg?component";
-import About from "svg/ocae/About.svg?component";
-import History from "svg/ocae/History.svg?component";
-import Impact from "svg/ocae/Impact.svg?component";
-import AnimalEthics from "svg/ocae/AnimalEthics.svg?component";
-import LatestNews from "svg/ocae/LatestNews.svg?component";
-import Commentary from "svg/ocae/Commentary.svg?component";
-import Video from "svg/ocae/Video.svg?component";
-import ResearchAreas from "svg/ocae/ResearchAreas.svg?component";
-import CentreBooks from "svg/ocae/CentreBooks.svg?component";
-import PMAnimalEthicsSeries from "svg/ocae/PMAnimalEthicsSeries.svg?component";
-import JournalOfAnimalEthics from "svg/ocae/JournalOfAnimalEthics.svg?component";
-import Fellows from "svg/ocae/Fellows.svg?component";
-import HonoraryFellows from "svg/ocae/HonoraryFellows.svg?component";
-import ApplyToBeAFellow from "svg/ocae/ApplyToBeAFellow.svg?component";
-import PreviousMeetings from "svg/ocae/PreviousMeetings.svg?component";
-import TheAnimalThing from "svg/ocae/TheAnimalThing.svg?component";
-import Bear from "svg/ocae/Bear.svg?component";
-import Antelope from "svg/ocae/Antelope.svg?component";
-import Panther from "svg/ocae/Panther.svg?component";
-import Lion from "svg/ocae/Lion.svg?component";
+import {
+  BookOpen,
+  BookOpenText,
+  ChartNoAxesCombined,
+  Circle,
+  FileText,
+  GraduationCap,
+  HandHeart,
+  History as HistoryIcon,
+  Info,
+  Library,
+  Newspaper,
+  PanelsTopLeft,
+  PawPrint,
+  ShieldCheck,
+  Target,
+  Users,
+  Video as VideoIcon,
+} from "@lucide/svelte";
+
+const Directors = Users;
+const ResearchFellows = Users;
+const OurResearch = Library;
+const OurNews = Newspaper;
+const Aims = Target;
+const About = Info;
+const History = HistoryIcon;
+const Impact = ChartNoAxesCombined;
+const AnimalEthics = PawPrint;
+const LatestNews = Newspaper;
+const Commentary = FileText;
+const Video = VideoIcon;
+const ResearchAreas = Library;
+const CentreBooks = BookOpen;
+const PMAnimalEthicsSeries = BookOpenText;
+const JournalOfAnimalEthics = ShieldCheck;
+const Fellows = GraduationCap;
+const HonoraryFellows = Users;
+const ApplyToBeAFellow = HandHeart;
+const PreviousMeetings = PanelsTopLeft;
+const TheAnimalThing = PawPrint;
+const Bear = Circle;
+const Antelope = Circle;
+const Panther = Circle;
+const Lion = Circle;
 
 // Social media icons
 import {

@@ -332,6 +332,7 @@ export const fetchTagsBySlugs = async (
     const seen = new Set<string>();
     for (const post of results) {
       for (const entry of post.tags ?? []) {
+        if (!entry || typeof entry === "string") continue;
         const tag = entry.tag_id;
         if (tag && typeof tag !== "string" && tag.slug && slugs.includes(tag.slug)) {
           seen.add(String(tag.id));

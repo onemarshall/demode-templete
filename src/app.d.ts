@@ -3,14 +3,19 @@
 declare global {
 	namespace App {
 		interface Platform {
-			env: Env;
-			ctx: ExecutionContext;
-			caches: CacheStorage;
-			cf?: IncomingRequestCfProperties
+			env?: Record<string, unknown>;
+			ctx?: {
+				waitUntil(promise: Promise<unknown>): void;
+				passThroughOnException?(): void;
+			};
+			caches?: CacheStorage;
+			cf?: Record<string, unknown>;
 		}
 
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			nonce?: string;
+		}
 		// interface PageData {}
 		// interface PageState {}
 	}

@@ -15,6 +15,9 @@ const rootWSOrigin = rootUrl
 const directusUrl = process.env.PUBLIC_DIRECTUS_URL || "http://localhost:8061";
 const isDev = process.env.NODE_ENV === "development";
 
+/** @param {unknown} value @returns {value is string} */
+const isString = (value) => typeof value === "string";
+
 // Common domains
 const domains = {
   cloudfront: "https://*.cloudfront.net",
@@ -34,6 +37,10 @@ const domains = {
   vimeo: "https://player.vimeo.com",
 };
 
+/**
+ * @param {{ corsOrigin: string }} options
+ * @returns {Record<string, string>}
+ */
 export function createSecurityHeaders({ corsOrigin }) {
   return {
     "Access-Control-Allow-Origin": corsOrigin,
@@ -54,7 +61,7 @@ export function createSecurityHeaders({ corsOrigin }) {
  *   nonce?: string,
  *   isDev?: boolean
  * }} options - Options for CSP directives
- * @returns {Record<string, string>} CSP directives
+ * @returns {Record<string, string[]>} CSP directives
  */
 export function CSPDirectives({ nonce = "", isDev: isDevOverride } = {}) {
   const isDevelopment = typeof isDevOverride === "boolean" ? isDevOverride : isDev;
@@ -93,7 +100,7 @@ export function CSPDirectives({ nonce = "", isDev: isDevOverride } = {}) {
   // Default sources
   const defaultSrc = [
     ...self,
-    ...(rootOrigin ? [rootOrigin, rootWSOrigin].filter(Boolean) : []),
+    ...(rootOrigin ? [rootOrigin, rootWSOrigin].filter(isString) : []),
     domains.unpkg,
     domains.googleApis,
     directusUrl,

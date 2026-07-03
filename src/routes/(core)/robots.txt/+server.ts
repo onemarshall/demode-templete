@@ -1,6 +1,6 @@
 import { generateRobotsTxt } from '$lib/features/directus/fetchers/robots-fetcher';
 import type { RequestHandler } from '@sveltejs/kit';
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 
 export const GET: RequestHandler = async ({ fetch }) => {
 	try {

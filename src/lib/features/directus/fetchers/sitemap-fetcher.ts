@@ -95,7 +95,7 @@ export const fetchSitemapPages = async (fetch: typeof globalThis.fetch): Promise
 
   const pages = await directus.request<Page[]>(
     readItems("pages", {
-      filter: { status: { _eq: "published" }, permalink: { _nnull: true } },
+      filter: { status: { _eq: "published" }, permalink: { _nnull: true } } as never,
       fields: ["id", "permalink", "published_at", "status", "seo"],
       sort: ["-published_at"],
     }),
@@ -116,7 +116,7 @@ export const fetchSitemapPosts = async (fetch: typeof globalThis.fetch): Promise
 
   const posts = await directus.request<Post[]>(
     readItems("posts", {
-      filter: { status: { _eq: "published" }, slug: { _nnull: true } },
+      filter: { status: { _eq: "published" }, slug: { _nnull: true } } as never,
       fields: ["id", "slug", "published_at", "status", "seo"],
       sort: ["-published_at"],
     }),

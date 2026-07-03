@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/state";
 	import { resolve } from "$app/paths";
-	import { env } from "$env/dynamic/public";
 	import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import { NewsPostSidebar } from "$lib/components/news";
@@ -16,26 +15,27 @@
 	const authorName = $derived(
 		[author?.first_name, author?.last_name].filter(Boolean).join(" "),
 	);
-	const postTags = $derived(
-		Array.isArray(post?.tags)
-			? post.tags.filter(
-					(
-						relation: unknown,
-					): relation is {
-						tag_id: {
-							id: string;
-							title: string;
-							slug?: string | null;
-						};
-					} => {
-						if (relation === null || typeof relation !== "object")
-							return false;
-						const r = relation as Record<string, unknown>;
-						return !!r.tag_id && typeof r.tag_id === "object";
-					},
-				)
-			: [],
-	);
+
+	type PostTagRelation = {
+		tag_id: {
+			id: string;
+			title: string;
+			slug?: string | null;
+		};
+	};
+
+	const isPostTagRelation = (relation: unknown): relation is PostTagRelation => {
+		if (relation === null || typeof relation !== "object") return false;
+		const tag = (relation as { tag_id?: unknown }).tag_id;
+		if (tag === null || typeof tag !== "object") return false;
+		const candidate = tag as { id?: unknown; title?: unknown };
+		return typeof candidate.id === "string" && typeof candidate.title === "string";
+	};
+
+	const normalizePostTags = (tags: unknown): PostTagRelation[] =>
+		Array.isArray(tags) ? tags.filter(isPostTagRelation) : [];
+
+	const postTags = $derived(normalizePostTags(post?.tags));
 	const formatDate = (dateStr?: string | null) => {
 		if (!dateStr) return null;
 		return new Date(dateStr).toLocaleDateString("en-GB", {

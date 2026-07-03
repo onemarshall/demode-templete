@@ -36,8 +36,8 @@
  */
 
 import { getRequestEvent } from "$app/server";
-import { PUBLIC_DIRECTUS_URL } from "$env/static/public";
-import { env as privateEnv } from "$env/dynamic/private";
+import { DIRECTUS_TOKEN } from "$app/env/private";
+import { PUBLIC_DIRECTUS_URL } from "$app/env/public";
 import { createDirectusClientServer } from "$lib/features/directus/client.server";
 import { createItem } from "@directus/sdk";
 import { error } from "@sveltejs/kit";
@@ -59,7 +59,7 @@ export async function submitDirectusForm(
   submissionData: Record<string, string>,
 ): Promise<string> {
   const { fetch } = getRequestEvent();
-  const token = privateEnv.DIRECTUS_TOKEN;
+  const token = DIRECTUS_TOKEN;
 
   // Fetch form field name→ID mapping
   const formResponse = await fetch(

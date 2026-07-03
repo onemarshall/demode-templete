@@ -1,4 +1,4 @@
-import { browser } from '$app/environment'
+import { browser } from '$app/env'
 import * as CookieConsent from 'vanilla-cookieconsent'
 import { createCookieConsentConfig } from './config'
 import { syncCookieConsentState } from './api'

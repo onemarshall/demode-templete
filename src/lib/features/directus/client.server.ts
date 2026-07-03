@@ -5,7 +5,7 @@
  * from server environment variables, enabling access to draft/unpublished content.
  * Only importable from server-side code (.server.ts files, hooks, endpoints).
  */
-import { env as privateEnv } from '$env/dynamic/private'
+import { DIRECTUS_TOKEN } from '$app/env/private'
 import {
 	createBaseDirectusClient,
 	type DirectusClient,
@@ -16,9 +16,7 @@ type FetchFunction = Parameters<typeof createBaseDirectusClient>[0]
 
 // Server-only version - can access private environment variables
 export const createDirectusClientServer = (fetch: FetchFunction): DirectusClient => {
-	const authToken = privateEnv.DIRECTUS_TOKEN
-
-	return withDirectusToken(createBaseDirectusClient(fetch), authToken)
+	return withDirectusToken(createBaseDirectusClient(fetch), DIRECTUS_TOKEN)
 }
 
 export type DirectusClientServer = DirectusClient

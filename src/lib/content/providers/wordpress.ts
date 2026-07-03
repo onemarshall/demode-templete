@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { env as privateEnv } from '$env/dynamic/private';
-import { env as publicEnv } from '$env/dynamic/public';
+import { WORDPRESS_URL } from '$app/env/private';
+import { PUBLIC_WORDPRESS_URL } from '$app/env/public';
 import {
 	PageBuilderModelSchema,
 	PostDetailSchema,
@@ -41,11 +41,11 @@ const toSlug = (path: string): string => {
 
 const resolveWordPressBaseUrl = (): string | null => {
 	const parsed = WordPressEnvSchema.safeParse({
-		PUBLIC_WORDPRESS_URL: publicEnv.PUBLIC_WORDPRESS_URL
+		PUBLIC_WORDPRESS_URL
 	});
 	if (parsed.success) return parsed.data.PUBLIC_WORDPRESS_URL;
 
-	const fallback = privateEnv.WORDPRESS_URL;
+	const fallback = WORDPRESS_URL;
 	if (fallback) {
 		const fallbackParsed = z.url().safeParse(fallback);
 		if (fallbackParsed.success) return fallbackParsed.data;

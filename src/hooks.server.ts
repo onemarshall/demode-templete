@@ -6,16 +6,16 @@ import {
   type SvelteRedirect,
 } from "$lib/features/directus/fetchers/redirect-fetcher";
 import { normalizePath } from "$lib/shared/utils/path";
-import { env as privateEnv } from "$env/dynamic/private";
-import { env as publicEnv } from "$env/dynamic/public";
+import { CMS_PROVIDER } from "$app/env/private";
+import { PUBLIC_CMS_PROVIDER, PUBLIC_SITE_URL } from "$app/env/public";
 
 /* -------------------------------------------------------------------------- */
 /*  Environment validation                                                     */
 /* -------------------------------------------------------------------------- */
 
 if (
-  publicEnv.PUBLIC_SITE_URL &&
-  publicEnv.PUBLIC_SITE_URL.includes("localhost") &&
+  PUBLIC_SITE_URL &&
+  PUBLIC_SITE_URL.includes("localhost") &&
   typeof globalThis.process !== "undefined" &&
   globalThis.process.env?.NODE_ENV === "production"
 ) {
@@ -36,8 +36,8 @@ let redirectCacheTimestamp = 0;
 const getRedirects = async (): Promise<SvelteRedirect[]> => {
   // Only fetch redirects in Directus mode
   const provider = (
-    privateEnv.CMS_PROVIDER ??
-    publicEnv.PUBLIC_CMS_PROVIDER ??
+    CMS_PROVIDER ??
+    PUBLIC_CMS_PROVIDER ??
     "static"
   ).toLowerCase();
   if (provider !== "directus") return [];

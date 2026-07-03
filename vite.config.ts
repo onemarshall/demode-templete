@@ -42,7 +42,7 @@ export default defineConfig({
         scripts: "./src/assets/scripts",
         css: "./src/assets/css",
         svg: "./src/assets/svg",
-        "@/*": "./path/to/lib/*",
+        "@/*": "./src/lib/*",
       },
     }),
   ],

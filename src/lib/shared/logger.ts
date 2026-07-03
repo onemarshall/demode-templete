@@ -8,10 +8,25 @@
  * - Memory-safe log tracking
  */
 
-import { createConsola, type ConsolaInstance } from 'consola';
+type LogMethod = (...args: unknown[]) => void;
 
-// Re-export ConsolaInstance for external use
-export type { ConsolaInstance };
+export interface ConsolaInstance {
+	info: LogMethod;
+	warn: LogMethod;
+	error: LogMethod;
+	debug: LogMethod;
+	trace: LogMethod;
+	success: LogMethod;
+	withTag(tag: string): ConsolaInstance;
+}
+
+type ConsoleLoggerOptions = {
+	level?: number;
+	defaults?: {
+		tag?: string;
+	};
+	formatOptions?: unknown;
+};
 
 // ============================================
 // Configuration
@@ -34,6 +49,57 @@ const LOG_LEVELS = {
 	DEBUG: 4,
 	TRACE: 5
 } as const;
+
+const METHOD_LEVELS = {
+	error: LOG_LEVELS.ERROR,
+	warn: LOG_LEVELS.WARN,
+	info: LOG_LEVELS.INFO,
+	success: LOG_LEVELS.INFO,
+	debug: LOG_LEVELS.DEBUG,
+	trace: LOG_LEVELS.TRACE
+} as const;
+
+function createConsola({ level = LOG_LEVELS.INFO, defaults }: ConsoleLoggerOptions): ConsolaInstance {
+	const tag = defaults?.tag ?? 'App';
+
+	const write = (method: keyof typeof METHOD_LEVELS, args: unknown[]) => {
+		if (level < METHOD_LEVELS[method]) return;
+
+		const prefix = tag ? [`[${tag}]`] : [];
+		const output = [...prefix, ...args];
+
+		switch (method) {
+			case 'error':
+				console.error(...output);
+				break;
+			case 'warn':
+				console.warn(...output);
+				break;
+			case 'debug':
+			case 'trace':
+				console.debug(...output);
+				break;
+			default:
+				console.info(...output);
+		}
+	};
+
+	return {
+		info: (...args) => write('info', args),
+		warn: (...args) => write('warn', args),
+		error: (...args) => write('error', args),
+		debug: (...args) => write('debug', args),
+		trace: (...args) => write('trace', args),
+		success: (...args) => write('success', args),
+		withTag: (nextTag) =>
+			createConsola({
+				level,
+				defaults: {
+					tag: tag ? `${tag}:${nextTag}` : nextTag
+				}
+			})
+	};
+}
 
 function clampLogLevel(value: number): number {
 	if (!Number.isFinite(value)) return LOG_LEVELS.INFO;

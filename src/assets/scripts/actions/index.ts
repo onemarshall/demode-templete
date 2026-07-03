@@ -1,0 +1,11 @@
+export { fade, staggerFade } from "./fade.ts";
+export { featureSticky } from "./featureSticky.ts";
+export { flipScroll } from "./flipScroll.ts";
+export { links } from "./links.ts";
+export { parallaxImage } from "./parallaxImage.ts";
+export { reveal } from "./reveal.ts";
+export { slicedText } from "./slicedText.ts";
+export { splitText } from "./splitText.ts";
+export { cursix, type CursixOptions } from "./cursix.ts";
+export { numberCounter } from "./numberCounter.ts";
+export { smoothScroll } from "./smoothScroll.ts";

@@ -1,8 +1,8 @@
 import { createDirectusContentProvider } from '$lib/content/providers/directus';
 import { staticContentProvider } from '$lib/content/providers/static';
 import { createWordPressContentProvider } from '$lib/content/providers/wordpress';
-import { env as privateEnv } from '$env/dynamic/private';
-import { env as publicEnv } from '$env/dynamic/public';
+import { CMS_PROVIDER } from '$app/env/private';
+import { PUBLIC_CMS_PROVIDER } from '$app/env/public';
 import type { ContentProvider, ContentProviderType } from '$lib/content/provider';
 
 const VALID_PROVIDERS: ContentProviderType[] = ['static', 'directus', 'wordpress'];
@@ -21,6 +21,6 @@ const parseProvider = (raw: string | undefined): ContentProviderType => {
 };
 
 export const getProviderType = (): ContentProviderType =>
-	parseProvider(privateEnv.CMS_PROVIDER ?? publicEnv.PUBLIC_CMS_PROVIDER);
+	parseProvider(CMS_PROVIDER ?? PUBLIC_CMS_PROVIDER);
 
 export const getContentProvider = (): ContentProvider => providerFactories[getProviderType()]();

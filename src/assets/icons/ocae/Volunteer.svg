@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>accessibility</title>
+  <g fill="currentColor">
+    <circle cx="12" cy="3" r="3" fill="currentColor" stroke-width="0"></circle>
+    <path d="m22,7H2v2h6.465l-.499,14.715,2.497.085.266-7.8h2.54l.266,7.8,2.497-.085-.499-14.715h6.465v-2Z" stroke-width="0" fill="currentColor"></path>
+  </g>
+</svg>

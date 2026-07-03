@@ -5,8 +5,8 @@
  * Called from hooks.server.ts with a 5-minute TTL cache.
  * Skips fetch entirely in static CMS mode.
  */
-import { env as publicEnv } from '$env/dynamic/public';
-import { env as privateEnv } from '$env/dynamic/private';
+import { CMS_PROVIDER, DIRECTUS_TOKEN } from '$app/env/private';
+import { PUBLIC_CMS_PROVIDER } from '$app/env/public';
 import { readItems } from '@directus/sdk';
 import { normalizePath } from '$lib/shared/utils/path';
 import { createScopedLogger } from '$lib/shared/logger';
@@ -29,15 +29,14 @@ export const fetchRedirects = async (
 	fetchFn: typeof globalThis.fetch = globalThis.fetch,
 ): Promise<SvelteRedirect[]> => {
 	// Check if we're in static mode
-	const cmsProvider = privateEnv.CMS_PROVIDER ?? publicEnv.PUBLIC_CMS_PROVIDER ?? 'static';
+	const cmsProvider = CMS_PROVIDER ?? PUBLIC_CMS_PROVIDER ?? 'static';
 	if (cmsProvider === 'static') {
 		log.info('Static mode: skipping redirects fetch');
 		return [];
 	}
 
 	try {
-		const token = publicEnv.PUBLIC_DIRECTUS_TOKEN;
-		const directus = createDirectusClient(fetchFn, token);
+		const directus = createDirectusClient(fetchFn, DIRECTUS_TOKEN);
 
 		const redirects = await directus.request(
 			readItems('redirects', {

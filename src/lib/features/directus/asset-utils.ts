@@ -5,7 +5,7 @@
  * Also provides responsive width calculations for srcset generation.
  * No network calls — pure URL string construction.
  */
-import { env } from '$env/dynamic/public';
+import { PUBLIC_DIRECTUS_URL } from '$app/env/public';
 import { type DirectusFile } from '$lib/types/directus-schema';
 
 export type DirectusImageLayout = 'constrained' | 'fullWidth' | 'fixed';
@@ -58,7 +58,7 @@ export const getDirectusAssetURL = (
 ): string => {
 	if (!fileOrString) return '';
 
-	const baseUrl = env.PUBLIC_DIRECTUS_URL || 'http://localhost:8055';
+	const baseUrl = PUBLIC_DIRECTUS_URL || 'http://localhost:8055';
 	const id = typeof fileOrString === 'string' ? fileOrString : fileOrString.id;
 	if (id.startsWith('http://') || id.startsWith('https://')) return id;
 

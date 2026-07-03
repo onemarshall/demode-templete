@@ -223,14 +223,16 @@ export const buildPermalinkCandidates = (permalink: string): string[] => {
 
 // block_button_group_buttons is a junction table. Flatten block_button_id into the button shape
 // that Button.svelte and ButtonGroup.svelte expect.
-const flattenButton = (raw: Record<string, unknown>): Record<string, unknown> => {
+const flattenButton = (raw: unknown): Record<string, unknown> => {
+  if (!raw || typeof raw !== "object") return {};
+  const row = raw as Record<string, unknown>;
   const btn =
-    raw.block_button_id && typeof raw.block_button_id === "object"
-      ? (raw.block_button_id as Record<string, unknown>)
+    row.block_button_id && typeof row.block_button_id === "object"
+      ? (row.block_button_id as Record<string, unknown>)
       : null;
   return {
-    id: raw.id,
-    label: raw.label ?? btn?.label ?? null,
+    id: row.id,
+    label: row.label ?? btn?.label ?? null,
     variant: btn?.variant ?? null,
     url: btn?.url ?? null,
     type: btn?.type ?? null,
@@ -249,8 +251,8 @@ const flattenButtonGroups = (blocks: PageBlock[]): void => {
     const item = block.item as BlockItemWithButtonGroup;
     for (const key of ["button_group", "buttons"] as const) {
       const group = item[key];
-      if (group && typeof group === "object" && Array.isArray(group.buttons)) {
-        group.buttons = group.buttons.map(flattenButton);
+    if (group && typeof group === "object" && Array.isArray(group.buttons)) {
+        group.buttons = group.buttons.map((button) => flattenButton(button));
       }
     }
   }

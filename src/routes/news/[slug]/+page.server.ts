@@ -1,5 +1,5 @@
 import { fetchAuthorById, fetchPostBySlug, fetchRelatedPosts } from '$lib/features/directus/fetchers'
-import { env as privateEnv } from '$env/dynamic/private'
+import { DRAFT_MODE_SECRET } from '$app/env/private'
 import { getDirectusAssetURL } from '$lib/features/directus/asset-utils'
 import type { PageServerLoad } from './$types'
 import { error } from '@sveltejs/kit'
@@ -7,7 +7,7 @@ import { error } from '@sveltejs/kit'
 export const load: PageServerLoad = async (event: Parameters<PageServerLoad>[0]) => {
 	const draft =
 		event.url.searchParams.get('draft') === 'true' &&
-		event.url.searchParams.get('token') === privateEnv.DRAFT_MODE_SECRET
+		event.url.searchParams.get('token') === DRAFT_MODE_SECRET
 	const slug = event.params.slug
 	const post = await fetchPostBySlug(slug, { draft }, event.fetch)
 

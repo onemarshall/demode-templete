@@ -1,4 +1,4 @@
-import { browser } from '$app/environment'
+import { browser } from '$app/env'
 import * as CookieConsent from 'vanilla-cookieconsent'
 import { cookieConsentState, defaultConsentPreferences, type ConsentPreferences } from './store.svelte'
 
