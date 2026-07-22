@@ -4,7 +4,7 @@
 	import "$lib/components/ui/cursix/styles.css";
 	import "css/app.css";
 	import { contenNavigationContext } from "$lib/content/context";
-	import { CookieConsent } from "$lib/shared";
+	import { CookieConsent, Loader } from "$lib/shared";
 	import { ScrollToTop } from "$lib/components/ui";
 	import type { LayoutData } from "./$types";
 	import { smoothScroll, cursix } from "scripts/actions";
@@ -106,6 +106,7 @@
 </div>
 <CookieConsent />
 <ScrollToTop />
+<Loader />
 
 <style>
 	@keyframes -global-route-progress-slide {

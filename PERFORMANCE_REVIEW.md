@@ -153,44 +153,48 @@ Images are served from Directus, but the reviewed files did not confirm use of D
 
 ### Summary
 
-- Total client bundle: 2.00 MiB rendered, 628.43 KiB gzip, 541.84 KiB brotli.
+- Total client bundle: 1.84 MiB rendered, 561.64 KiB gzip, 484.50 KiB brotli.
 - No duplicated modules across bundles.
-- Largest chunk: `_app/immutable/chunks/C-T0k-SI.js` — 815.80 KiB rendered (237.02 KiB gzip).
+- Largest chunk: `_app/immutable/chunks/D1EhI5RW.js` — 815.63 KiB rendered (236.93 KiB gzip).
 - Second largest: `_app/immutable/chunks/COEZmzHS.js` — 443.47 KiB rendered (129.40 KiB gzip).
 
 ### Top packages by rendered size
 
-1. `gsap` — 325.56 KiB (~16% of total)
+1. `gsap` — 325.56 KiB (~17% of total)
 2. `bits-ui` — 267.92 KiB
 3. `svelte` — 188.59 KiB
 4. `zod` — 112.90 KiB
-5. `markdown-it` — 95.25 KiB
+5. `@sveltejs/kit` — 92.00 KiB
 6. `sveltekit-superforms` — 80.57 KiB
 7. `tailwind-merge` — 56.84 KiB
 8. `svelte-meta-tags` — 34.54 KiB
 9. `vanilla-cookieconsent` — 27.66 KiB
-10. `@directus/visual-editing` — 21.57 KiB
+10. `formsnap` — 22.58 KiB
 
 ### Notable observations
 
-- `C-T0k-SI.js` contains `TypoTemplete`, `sveltekit-superforms`, `zod`, `bits-ui/select`, `Books`, `FellowsList`, and `Videos`.
+- `D1EhI5RW.js` is now the largest chunk, containing `TypoTemplete`, `sveltekit-superforms`, `zod`, `bits-ui/select`, `Books`, `FellowsList`, and `Videos`.
 - `COEZmzHS.js` is now the leaner GSAP chunk: `gsap-core`, `ScrollTrigger`, `CSSPlugin`, plus `tailwind-merge`.
-- `D5v76wTS.js` is the lazy-loaded `GSAP Flip` chunk.
-- `BfyLw3k7.js` is the lazy-loaded `GSAP ScrollSmoother` chunk.
-- `D156XvCZ.js` is the lazy-loaded `GSAP SplitText` chunk.
-- `Bwu-oL1V.js` remains the `markdown-it`/`entities` chunk.
+- `D5v76wTS.js` is the lazy-loaded `GSAP Flip` chunk (48.60 KiB rendered).
+- `Cxjcez3o.js` is the lazy-loaded `GSAP ScrollSmoother` chunk (27.10 KiB rendered).
+- `D156XvCZ.js` is the lazy-loaded `GSAP SplitText` chunk (23.00 KiB rendered).
+- `markdown-it`/`entities` is no longer in the client bundle. Markdown is now rendered server-side in `page-fetcher.ts`, `post-fetcher.ts`, and `static.ts` before it reaches `Text.svelte` / `TextUnstyles.svelte`.
 - `vanilla-cookieconsent` now splits into its own lazy chunk (`2o2HOC1r.js`, 31.66 KiB) after removing the static re-export from `cookie-consent/index.ts`. The `INEFFECTIVE_DYNAMIC_IMPORT` warning is gone.
 - `@vinejs/vine` is no longer bundled for the browser after aliasing it to a stub in `vite.config.ts`.
-- `0.B-cN-rHz.css` remains 204.22 KiB (gzip 30.54 KiB) — the biggest CSS file; fonts and global utilities dominate.
+- `0.Xw8pAlNY.css` is now 201.50 KiB (gzip 30.05 KiB) — the biggest CSS file. The `cookies.css` overrides have been moved to the lazy-loaded `vanilla-cookieconsent` chunk, but `colour.css` and the Tailwind v4 base/theme still dominate.
 
 ### Optimizations applied since the audit
 
 1. **Central `gsap.ts` module trimmed** — removed the wildcard re-export and dropped unused `Observer`.
 2. **Lazy-loaded GSAP plugins** — `ScrollSmoother`, `Flip`, and `SplitText` are now imported on demand inside their actions, splitting ~91 KiB of plugin code out of the initial GSAP chunk.
 3. **Fixed `@vinejs/vine` client leak** — added a stub module and `resolve.alias` in `vite.config.ts` so the optional `sveltekit-superforms` validator is not bundled for the browser.
+4. **Moved `markdown-it` to the server** — created `src/lib/server/markdown.ts` and wired `page-fetcher.ts`, `post-fetcher.ts`, and `static.ts` to render all `content` fields to HTML before serialization. `Text.svelte` and `TextUnstyles.svelte` now render pre-rendered HTML. `markdown-it` no longer appears in the client bundle.
+5. **Moved `cookies.css` out of the main bundle** — the cookie-consent custom overrides now load with the lazy `vanilla-cookieconsent` chunk in `client.ts`, shaving ~2.7 KiB off the main stylesheet.
+6. **Removed dead hand-rolled color utilities from `colour.css`** — grepped every `.svelte` file for the `.color-primary`/`.bg-accent`/`.bg-primary-light`-style classes (~336 lines) and found zero usages; every component uses Tailwind's own generated utilities (`bg-primary-800`, `bg-white/20`, `border-primary/20`) instead, which also support opacity modifiers the hand-rolled classes lacked. Kept the `:root` custom properties (required by Tailwind's `@theme` mapping) and the `.color-contrast-*` / `.bg-contrast-*` classes (5 real usages, no Tailwind equivalent since `--color-contrast-*` isn't mapped into `@theme`). Main stylesheet dropped from 201.50 KiB to 194.80 KiB rendered.
+7. **Deleted 55 orphaned CSS files (~398 KB) from `src/assets/css/`** — traced the full `@import` graph and found only `app.css`, `base/colour.css`, `fonts/darkmode-on.css`, `fonts/ivypresto.css`, `lib/cookies.css`, and `lib/components/ui/cursix/styles.css` were ever referenced anywhere in the codebase. Everything else — `base/util.css` (185 KB), all of `components/` (34 files), `theme/` (22 files), `forms/` (6 files), `props/`, `style/`, most of `base/`, most of `lib/`, and 2 unused font files — was leftover from a pre-Tailwind CSS codebase with zero imports anywhere. These files had no effect on the shipped bundle (Vite never bundles unimported files) but were pure workspace clutter. Deleted after confirming zero references via grep.
+8. **Fixed broken `--font-primary`/`--font-secondary` theme mapping** — `app.css`'s `@theme` block self-referenced undefined variables (`--font-primary: var(--font-primary)`), so the `font-primary`/`font-secondary` Tailwind classes used in ~10 components (`Stats.svelte`, `Books.svelte`, `FellowsList.svelte`, news pages, etc.) silently resolved to nothing. Fixed to point at the actual font vars (`--font-sans` from `darkmode-on.css`, `--font-serif` from `ivypresto.css`). Also removed the dead `--leading-*`/`--max-width-*`/`--z-*` lines in the same block — they referenced undefined `--line-height-*`/`--max-width-*`/`--z-index-*` vars (defined only in the now-deleted `util.css`) and had zero component usage.
 
 ### Remaining high-impact recommendations
 
-1. **Markdown rendering** — `markdown-it` + `entities` is still 95 KiB. The clean fix is to parse markdown server-side in `page-fetcher.ts` and `post-fetcher.ts`, then make `Text.svelte` / `TextUnstyles.svelte` render pre-rendered HTML. This removes `markdown-it` from the client bundle entirely.
-2. **CSS size** — `0.B-cN-rHz.css` is still 204 KiB. Audit `app.css` font imports and unused Tailwind utilities; subset or remove unused weights.
-3. **bits-ui surface** — `bits-ui` is tree-shakeable (`sideEffects: false`), so the 267 KiB is the used set of components. Reducing it requires removing or replacing components such as `Select` and `NavigationMenu`.
+1. **CSS size** — after removing dead utility classes and the orphaned files, the main stylesheet is 194.51 KiB. The remaining bulk is the `colour.css` `:root` custom properties and the Tailwind v4 base/theme (emitted regardless of usage). Tried `@import "tailwindcss" theme(static)` to drop unused theme vars — it made things worse (213.69 KiB) because it forces _all_ theme vars to be emitted; reverted. A real reduction would require ejecting the default theme (`tailwindcss/theme.css` + `preflight.css` + `utilities.css` as separate layers) and forking/subsetting `theme.css`. Font CSS is small; the referenced local `InterVariable.woff2` and `ivypresto-display.woff2` files are not present in `static/assets/fonts`.
+2. **bits-ui surface** — `bits-ui` is tree-shakeable (`sideEffects: false`), so the 267 KiB is the used set of components. Reducing it requires removing or replacing components such as `Select` and `NavigationMenu`.

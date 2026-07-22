@@ -1,6 +1,0 @@
-/* Basic breakpoints */
-@custom-media --media-xs (min-width: 32rem);
-@custom-media --media-sm (min-width: 48rem);
-@custom-media --media-md (min-width: 52rem);
-@custom-media --media-lg (min-width: 64rem);
-@custom-media --media-xl (min-width: 90rem);

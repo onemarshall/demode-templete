@@ -1,5 +1,6 @@
 import { browser } from "$app/env";
 import "vanilla-cookieconsent/dist/cookieconsent.css";
+import "css/lib/cookies.css";
 import * as CookieConsent from "vanilla-cookieconsent";
 import { createCookieConsentConfig } from "./config";
 import { syncCookieConsentState } from "./api";

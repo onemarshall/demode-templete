@@ -1,6 +1,32 @@
 import { gsap, ScrollTrigger } from "./gsap";
 import type { Action } from "svelte/action";
 
+/**
+ * Wait for the initial page load screen to finish before starting reveal
+ * animations. This keeps the hero (and other above-the-fold fades) from
+ * running while the loading overlay is still visible.
+ */
+function whenPageLoaded(start: () => () => void): () => void {
+  const body = document.body;
+  if (body?.classList.contains("is-loaded")) {
+    return start();
+  }
+
+  let cleanup = () => {};
+  const observer = new MutationObserver(() => {
+    if (body?.classList.contains("is-loaded")) {
+      observer.disconnect();
+      cleanup = start();
+    }
+  });
+  observer.observe(body, { attributes: true, attributeFilter: ["class"] });
+
+  return () => {
+    observer.disconnect();
+    cleanup();
+  };
+}
+
 interface FadeOptions {
   /** Vertical offset to animate from. Ignored if x is set. Default: 24 */
   y?: number;
@@ -35,28 +61,34 @@ export const fade: Action<HTMLElement, FadeOptions | undefined> = (node, options
   const dir = x !== 0 ? "x" : "y";
   const val = x !== 0 ? x : y;
 
-  gsap.set(node, { autoAlpha: 0, [dir]: val, willChange: "opacity, transform" });
+  const init = () => {
+    gsap.set(node, { autoAlpha: 0, [dir]: val, willChange: "opacity, transform" });
 
-  const trigger = ScrollTrigger.create({
-    trigger: node,
-    start,
-    once,
-    onEnter: () =>
-      gsap.to(node, {
-        autoAlpha: 1,
-        [dir]: 0,
-        duration,
-        delay,
-        ease,
-        onComplete() {
-          gsap.set(node, { clearProps: "opacity,visibility,x,y,willChange" });
-        },
-      }),
-  });
+    const trigger = ScrollTrigger.create({
+      trigger: node,
+      start,
+      once,
+      onEnter: () =>
+        gsap.to(node, {
+          autoAlpha: 1,
+          [dir]: 0,
+          duration,
+          delay,
+          ease,
+          onComplete() {
+            gsap.set(node, { clearProps: "opacity,visibility,x,y,willChange" });
+          },
+        }),
+    });
+
+    return () => trigger.kill();
+  };
+
+  const cleanup = whenPageLoaded(init);
 
   return {
     destroy() {
-      trigger.kill();
+      cleanup();
     },
   };
 };
@@ -118,40 +150,49 @@ export const staggerFade: Action<HTMLElement, StaggerFadeOptions | undefined> = 
     willChange: "transform, opacity",
   };
 
-  // Set initial hidden state
-  gsap.set(targets, initialState);
-
-  // Use ScrollTrigger.batch — groups elements entering the viewport
-  // together and fires them as one coordinated staggered animation
-  const triggers = ScrollTrigger.batch(targets, {
-    start,
-    once,
-    onEnter: (batch: Element[]) =>
-      gsap.to(batch, {
-        opacity: 1,
-        [dir]: 0,
-        duration,
-        ease: resolvedEase,
-        clearProps: true,
-        stagger: {
-          amount: stagger,
-          from: "start",
-        },
-      }),
-  });
-
-  // Re-apply initial state on ScrollTrigger refresh (e.g. resize)
-  const onRefresh = (): void => {
+  const init = () => {
+    // Set initial hidden state
     gsap.set(targets, initialState);
-  };
-  ScrollTrigger.addEventListener("refreshInit", onRefresh);
 
-  return {
-    destroy() {
+    // Re-apply initial state on ScrollTrigger refresh (e.g. resize)
+    const onRefresh = (): void => {
+      gsap.set(targets, initialState);
+    };
+
+    // Use ScrollTrigger.batch — groups elements entering the viewport
+    // together and fires them as one coordinated staggered animation
+    const triggers = ScrollTrigger.batch(targets, {
+      start,
+      once,
+      onEnter: (batch: Element[]) =>
+        gsap.to(batch, {
+          opacity: 1,
+          [dir]: 0,
+          duration,
+          ease: resolvedEase,
+          clearProps: true,
+          stagger: {
+            amount: stagger,
+            from: "start",
+          },
+        }),
+    });
+
+    ScrollTrigger.addEventListener("refreshInit", onRefresh);
+
+    return () => {
       if (Array.isArray(triggers)) {
         triggers.forEach((t: { kill: () => void }) => t.kill());
       }
       ScrollTrigger.removeEventListener("refreshInit", onRefresh);
+    };
+  };
+
+  const cleanup = whenPageLoaded(init);
+
+  return {
+    destroy() {
+      cleanup();
     },
   };
 };

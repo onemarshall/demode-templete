@@ -1,5 +1,5 @@
 <div
-	class="loader loader-navigating fixed inset-0 z-3002 grid h-full w-full place-items-center bg-gray-950"
+	class="loader fixed inset-0 z-3002 grid h-full w-full place-items-center bg-gray-950 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
 	role="status"
 	aria-live="polite"
 	aria-atomic="true"
@@ -18,6 +18,12 @@
 </div>
 
 <style>
+	:global(body.is-loaded) .loader {
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+	}
+
 	@keyframes -global-circle-loader {
 		from {
 			transform: scale(0);
