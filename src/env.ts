@@ -1,22 +1,18 @@
-import { defineEnvVars } from "@sveltejs/kit/hooks";
+import { defineEnvVars } from "@sveltejs/kit/env";
 import { z } from "zod";
 
 const optionalNonEmptyString = z
   .union([z.string().min(1), z.literal("")])
   .optional()
   .transform((value) => (value === "" ? undefined : value));
-const optionalUrl = z
-  .union([z.url(), z.literal("")])
-  .optional()
-  .transform((value) => (value === "" ? undefined : value));
 
 export const variables = defineEnvVars({
   CMS_PROVIDER: {
-    description: "Private CMS provider override: static, directus, or wordpress.",
+    description: "Private CMS provider override: static or directus.",
   },
   PUBLIC_CMS_PROVIDER: {
     public: true,
-    description: "Browser-visible CMS provider fallback: static, directus, or wordpress.",
+    description: "Browser-visible CMS provider fallback: static or directus.",
   },
   PUBLIC_SITE_URL: {
     public: true,
@@ -39,14 +35,5 @@ export const variables = defineEnvVars({
   PUBLIC_ENABLE_VISUAL_EDITING: {
     public: true,
     description: "Enables Directus visual editing when paired with the visual-editing query flag.",
-  },
-  PUBLIC_WORDPRESS_URL: {
-    public: true,
-    schema: optionalUrl,
-    description: "Public WordPress base URL when the WordPress provider is enabled.",
-  },
-  WORDPRESS_URL: {
-    schema: optionalUrl,
-    description: "Private WordPress base URL override for server-side provider use.",
   },
 });

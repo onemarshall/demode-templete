@@ -7,7 +7,6 @@ export {
   showCookieConsent,
   syncCookieConsentState,
 } from "./api";
-export { initCookieConsent } from "./client";
 export { createCookieConsentConfig } from "./config";
 export { default as CookiePreferencesButton } from "./CookiePreferencesButton.svelte";
 export {

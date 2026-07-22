@@ -1,0 +1,344 @@
+/*! purgecss start ignore */
+
+:root {
+	--btn-border: 2px;
+}
+
+/* Button Group */
+.button-group {
+	display: flex;
+	gap: var(--space-sm);
+
+	& .btn {
+		flex: 1;
+	}
+}
+.btn {
+	position: relative;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	white-space: nowrap;
+	text-decoration: none;
+	padding: var(--space-2xs) var(--space-sm);
+	border-radius: var(--radius-sm);
+	border: var(--btn-border) solid transparent;
+	font-size: var(--text-base);
+	line-height: 1.2;
+	cursor: pointer;
+	transition: 0.2s;
+	will-change: transform;
+
+	&:not(.btn--link) {
+		background-color: oklch(var(--darker) / var(--bg-opacity, 1));
+		color: var(--color-contrast-higher);
+		box-shadow:
+			inset 0 0 0 color-mix(in oklch, var(--color-white), transparent 85%),
+			0 1px 2px color-mix(in oklch, var(--color-sec-darker), transparent 90%),
+			0 1px 4px color-mix(in oklch, var(--color-sec-darker), transparent 90%),
+			0 3px 6px -2px color-mix(in oklch, var(--color-sec-darker), transparent 80%);
+
+		&:hover {
+			background: var(--color-bg);
+			box-shadow:
+				inset 0 0 0 color-mix(in oklch, var(--color-white), transparent 85%),
+				0 0 0 1px color-mix(in oklch, var(--color-black), transparent 95%),
+				0 0.1px 0.3px color-mix(in oklch, var(--color-black), transparent 90%),
+				0 1px 2px color-mix(in oklch, var(--color-black), transparent 95%),
+				0 1px 3px -1px color-mix(in oklch, var(--color-black), transparent 80%);
+		}
+	}
+
+	&:focus-visible {
+		outline: none;
+		box-shadow:
+			inset 0 0 0 alpha(var(--color-white), 0.15),
+			0 1px 2px alpha(var(--color-primary-darker), 0.25),
+			0 1px 4px alpha(var(--color-primary-darker), 0.1),
+			0 3px 6px -2px alpha(var(--color-primary-darker), 0.25),
+			0 0 0 2px var(--color-bg),
+			0 0 0 4px var(--color-primary);
+	}
+
+	&:active {
+		transform: translateY(2px);
+	}
+
+	/* purgecss ignore */
+	&.btn--warning {
+		background: var(--color-warning);
+		color: var(--color-white);
+		&:hover {
+			background: var(--color-warning-dark);
+		}
+	}
+
+	&.btn--error {
+		background: var(--color-error);
+		color: var(--color-white);
+
+		&:hover {
+			background: var(--color-error-dark);
+		}
+	}
+	/* purgecss ignore */
+	&.btn--success {
+		background: var(--color-success);
+		color: var(--color-white);
+
+		&:hover {
+			background: var(--color-success-dark);
+		}
+	}
+
+	&.btn--primary {
+		background: var(--color-primary-dark);
+		color: var(--color-white);
+
+		&:hover {
+			background: var(--color-primary-darker);
+		}
+	}
+
+	&.btn--accent {
+		background: var(--color-accent);
+		color: var(--color-white);
+
+		&:hover {
+			background: var(--color-accent-dark);
+		}
+	}
+
+	&.btn--sec {
+		background: var(--color-sec);
+		color: var(--color-white);
+
+		&:hover {
+			background: var(--color-sec-dark);
+		}
+	}
+
+	&.btn--contrast {
+		background: var(--color-contrast-high);
+		color: var(--color-bg);
+
+		&:hover {
+			background: var(--color-contrast-low);
+		}
+	}
+
+	&.btn--subtle {
+		background: var(--color-bg-lighter);
+		color: var(--color-contrast-higher);
+
+		&:hover {
+			background: var(--color-bg-light);
+		}
+	}
+	/* purgecss ignore */
+	&.btn--primary-subtle {
+		background: var(--color-primary-lighter);
+		color: var(--color-primary-darker);
+
+		&:hover {
+			background: var(--color-primary-dark);
+			color: var(--color-white);
+		}
+	}
+
+	&.btn--accent-subtle {
+		background: var(--color-accent-lighter);
+		color: var(--color-accent-darker);
+
+		&:hover {
+			background: var(--color-accent-dark);
+			color: var(--color-white);
+		}
+	}
+
+	&.btn--sec-subtle {
+		background: var(--color-sec-lighter);
+		color: var(--color-sec-darker);
+
+		&:hover {
+			background: var(--color-sec-dark);
+			color: var(--color-white);
+		}
+	}
+
+	/* Link Button */
+	&.btn--link {
+		background: transparent;
+		color: var(--color-primary);
+		padding: 0;
+		box-shadow: none;
+
+		&:hover,
+		&:focus,
+		&:active {
+			background: transparent;
+			box-shadow: none;
+
+			color: var(--color-primary-light);
+		}
+	}
+
+	/* Outline Variants */
+	&.btn--outline {
+		background: transparent;
+		color: inherit;
+		border: var(--btn-border) solid currentColor;
+
+		&:hover {
+			background: currentColor;
+			color: white;
+		}
+
+		&.btn--primary {
+			color: var(--color-primary-dark);
+			border-color: var(--color-primary);
+
+			&:hover {
+				background: var(--color-primary);
+				color: white;
+			}
+		}
+
+		&.btn--accent {
+			color: var(--color-accent-dark);
+			border-color: var(--color-accent);
+
+			&:hover {
+				background: var(--color-accent);
+				color: white;
+			}
+		}
+
+		&.btn--sec {
+			color: var(--color-sec-dark);
+			border-color: var(--color-sec);
+
+			&:hover {
+				background: var(--color-sec);
+				color: white;
+			}
+		}
+
+		&.btn--contrast {
+			color: var(--color-contrast-higher);
+			border-color: var(--color-contrast-higher);
+
+			&:hover {
+				background: var(--color-contrast-higher);
+				color: white;
+			}
+		}
+	}
+
+	/* Shape Variants */
+	&.btn--rounded {
+		border-radius: 50px;
+		padding: var(--space-xs) var(--space-lg);
+	}
+
+	&.btn--long {
+		padding: var(--space-xs) var(--space-lg);
+	}
+
+	&.btn--tall {
+		padding: var(--space-sm) var(--space-lg);
+	}
+
+	/* Icon within button */
+	& .icon {
+		margin: 0 0.3rem;
+	}
+
+	/* Gradient style */
+	&.btn--gradient {
+		color: var(--color-white);
+		border-width: var(--btn-border);
+		border-image: linear-gradient(to right, var(--color-primary-dark), var(--color-accent)) 1;
+		background:
+			linear-gradient(transparent, transparent) padding-box,
+			linear-gradient(to right, var(--color-primary-darker), var(--color-accent)) border-box;
+
+		&:hover {
+			color: var(--color-contrast-higher);
+			background-color: transparent;
+		}
+	}
+}
+
+/* Size Variants */
+/* purgecss ignore */
+
+.btn--sm.btn--long,
+.btn--sm.btn--outline {
+	padding: var(--space-2xs) var(--space-base);
+}
+
+.btn--sm {
+	font-size: var(--text-sm);
+	padding: var(--space-2xs) var(--space-sm);
+}
+
+.btn--md {
+	padding: var(--space-sm) var(--space-md);
+	font-size: var(--text-md);
+}
+
+.btn--lg {
+	font-size: var(--text-lg);
+	padding: var(--space-sm) var(--space-lg);
+}
+
+.btn--lg.btn--rounded.btn--long {
+	padding: var(--space-md) var(--space-xl);
+}
+.btn--md.btn--rounded.btn--long {
+	padding: var(--space-sm) var(--space-xl);
+}
+
+/* Disabled State */
+.btn--disabled,
+.btn[disabled],
+.btn[readonly] {
+	opacity: 0.6;
+	cursor: not-allowed;
+
+	&:hover,
+	&:focus-visible,
+	&:active {
+		opacity: 0.6;
+		box-shadow: none;
+		transform: translateY(0);
+	}
+}
+
+/* Theme-specific styles */
+[data-theme='primary'],
+[data-theme='accent'],
+[data-theme='sec'],
+[data-theme='dark'] {
+	& .btn--primary.btn--outline,
+	& .btn--accent.btn--outline,
+	& .btn--sec.btn--outline {
+		color: var(--color-contrast-lighter);
+	}
+
+	& .btn--contrast.btn--outline:hover {
+		color: var(--color-contrast-lower);
+	}
+}
+
+[data-theme='dark'] {
+	& .btn--link {
+		color: var(--color-primary-lighter);
+
+		&:hover {
+			color: var(--color-primary-light);
+		}
+	}
+}
+/*! purgecss end ignore */

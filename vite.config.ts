@@ -4,6 +4,11 @@ import tailwindcss from "@tailwindcss/vite";
 import adapter from "@sveltejs/adapter-cloudflare";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { CSPDirectives } from "./csp.config.mjs";
+import { visualizer } from "rollup-plugin-visualizer";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [
@@ -31,7 +36,6 @@ export default defineConfig({
       }),
       experimental: {
         remoteFunctions: true,
-        handleRenderingErrors: true,
         forkPreloads: true,
       },
       csp: {
@@ -42,10 +46,30 @@ export default defineConfig({
         scripts: "./src/assets/scripts",
         css: "./src/assets/css",
         svg: "./src/assets/svg",
+        $lib: "./src/lib",
+        "$lib/*": "./src/lib/*",
         "@/*": "./src/lib/*",
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      plugins: [
+        visualizer({
+          filename: "stats.md",
+          template: "markdown",
+          open: false,
+          gzipSize: true,
+          brotliSize: true,
+        }) as any,
+      ],
+    },
+  },
+  resolve: {
+    alias: {
+      "@vinejs/vine": path.resolve(__dirname, "./src/lib/utils/stub-vine.ts"),
+    },
+  },
   test: {
     expect: { requireAssertions: true },
     projects: [

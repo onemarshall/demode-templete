@@ -12,6 +12,7 @@ import { type Post, type Schema } from "$lib/types/directus-schema";
 import { type QueryFields, type QueryFilter, readItems, readUser } from "@directus/sdk";
 import { createDirectusClient, PUBLISHED_FILTER, POST_SORT } from "./shared";
 import { createScopedLogger } from "$lib/shared/logger";
+import { renderMarkdownInData } from "$lib/server/markdown";
 
 // Directus SDK's QueryFields/QueryFilter recursive generics cannot be inferred
 // from nested object literals. Centralise the escape hatch here so no call
@@ -134,6 +135,7 @@ export const fetchPostBySlug = async (
     return null;
   }
 
+  renderMarkdownInData(post);
   return post;
 };
 

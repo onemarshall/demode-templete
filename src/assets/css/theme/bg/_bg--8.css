@@ -1,0 +1,24 @@
+[data-layout='bg--8'] {
+	@media (--media-md) {
+		.grid-bg-1 {
+			grid-column: 15/-1;
+			grid-row: 1/-1;
+		}
+		.grid-bg-2 {
+			grid-column: 12/-1;
+			grid-row: 1/-1;
+		}
+		.grid-bg-3 {
+			grid-column: 10/-1;
+			grid-row: 10/-1;
+		}
+		.grid-grainy {
+			grid-column: 12/-1;
+			grid-row: 10/-1;
+		}
+		.grid-pattern {
+			grid-column: 1/-1;
+			grid-row: 10/-1;
+		}
+	}
+}

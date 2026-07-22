@@ -1,0 +1,68 @@
+#cc-main {
+	--cc-font-family: var(--font-primary);
+	--cc-modal-border-radius: var(--radius-md);
+	--cc-btn-border-radius: 999px;
+	--cc-bg: var(--color-bg);
+	--cc-text: var(--color-contrast-high);
+	--cc-secondary-text: var(--color-contrast-medium);
+	--cc-btn-primary-bg: var(--color-primary-dark);
+	--cc-btn-primary-hover-bg: var(--color-primary-darker);
+	--cc-btn-primary-text: var(--color-white);
+	--cc-btn-primary-border-color: var(--color-primary-dark);
+	--cc-btn-primary-hover-border-color: var(--color-primary-darker);
+	--cc-btn-secondary-bg: var(--color-gray-300);
+	--cc-btn-secondary-hover-bg: var(--color-gray-400);
+	--cc-btn-secondary-text: var(--color-gray-900);
+	--cc-btn-secondary-hover-text: var(--color-gray-100);
+	--cc-toggle-bg-on: var(--color-sec);
+	--cc-toggle-bg-off: var(--color-gray-300);
+	--cc-toggle-bg-readonly: var(--color-gray-400);
+	--cc-toggle-knob-bg: var(--color-white);
+	--cc-toggle-knob-icon-color: var(--color-gray-400);
+	--cc-cookie-category-block-bg: var(--color-gray-200);
+	--cc-cookie-category-block-bg-hover: var(--color-gray-300);
+	--cc-cookie-table-border: color-mix(in oklab, var(--color-gray-400) 60%, transparent);
+	--cc-section-border: color-mix(in oklab, var(--color-gray-400) 35%, transparent);
+	--cc-separator-border-color: color-mix(in oklab, var(--color-gray-400) 35%, transparent);
+	--cc-overlay-bg: color-mix(in oklab, var(--color-gray-900) 72%, transparent);
+	--cc-webkit-scrollbar-bg: var(--color-gray-400);
+	--cc-webkit-scrollbar-bg-hover: var(--color-gray-600);
+}
+
+#cc-main .cm,
+#cc-main .pm {
+	box-shadow: 0 24px 64px color-mix(in oklab, var(--color-gray-900) 16%, transparent);
+}
+
+#cc-main .cm__title,
+#cc-main .pm__title,
+#cc-main .pm__section-title {
+	font-family: var(--font-primary);
+}
+
+#cc-main .cm__btn,
+#cc-main .pm__btn {
+	font-weight: 600;
+	letter-spacing: 0.01em;
+}
+
+#cc-main .pm__section {
+	border: 0;
+}
+
+#cc-main .pm__badge,
+#cc-main .pm__service-counter {
+	background: var(--color-bg-dark);
+	color: var(--color-contrast-high);
+}
+
+.dark #cc-main,
+[data-theme='dark'] #cc-main {
+	--cc-bg: var(--color-bg);
+	--cc-text: var(--color-contrast-high);
+	--cc-secondary-text: var(--color-contrast-medium);
+	--cc-btn-secondary-bg: var(--color-bg-light);
+	--cc-btn-secondary-hover-bg: var(--color-bg-lighter);
+	--cc-cookie-category-block-bg: var(--color-bg-light);
+	--cc-cookie-category-block-bg-hover: var(--color-bg-lighter);
+}

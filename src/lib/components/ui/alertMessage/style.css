@@ -1,0 +1,28 @@
+/* --------------------------------
+
+   File#: _2_alert-message
+   Title: Alert Message
+   Descr: An alert message displayed in a modal window
+   Usage: codyhouse.co/license
+
+   -------------------------------- */
+/*! purgecss start ignore */
+.alert-msg {
+	--modal-transition-duration: 0.2s;
+}
+
+.alert-msg__close-btn {
+	display: inline-flex;
+	align-items: center;
+	background-color: oklch(var(--higher) / var(--bg-opacity, 1));
+	backdrop-filter: blur(10px);
+	padding: var(--space-2xs) var(--space-sm);
+	color: var(--color-bg);
+	line-height: 1;
+	transition: 0.2s;
+}
+.alert-msg__close-btn:hover {
+	background-color: oklch(var(--high) / var(--bg-opacity, 1));
+}
+
+/*! purgecss end ignore */

@@ -1,0 +1,251 @@
+/* --------------------------------
+
+File#: _1_newsletter-input
+Title: Newsletter Input
+Descr: Animated newsletter input
+Usage: codyhouse.co/license
+
+-------------------------------- */
+/*! purgecss start ignore */
+:root {
+	--news-form-input-height: 65px;
+	--news-form-input-padding-x: 20px;
+	--news-form-input-radius: 40em;
+	--news-form-btn-padding-x: var(--space-lg);
+	--news-form-input-height: 80px;
+	--news-form-btn-margin: var(--space-xs);
+	@include min-width(sm) {
+		--news-form-btn-margin: var(--space-xs);
+		--news-form-btn-padding-x: var(--space-lg);
+		--news-form-input-height: 80px;
+		--news-form-input-padding-x: 30px;
+		--news-form-input-radius: 80em;
+	}
+}
+
+.news-form__wrapper {
+	position: relative;
+}
+
+.news-form__input {
+	background-color: oklch(var(--higher) / 0.3);
+	padding: 0 var(--news-form-input-padding-x);
+	border-radius: var(--news-form-input-radius);
+	width: 100%;
+	height: var(--news-form-input-height);
+	transition: 0.2s;
+
+	&:focus {
+		outline: none;
+		background-color: var(--color-bg);
+		box-shadow:
+			var(--shadow-md),
+			0 0 0 2px var(--color-primary);
+	}
+}
+
+.news-form__btn {
+	display: inline-block;
+	overflow: hidden;
+	position: absolute;
+	top: var(--news-form-btn-margin);
+	right: var(--news-form-btn-margin);
+	height: calc(var(--news-form-input-height) - 2 * var(--news-form-btn-margin));
+	padding: 0 var(--news-form-btn-padding-x);
+	background-color: oklch(var(--lighter) / 1);
+	color: oklch(var(--higher) / 1);
+	border-radius: calc(var(--news-form-input-radius) * 0.85);
+	box-shadow: var(--shadow-sm);
+	cursor: pointer;
+	transition: 0.2s;
+
+	> * {
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		transition: transform 0.3s var(--ease-out);
+	}
+
+	> *:last-child {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		transform: translateY(100%);
+	}
+	&:focus,
+	&:hover {
+		color: var(--color-white);
+		background-color: oklch(var(--color-bg) var(--primary) / 1);
+	}
+}
+
+.news-form__icon {
+	display: block;
+	width: var(--news-form-icon-size);
+	height: var(--news-form-icon-size);
+
+	> * {
+		transform-origin: 50% 50%;
+	}
+}
+
+.news-form__icon-circle {
+	stroke-dashoffset: 160;
+	stroke-dasharray: 32;
+}
+
+.news-form__icon-check {
+	stroke-dashoffset: 30;
+	stroke-dasharray: 30;
+}
+
+.news-form__icon-excl-line {
+	stroke-dashoffset: 14;
+	stroke-dasharray: 14;
+}
+
+.news-form__icon-excl-dot {
+	transform-origin: 12px 21.5px;
+	transform: scale(0);
+}
+
+.news-form--enabled {
+	.news-form__btn {
+		background-color: var(--color-primary);
+		color: var(--color-white);
+
+		&:hover {
+			background-color: var(--color-primary-dark);
+		}
+	}
+}
+
+.news-form--loading {
+	.news-form__btn {
+		> *:first-child {
+			transform: translateY(-100%);
+		}
+
+		> *:last-child {
+			transform: translateY(0);
+		}
+	}
+}
+
+.news-form--circle-loop {
+	.news-form__icon-circle {
+		animation: news-input-circle-anim-loader 1s var(--ease-in-out);
+	}
+}
+
+.news-form--success,
+.news-form--error {
+	.news-form__btn {
+		> * {
+			transition: none;
+		}
+
+		> *:first-child {
+			transform: translateY(-100%);
+		}
+
+		> *:last-child {
+			transform: translateY(0);
+		}
+	}
+}
+
+.news-form--success {
+	.news-form__icon-circle {
+		animation: news-input-circle-anim-success 1s var(--ease-in-out) forwards;
+	}
+
+	.news-form__icon-check {
+		animation: news-input-check-anim-success 0.5s 0.8s var(--ease-in-out) forwards;
+	}
+}
+
+.news-form--error {
+	.news-form__icon-circle {
+		animation: news-input-circle-anim-error 0.8s var(--ease-in-out) forwards;
+	}
+
+	.news-form__icon-excl-line {
+		animation: news-input-line-anim-error 0.3s 0.6s var(--ease-in-out) forwards;
+	}
+
+	.news-form__icon-excl-dot {
+		animation: news-input-dot-anim-error 0.3s 0.9s var(--ease-out) forwards;
+	}
+}
+
+@keyframes news-input-circle-anim-loader {
+	from {
+		transform: rotate(0);
+		stroke-dashoffset: 160;
+	}
+
+	to {
+		stroke-dashoffset: 96;
+		transform: rotate(-180deg);
+	}
+}
+
+@keyframes news-input-circle-anim-success {
+	from {
+		transform: rotate(0);
+		stroke-dashoffset: 160;
+	}
+
+	to {
+		transform: rotate(-180deg);
+		stroke-dashoffset: 96;
+	}
+}
+
+@keyframes news-input-circle-anim-error {
+	from {
+		transform: rotate(0);
+		stroke-dashoffset: 160;
+	}
+
+	to {
+		transform: rotate(-90deg);
+		stroke-dashoffset: 96;
+	}
+}
+
+@keyframes news-input-check-anim-success {
+	from {
+		stroke-dashoffset: 30;
+	}
+
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes news-input-line-anim-error {
+	from {
+		stroke-dashoffset: 14;
+	}
+
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes news-input-dot-anim-error {
+	from {
+		transform: translateY(-4px) scale(0);
+	}
+
+	to {
+		transform: translateY(0) scale(1);
+	}
+}
+
+/*! purgecss end ignore */

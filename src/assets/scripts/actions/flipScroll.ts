@@ -1,4 +1,4 @@
-import { ScrollTrigger, Flip } from "./gsap";
+import { gsap, ScrollTrigger } from "./gsap";
 import type { Action } from "svelte/action";
 
 export interface FlipScrollOptions {
@@ -77,7 +77,9 @@ export const flipScroll: Action<HTMLElement, FlipScrollOptions | undefined> = (
 
   let tl: { kill(): void } | null = null;
 
-  Promise.all(imagePromises).then(() => {
+  Promise.all(imagePromises).then(async () => {
+    const { Flip } = await import("gsap/dist/Flip");
+    gsap.registerPlugin(Flip);
     // Temporarily apply end-state class to capture target positions
     node.classList.add(switchClass);
     const targets: Element[] = [...Array.from(items), ...(caption ? [caption] : [])];
@@ -88,8 +90,7 @@ export const flipScroll: Action<HTMLElement, FlipScrollOptions | undefined> = (
     node.classList.remove(switchClass);
 
     // Pin the containing section so the whole block stays in view during scrub
-    const pinTarget =
-      node.closest("section") ?? node.parentElement ?? node;
+    const pinTarget = node.closest("section") ?? node.parentElement ?? node;
 
     tl = Flip.to(flipstate, {
       ease: "none",

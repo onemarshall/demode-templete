@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
-	import { initCookieConsent } from '$lib/features/cookie-consent'
+	import { onMount } from "svelte";
 
-	onMount(() => {
-		void initCookieConsent()
-	})
+	onMount(async () => {
+		const { initCookieConsent } = await import(
+			"$lib/features/cookie-consent/client"
+		);
+		void initCookieConsent();
+	});
 </script>

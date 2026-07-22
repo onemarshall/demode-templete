@@ -1,20 +1,22 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
-	import SafeHtml from "$lib/components/layout/SafeHtml.svelte";
-	import type { Snippet } from "svelte";
-	import type { HTMLAttributes } from "svelte/elements";
-
-	interface Props extends HTMLAttributes<HTMLDivElement> {
-		content?: string | null;
-		children?: Snippet;
+	interface TextProps {
+		content: string;
+		class?: string;
+		"data-directus"?: string | undefined;
 	}
 
-	let { content, class: className, children, ...rest }: Props = $props();
+	let {
+		content,
+		"data-directus": dataDirectus,
+		...props
+	}: TextProps = $props();
 </script>
 
-<div class={cn("prose max-w-none", className)} {...rest}>
-	{#if content}
-		<SafeHtml {content} />
-	{/if}
-	{@render children?.()}
+<div
+	class={props.class
+		? "prose dark:prose-invert" + props.class
+		: "prose dark:prose-invert"}
+	data-directus={dataDirectus}
+>
+	{@html content}
 </div>

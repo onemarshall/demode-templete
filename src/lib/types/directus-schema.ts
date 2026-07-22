@@ -1266,8 +1266,6 @@ export interface Post {
   post_type?: "article" | "essay" | "news" | "event" | "interview" | "review" | null;
   /** @description Feature this post in curated listings */
   featured?: boolean | null;
-  /** @description Original WordPress post ID for import reconciliation */
-  wordpress_post_id?: string | null;
   video?: "json" | null;
   /** @description Primary editorial category for this post */
   category?: Category | string | null;

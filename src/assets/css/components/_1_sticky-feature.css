@@ -1,0 +1,130 @@
+/* -------------------------------- 
+
+File#: _1_sticky-feature
+Title: Sticky Feature
+Descr: List of product features with sticky images
+Usage: codyhouse.co/license
+
+-------------------------------- */
+/*! purgecss start ignore */
+.sticky-feature {
+	position: relative;
+	z-index: 1;
+}
+
+.sticky-feature__content-figure {
+	/* images visible on small screens */
+	border-radius: var(--radius-md);
+	overflow: hidden;
+	/* box-shadow: var(--shadow-sm); */
+	margin-top: var(--space-md);
+
+	img {
+		display: block;
+		width: 100%;
+		object-fit: cover;
+		max-height: 30vh;
+	}
+}
+
+.sticky-feature__media-list {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+}
+
+.sticky-feature__media-item {
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.sticky-feature__media-figure {
+	/* images visible on bigger screens */
+	border-radius: var(--radius-lg);
+	/* box-shadow: var(--shadow-sm); */
+	overflow: hidden;
+	opacity: 0;
+
+	img {
+		display: block;
+		width: 100%;
+		object-fit: cover;
+		max-height: 70vh;
+	}
+
+	.sticky-feature-current-item & {
+		opacity: 1;
+	}
+}
+
+@media (--media-md) {
+	.sticky-feature__content-list {
+		padding-top: 50vh;
+		padding-bottom: 50vh;
+	}
+
+	.sticky-feature__title {
+		cursor: pointer;
+		opacity: 0.3;
+
+		&:hover,
+		.sticky-feature-current-item & {
+			opacity: 1;
+		}
+	}
+
+	.sticky-feature__content-figure {
+		/* show only to screen readers */
+		position: absolute;
+		clip: rect(1px, 1px, 1px, 1px);
+		clip-path: inset(50%);
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		padding: 0;
+		border: 0;
+		white-space: nowrap;
+	}
+
+	.sticky-feature__media-list {
+		/* text overlay gradients */
+		&::before,
+		&::after {
+			content: '';
+			position: absolute;
+			right: 0;
+			width: 100vw;
+			height: 100px;
+			pointer-events: none;
+		}
+
+		/* &::before {
+			top: 0;
+			background: linear-gradient(
+				to bottom,
+				var(--color-bg),
+				alpha(var(--color-bg), 0.8),
+				alpha(var(--color-bg), 0)
+			);
+		}
+
+		&::after {
+			bottom: 0;
+			background: linear-gradient(
+				to top,
+				var(--color-bg),
+				alpha(var(--color-bg), 0.8),
+				alpha(var(--color-bg), 0)
+			);
+		} */
+	}
+}
+
+/*! purgecss end ignore */

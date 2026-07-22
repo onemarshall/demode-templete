@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
-	let { children }: { children?: Snippet } = $props();
+	import { Tooltip as TooltipPrimitive } from "bits-ui";
+
+	let { ...restProps }: TooltipPrimitive.ProviderProps = $props();
 </script>
 
-{@render children?.()}
+<TooltipPrimitive.Provider {...restProps} />

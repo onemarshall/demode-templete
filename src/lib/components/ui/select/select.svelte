@@ -1,23 +1,11 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
-	import { setSelectContext } from "./context";
+	import { Select as SelectPrimitive } from "bits-ui";
 
-	interface Props {
-		value?: string;
-		name?: string;
-		type?: "single";
-		onValueChange?: (value: string) => void;
-		children?: Snippet;
-	}
-
-	let { value = "", onValueChange, children }: Props = $props();
-
-	setSelectContext({
-		getValue: () => value,
-		setValue: (next) => onValueChange?.(next),
-	});
+	let {
+		open = $bindable(false),
+		value = $bindable(),
+		...restProps
+	}: SelectPrimitive.RootProps = $props();
 </script>
 
-<div class="relative inline-flex flex-col gap-1">
-	{@render children?.()}
-</div>
+<SelectPrimitive.Root bind:open bind:value={value as never} {...restProps} />

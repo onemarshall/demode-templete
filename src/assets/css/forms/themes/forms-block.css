@@ -1,0 +1,8 @@
+[data-form='block'] {
+	--form-control--padding: 2rem 0.75rem;
+	--form-control--padding--textarea: 0.85rem 4rem 2rem 0.75rem;
+}
+
+[data-form='block'] textarea[data-fs-control] {
+	padding: var(--form-control--padding--textarea);
+}

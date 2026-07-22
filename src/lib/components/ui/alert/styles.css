@@ -1,0 +1,61 @@
+/* -------------------------------- 
+
+File#: _1_alert
+Title: Alert
+Descr: Feedback message
+Usage: codyhouse.co/license
+
+-------------------------------- */
+/*! purgecss start ignore */
+.alert {
+	background-color: oklch(var(--lower) / var(--bg-opacity, 0.2));
+	color: var(--color-contrast-higher);
+	position: absolute;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+}
+
+.alert__icon {
+	color: var(--color-primary);
+}
+
+.alert__close-btn {
+	display: inline-flex;
+	flex-shrink: 0;
+	transition: 0.3s var(--ease-out);
+}
+.alert__close-btn .icon {
+	display: block;
+}
+.alert__close-btn:hover {
+	transform: scale(1.1);
+}
+
+.alert--success {
+	background-color: oklch(var(--color-lighter) var(--success-chroma) var(--success) / 0.5);
+}
+.alert--success .alert__icon {
+	color: var(--color-success);
+}
+.alert--failure,
+.alert--error {
+	background-color: color-mix(in oklch, var(--color-error) 10%, transparent);
+}
+.alert--failure .alert__icon,
+.alert--error .alert__icon {
+	color: var(--color-error);
+}
+
+.alert--warning {
+	background-color: oklch(var(--color-lighter) var(--warning-chroma) var(--warning) / 0.5);
+}
+.alert--warning .alert__icon {
+	color: var(--color-warning);
+}
+
+.alert--is-visible {
+	position: static;
+	clip: auto;
+	clip-path: none;
+}
+/*! purgecss end ignore */

@@ -1,0 +1,236 @@
+/*! purgecss start ignore */
+:root {
+	--image-hero-focus-y: 50%;
+	--image-hero-focus-x: 50%;
+	--image-focus-y: 0%;
+	--image-focus-x: 0%;
+	--widescreen: 16/9;
+	--fullscreen: 16/9;
+	--scroll: 2/3;
+	--landscape: 3/2;
+	--portrait: 2/3;
+	--square: 1/1;
+}
+
+@media (min-width: 768px) {
+	:root {
+		--fullscreen: 16/7;
+	}
+}
+
+img {
+	aspect-ratio: 16/9;
+}
+
+@media (min-width: 768px) {
+	img {
+		aspect-ratio: 3/2;
+	}
+}
+
+.bg-image {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+}
+.wrap {
+	position: relative;
+	overflow: hidden;
+}
+.wrap img {
+	scale: var(--image-scale, 1.4);
+	width: 100%;
+	object-fit: cover;
+	will-change: transform;
+	margin: 0;
+}
+
+.hero img {
+	object-position: var(--image-hero-focus-y) var(--image-hero-focus-x);
+}
+
+/* Aspect ratio classes */
+video.fullscreen,
+img.fullscreen,
+.wrap.fullscreen img {
+	aspect-ratio: var(--fullscreen);
+}
+
+video.widescreen,
+img.widescreen,
+.wrap.widescreen img {
+	aspect-ratio: var(--widescreen);
+}
+
+video.landscape,
+img.landscape,
+.wrap.landscape img {
+	aspect-ratio: var(--landscape);
+}
+
+video.portrait,
+img.portrait,
+.wrap.portrait img {
+	aspect-ratio: var(--portrait);
+}
+
+video.square,
+img.square,
+.wrap.square img {
+	aspect-ratio: var(--square);
+}
+
+/* Breakpoint-specific styles */
+@media (min-width: 576px) {
+	video.fullscreen\@sm,
+	img.fullscreen\@sm,
+	.wrap.fullscreen\@sm img {
+		aspect-ratio: var(--fullscreen);
+	}
+
+	video.widescreen\@sm,
+	img.widescreen\@sm,
+	.wrap.widescreen\@sm img {
+		aspect-ratio: var(--widescreen);
+	}
+
+	video.square\@sm,
+	img.square\@sm,
+	.wrap.square\@sm img {
+		aspect-ratio: var(--square);
+	}
+
+	video.landscape\@sm,
+	img.landscape\@sm,
+	.wrap.landscape\@sm img {
+		aspect-ratio: var(--landscape);
+	}
+
+	video.portrait\@sm,
+	img.portrait\@sm,
+	.wrap.portrait\@sm img {
+		aspect-ratio: var(--portrait);
+	}
+
+	video.scroll\@sm,
+	img.scroll\@sm,
+	.wrap.scroll\@sm img {
+		aspect-ratio: var(--scroll);
+	}
+}
+
+@media (min-width: 768px) {
+	video.fullscreen\@md,
+	img.fullscreen\@md,
+	.wrap.fullscreen\@md img {
+		aspect-ratio: var(--fullscreen);
+	}
+
+	video.widescreen\@md,
+	img.widescreen\@md,
+	.wrap.widescreen\@md img {
+		aspect-ratio: var(--widescreen);
+	}
+
+	video.square\@md,
+	img.square\@md,
+	.wrap.square\@md img {
+		aspect-ratio: var(--square);
+	}
+
+	video.landscape\@md,
+	img.landscape\@md,
+	.wrap.landscape\@md img {
+		aspect-ratio: var(--landscape);
+	}
+
+	video.portrait\@md,
+	img.portrait\@md,
+	.wrap.portrait\@md img {
+		aspect-ratio: var(--portrait);
+	}
+
+	video.scroll\@md,
+	img.scroll\@md,
+	.wrap.scroll\@md img {
+		aspect-ratio: var(--scroll);
+	}
+}
+
+@media (min-width: 992px) {
+	video.fullscreen\@lg,
+	img.fullscreen\@lg,
+	.wrap.fullscreen\@lg img {
+		aspect-ratio: var(--fullscreen);
+	}
+
+	video.widescreen\@lg,
+	img.widescreen\@lg,
+	.wrap.widescreen\@lg img {
+		aspect-ratio: var(--widescreen);
+	}
+
+	video.square\@lg,
+	img.square\@lg,
+	.wrap.square\@lg img {
+		aspect-ratio: var(--square);
+	}
+
+	video.landscape\@lg,
+	img.landscape\@lg,
+	.wrap.landscape\@lg img {
+		aspect-ratio: var(--landscape);
+	}
+
+	video.portrait\@lg,
+	img.portrait\@lg,
+	.wrap.portrait\@lg img {
+		aspect-ratio: var(--portrait);
+	}
+
+	video.scroll\@lg,
+	img.scroll\@lg,
+	.wrap.scroll\@lg img {
+		aspect-ratio: var(--scroll);
+	}
+}
+
+@media (min-width: 1200px) {
+	video.fullscreen\@xl,
+	img.fullscreen\@xl,
+	.wrap.fullscreen\@xl img {
+		aspect-ratio: var(--fullscreen);
+	}
+
+	video.widescreen\@xl,
+	img.widescreen\@xl,
+	.wrap.widescreen\@xl img {
+		aspect-ratio: var(--widescreen);
+	}
+
+	video.square\@xl,
+	img.square\@xl,
+	.wrap.square\@xl img {
+		aspect-ratio: var(--square);
+	}
+
+	video.landscape\@xl,
+	img.landscape\@xl,
+	.wrap.landscape\@xl img {
+		aspect-ratio: var(--landscape);
+	}
+
+	video.portrait\@xl,
+	img.portrait\@xl,
+	.wrap.portrait\@xl img {
+		aspect-ratio: var(--portrait);
+	}
+
+	video.scroll\@xl,
+	img.scroll\@xl,
+	.wrap.scroll\@xl img {
+		aspect-ratio: var(--scroll);
+	}
+}
+/*! purgecss end ignore */

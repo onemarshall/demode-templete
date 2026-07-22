@@ -4,6 +4,7 @@ import { footerNavigationLinks } from "$lib/static/content/navigation/footer.nav
 import { mainNavigationLinks } from "$lib/static/content/navigation/main.nav";
 import { menus } from "$lib/static/content/menu.content";
 import { buildBaseSiteGlobals, normalizePath } from "./shared";
+import { renderMarkdownInData } from "$lib/server/markdown";
 import {
   NavigationTreeSchema,
   PageBuilderModelSchema,
@@ -191,7 +192,9 @@ export const createStaticContentProvider = (): ContentProvider => ({
   getPageByPath: async (path: string) => {
     const page = staticPagesByPath.get(normalizePath(path));
     if (!page) return null;
-    return PageModelSchema.parse(page);
+    const parsed = PageModelSchema.parse(page);
+    renderMarkdownInData(parsed);
+    return parsed;
   },
   getPostBySlug: async (slug: string) =>
     PostDetailSchema.parse({

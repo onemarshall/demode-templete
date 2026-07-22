@@ -1,0 +1,61 @@
+/*! purgecss start ignore */
+.gallery-wrap {
+	position: relative;
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 40vh auto;
+	overflow: hidden;
+}
+
+.gallery-wrap--auto {
+	height: auto;
+}
+
+.gallery-wrap--large {
+	height: 110vh;
+}
+
+.gallery-wrap--dense {
+	margin: 0;
+}
+
+.gallery {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	flex: none;
+}
+
+.gallery--breakout {
+	width: min-content;
+}
+
+.gallery__item {
+	background-position: 50% 50%;
+	background-size: cover;
+	flex: none;
+	border-radius: 6px;
+	position: relative;
+	filter: brightness(1);
+}
+
+.gallery__item-cut {
+	overflow: hidden;
+	display: grid;
+	place-items: center;
+}
+
+.gallery__item-inner {
+	width: 100%;
+	height: 100%;
+	background-position: 50% 50%;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+.caption {
+	z-index: 101;
+}
+/*! purgecss end ignore */

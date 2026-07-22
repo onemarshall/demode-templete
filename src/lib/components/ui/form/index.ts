@@ -1,7 +1,33 @@
-import Field from "./field.svelte";
-import Control from "./control.svelte";
-import Label from "./label.svelte";
-import Description from "./description.svelte";
-import FieldErrors from "./field-errors.svelte";
+import * as FormPrimitive from "formsnap";
+import Description from "./form-description.svelte";
+import Label from "./form-label.svelte";
+import FieldErrors from "./form-field-errors.svelte";
+import Field from "./form-field.svelte";
+import Fieldset from "./form-fieldset.svelte";
+import Legend from "./form-legend.svelte";
+import ElementField from "./form-element-field.svelte";
+import Button from "./form-button.svelte";
 
-export { Control, Description, Field, FieldErrors, Label };
+const Control = FormPrimitive.Control;
+
+export {
+	Field,
+	Control,
+	Label,
+	Button,
+	FieldErrors,
+	Description,
+	Fieldset,
+	Legend,
+	ElementField,
+	//
+	Field as FormField,
+	Control as FormControl,
+	Description as FormDescription,
+	Label as FormLabel,
+	FieldErrors as FormFieldErrors,
+	Fieldset as FormFieldset,
+	Legend as FormLegend,
+	ElementField as FormElementField,
+	Button as FormButton,
+};

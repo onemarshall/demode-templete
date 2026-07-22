@@ -1,0 +1,15 @@
+[data-layout='bg--2'] {
+	.grid-image {
+		grid-area: 1 / 1 / -1 / -1;
+	}
+	.grid-grainy {
+		grid-area: 1 / 1 / -1 / -1;
+		clip-path: polygon(0 0, 0% 100%, 100% 100%);
+		opacity: 0.5;
+		background: var(--color-contrast-low);
+	}
+	.grid-pattern {
+		grid-area: 1 / 1 / -1 / -1;
+		clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+	}
+}

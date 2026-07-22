@@ -1,4 +1,4 @@
-import { gsap, ScrollTrigger, SplitText } from "./gsap";
+import { gsap, ScrollTrigger } from "./gsap";
 import type { Action } from "svelte/action";
 
 type SplitSegment = "chars" | "words" | "lines";
@@ -244,7 +244,7 @@ export const splitText: Action<HTMLElement, SplitTextActionOptions | undefined> 
     start = "top 85%",
   } = options;
 
-  let split: InstanceType<typeof SplitText> | null = null;
+  let split: { chars: Element[]; words: Element[]; lines: Element[]; revert(): void } | null = null;
   let outerTrigger: ScrollTrigger | null = null;
 
   if (preset && presets[preset]) {
@@ -254,7 +254,9 @@ export const splitText: Action<HTMLElement, SplitTextActionOptions | undefined> 
       trigger: node,
       start: "top 90%",
       once: true,
-      onEnter: () => {
+      onEnter: async () => {
+        const { SplitText } = await import("gsap/dist/SplitText");
+        gsap.registerPlugin(SplitText);
         split = new SplitText(node, { type: config.splitType });
 
         const targets =
@@ -288,7 +290,9 @@ export const splitText: Action<HTMLElement, SplitTextActionOptions | undefined> 
       trigger: node,
       start,
       once: true,
-      onEnter: () => {
+      onEnter: async () => {
+        const { SplitText } = await import("gsap/dist/SplitText");
+        gsap.registerPlugin(SplitText);
         split = new SplitText(node, { type });
         const targets =
           type === "words" ? split.words : type === "lines" ? split.lines : split.chars;

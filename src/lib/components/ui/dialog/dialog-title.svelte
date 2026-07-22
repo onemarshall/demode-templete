@@ -1,10 +1,17 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
-	import type { Snippet } from "svelte";
-	import type { HTMLAttributes } from "svelte/elements";
+	import { Dialog as DialogPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
 
-	let { class: className, children, ...rest }: HTMLAttributes<HTMLHeadingElement> & { children?: Snippet } =
-		$props();
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: DialogPrimitive.TitleProps = $props();
 </script>
 
-<h2 class={cn("text-lg font-semibold", className)} {...rest}>{@render children?.()}</h2>
+<DialogPrimitive.Title
+	bind:ref
+	data-slot="dialog-title"
+	class={cn("text-lg leading-none font-semibold", className)}
+	{...restProps}
+/>

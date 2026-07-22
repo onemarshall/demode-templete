@@ -1,8 +1,7 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
-	let { open = $bindable(false), children }: { open?: boolean; children?: Snippet } = $props();
+	import { Dialog as SheetPrimitive } from "bits-ui";
+
+	let { open = $bindable(false), ...restProps }: SheetPrimitive.RootProps = $props();
 </script>
 
-{#if open}
-	{@render children?.()}
-{/if}
+<SheetPrimitive.Root bind:open {...restProps} />

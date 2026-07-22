@@ -1,0 +1,52 @@
+[data-form='line'] {
+	--form-control--padding: 0.9rem 0.75rem;
+	--form-control--box-shadow: inset 0 0 0 0px
+			color-mix(in oklch, var(--color-black), transparent 100%),
+		0 0 0 3px var(--color-contrast-lower);
+	--form-control--box-shadow-focus: inset 0 0 0 0px
+			color-mix(in oklch, var(--color-black), transparent 100%),
+		0 0 0 3px var(--color-contrast-lower);
+	--form-control--bg-focus: color-mix(in oklch, var(--color-black), transparent 97%);
+}
+
+/* 
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
+Form
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
+*/
+[data-form='line'] [data-fs-control] {
+	box-shadow: none;
+	border-radius: 0;
+	border-bottom: 3px solid oklch(var(--darker) / 1);
+	&::placeholder {
+		opacity: 1;
+		color: var(--form-control--placeholder-color);
+	}
+	&:focus,
+	&:focus-within {
+		background: var(--form-control--bg-focus);
+		outline: none;
+		border-bottom: 3px solid oklch(var(--color-background) var(--primary));
+	}
+}
+[data-form='line'] input:autofill {
+	outline: none;
+	border-bottom: 3px solid oklch(var(--color-bg) var(--primary));
+}
+/* 
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
+Error
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠ 
+*/
+
+[data-form='line'] .form-control[aria-invalid='true'] {
+	background: color-mix(in oklch, var(--color-error) 8%, transparent);
+	box-shadow: none;
+	border-bottom: 3px solid oklch(var(--color-bg) var(--system-chroma) var(--error) / 1);
+
+	&:focus,
+	&:focus-within {
+		box-shadow: none;
+		border-bottom: 3px solid oklch(var(--color-bg) var(--system-chroma) var(--error) / 1);
+	}
+}

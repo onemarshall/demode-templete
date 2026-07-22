@@ -128,6 +128,7 @@ import {
 } from "./page-fetcher.fields";
 import { fetchPostsCount, fetchPostsList } from "./post-fetcher";
 import { createScopedLogger } from "$lib/shared/logger";
+import { renderMarkdownInData } from "$lib/server/markdown";
 
 const log = createScopedLogger(["Directus", "Pages"]);
 
@@ -251,7 +252,7 @@ const flattenButtonGroups = (blocks: PageBlock[]): void => {
     const item = block.item as BlockItemWithButtonGroup;
     for (const key of ["button_group", "buttons"] as const) {
       const group = item[key];
-    if (group && typeof group === "object" && Array.isArray(group.buttons)) {
+      if (group && typeof group === "object" && Array.isArray(group.buttons)) {
         group.buttons = group.buttons.map((button) => flattenButton(button));
       }
     }
@@ -303,9 +304,7 @@ const mapById = (items: HydratedItem[]): Map<string, HydratedItem> =>
   new Map(items.filter((item) => item.id != null).map((item) => [String(item.id), item] as const));
 
 const getIdsForCollection = (rows: PageBlockRow[], collection: string): string[] =>
-  rows
-    .filter((row) => row.collection === collection && row.item)
-    .map((row) => String(row.item));
+  rows.filter((row) => row.collection === collection && row.item).map((row) => String(row.item));
 
 const fetchCollectionItems = async (
   directus: DirectusClient,
@@ -499,6 +498,7 @@ export const fetchPageData = async (
     );
     await processPageBlocks(blocks, directus, postPages, fetch, token);
     flattenButtonGroups(blocks);
+    renderMarkdownInData(page);
 
     return page;
   } catch (err) {

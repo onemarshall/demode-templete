@@ -1,15 +1,30 @@
-<script lang="ts">
-	import { cn } from "$lib/utils";
-	import type { Snippet } from "svelte";
+<!-- Made by Alex -->
+<!-- Not ShadCN -->
 
-	interface Props {
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	type SemanticElement =
+		| 'div'
+		| 'section'
+		| 'main'
+		| 'article'
+		| 'aside'
+		| 'nav'
+		| 'header'
+		| 'footer'
+		| 'form';
+
+	interface ContainerProps {
 		class?: string;
-		children?: Snippet;
+		as?: SemanticElement;
+		children: Snippet;
+		role?: string;
 	}
 
-	let { class: className, children }: Props = $props();
+	const { class: className, as: Component = 'div', children }: ContainerProps = $props();
 </script>
 
-<div class={cn("mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8", className)}>
-	{@render children?.()}
-</div>
+<svelte:element this={Component} class={className ? 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-16 ' + className : 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-16'}
+	>{@render children()}</svelte:element
+>

@@ -1,0 +1,40 @@
+[data-layout='bg--8'] {
+	.grid-bg-1 {
+		grid-area: 1 / 1 / -1 / -1;
+		z-index: 2;
+		clip-path: polygon(
+			0% 0%,
+			0 100%,
+			0 100%,
+			30% 0,
+			100% 0,
+			70% 100%,
+			0 100%,
+			0 100%,
+			100% 100%,
+			100% 0%
+		);
+	}
+	.grid-pattern,
+	.grid-grainy {
+		grid-area: 1/ 1 / -1 / -1;
+	}
+	.grid__mask,
+	.grid-grainy,
+	.grid-pattern {
+		grid-area: 1 / 1 / -1 / -1;
+
+		clip-path: polygon(
+			0% 0%,
+			0 100%,
+			0 100%,
+			30% 0,
+			100% 0,
+			70% 100%,
+			0 100%,
+			0 100%,
+			100% 100%,
+			100% 0%
+		);
+	}
+}

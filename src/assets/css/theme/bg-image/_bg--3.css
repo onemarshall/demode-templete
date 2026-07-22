@@ -1,0 +1,30 @@
+[data-layout='bg--3'] {
+	.grid-image {
+		grid-area: 1 / 1 / -1 / -1;
+	}
+	.grid-pattern,
+	.grid-image,
+	.grid-grainy {
+		grid-area: 1/ 1 / -1 / -1;
+	}
+	.grid-grainy,
+	.grid-pattern {
+		grid-area: 1 / 1 / -1 / -1;
+		clip-path: polygon(0px 80%, 100% 50px, 100% 100%, 0% 100%);
+		@media (--media-md) {
+			clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+		}
+	}
+	.grid-grainy {
+		clip-path: polygon(0px 50%, 100% 50px, 100% 100%, 0% 100%);
+		@media (--media-md) {
+			clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+		}
+	}
+	.grid-image {
+		clip-path: polygon(0px 25%, 100% 50px, 100% 100%, 0% 100%);
+		@media (--media-md) {
+			clip-path: polygon(0 30%, 100% 0, 100% 100%, 0% 100%);
+		}
+	}
+}

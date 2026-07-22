@@ -1,0 +1,14 @@
+[data-layout='bg--6'] {
+	.grid-bg-1 {
+		grid-column: 1/-1;
+		grid-row: 8/-1;
+	}
+	.grid-pattern {
+		grid-column: 1/-1;
+		grid-row: 4/-1;
+	}
+	.grid-grainy {
+		grid-column: 1/-1;
+		grid-row: 10/-1;
+	}
+}

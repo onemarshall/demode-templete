@@ -1,23 +1,19 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
-	import { setRadioContext } from "./context";
+	import { RadioGroup as RadioGroupPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils";
 
-	interface Props {
-		value?: string;
-		name?: string;
-		onValueChange?: (value: string) => void;
-		children?: Snippet;
-	}
-
-	let { value = "", name, onValueChange, children }: Props = $props();
-
-	setRadioContext({
-		getValue: () => value,
-		setValue: (next) => onValueChange?.(next),
-		getName: () => name ?? "",
-	});
+	let {
+		ref = $bindable(null),
+		class: className,
+		value = $bindable(""),
+		...restProps
+	}: RadioGroupPrimitive.RootProps = $props();
 </script>
 
-<div role="radiogroup">
-	{@render children?.()}
-</div>
+<RadioGroupPrimitive.Root
+	bind:ref
+	bind:value
+	data-slot="radio-group"
+	class={cn("grid gap-3", className)}
+	{...restProps}
+/>

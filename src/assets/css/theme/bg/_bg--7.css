@@ -1,0 +1,19 @@
+[data-layout='bg--7'] {
+	.grid-bg-1 {
+		grid-area: 4/1/-1/-1;
+		background-color: oklch(var(--dark) / var(--bg-opacity, 1));
+	}
+	.grid-pattern {
+		@media (--media-md) {
+			grid-column: 5/-2;
+			grid-row: 10/-3;
+		}
+	}
+	.grid-grainy {
+		grid-area: 4/3/-2/-3;
+		@media (--media-md) {
+			grid-column: 5/-2;
+			grid-row: 10/-3;
+		}
+	}
+}

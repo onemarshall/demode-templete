@@ -1,0 +1,160 @@
+.icon {
+	--size: 1.5cap;
+	font-size: var(--size);
+	width: var(--size);
+	height: var(--size);
+	display: inline-block;
+	color: inherit;
+	fill: currentColor;
+	line-height: 1;
+	flex-shrink: 0;
+	max-width: initial;
+}
+
+.icon--3xs {
+	--size: 8px;
+}
+
+.icon--2xs {
+	--size: 12px;
+}
+
+.icon--xs {
+	--size: 16px;
+}
+
+.icon--sm {
+	--size: 24px;
+}
+
+.icon--md {
+	--size: 32px;
+}
+
+.icon--lg {
+	--size: 48px;
+}
+
+.icon--xl {
+	--size: 64px;
+}
+
+.icon--2xl {
+	--size: 96px;
+}
+
+.icon--3xl {
+	--size: 128px;
+}
+
+/* rotate the icon infinitely */
+.icon--is-spinning {
+	animation: icon-spin 1s infinite linear;
+}
+
+@keyframes icon-spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+/* SVG symbols - enable icon color corrections */
+.icon use {
+	color: inherit;
+	fill: currentColor;
+}
+
+.icon-gap-xs {
+	gap: 0.1cap;
+}
+.icon-gap-sm {
+	gap: 0.3cap;
+}
+.icon-gap-md {
+	gap: 0.5cap;
+}
+.icon--3xs {
+	--size: 8px;
+}
+
+.icon--2xs {
+	--size: 12px;
+}
+
+.icon--xs {
+	--size: 16px;
+}
+
+.icon--sm {
+	--size: 24px;
+}
+
+.icon--md {
+	--size: 32px;
+}
+
+.icon--lg {
+	--size: 48px;
+}
+
+.icon--xl {
+	--size: 64px;
+}
+
+.icon--2xl {
+	--size: 96px;
+}
+
+.icon--3xl {
+	--size: 128px;
+}
+
+/* rotate the icon infinitely */
+.icon--is-spinning {
+	animation: icon-spin 1s infinite linear;
+}
+
+@keyframes icon-spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.social__link-icon .icon {
+	font-size: 20px;
+	margin: auto;
+}
+
+.social__link--icon-button {
+	display: inline-flex;
+	--size: 42px;
+	width: var(--size);
+	height: var(--size);
+	color: var(--color-contrast-high);
+	background-color: oklch(var(--low) / 0.3);
+	border-radius: 50%;
+	transition: 0.2s;
+}
+.social__link-icon .icon {
+	font-size: 20px;
+	margin: auto;
+}
+
+.social__link--icon-button {
+	display: inline-flex;
+	--size: 42px;
+	width: var(--size);
+	height: var(--size);
+	color: var(--color-contrast-high);
+	background-color: oklch(var(--low) / 0.3);
+	border-radius: 50%;
+	transition: 0.2s;
+}
+.social__link--icon-button:hover {
+	background-color: oklch(var(--darker) / var(--color-opacity, 1));
+}

@@ -1,0 +1,31 @@
+/* --------------------------------
+
+File#: _1_note
+Title: Note
+Descr: A brief piece of information given to the user
+Usage: codyhouse.co/license
+
+-------------------------------- */
+/*! purgecss start ignore */
+.note {
+	background-color: var(--color-bg-light);
+	border-left: 3px solid var(--color-primary);
+	padding: var(--space-sm);
+	box-shadow: var(--shadow-sm);
+}
+[data-note-type='warning'] {
+	border-left-color: var(--color-warning);
+}
+[data-note-type='error'] {
+	border-left-color: var(--color-error);
+}
+[data-note-type='success'] {
+	border-left-color: var(--color-success);
+}
+.text-component .note__content > *:last-child {
+	margin-bottom: 0;
+}
+.text-component .note__title {
+	margin-bottom: 0;
+}
+/*! purgecss end ignore */

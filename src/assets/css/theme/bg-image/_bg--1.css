@@ -1,0 +1,25 @@
+[data-layout='bg--1'] {
+	.grid-image {
+		clip-path: circle(80% at 83% 9%);
+		@media (--media-md) {
+			clip-path: circle(78% at 87% 0);
+		}
+	}
+
+	.grid-grainy,
+	.grid-pattern {
+		grid-area: 1 / 1 / -1 / -1;
+		clip-path: circle(74.5% at 100% 16%);
+		@media (--media-md) {
+			clip-path: circle(62.6% at 100% 10%);
+		}
+	}
+	.grid-grainy {
+		clip-path: circle(50% at 99% 82%);
+		@media (--media-md) {
+			clip-path: circle(67.4% at 99% 82%);
+		}
+		opacity: 0.4;
+		background: var(--color-contrast-low);
+	}
+}

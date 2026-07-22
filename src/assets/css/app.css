@@ -1,0 +1,127 @@
+/* Tailwind v4 */
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* === KEEP YOUR DESIGN SYSTEM === */
+/* Base Design Tokens */
+/* @import './base/media.css'; */
+/* @import './base/reset.css'; */
+
+/* Color System (KEEP ALL - this is your unique value) */
+@import "./base/colour.css";
+
+/* Typography System (KEEP - variable fonts, responsive line heights) */
+/* @import './base/typography.css'; */
+
+/* Grid System (KEEP - your complex responsive grid) */
+/* @import './base/grid.css'; */
+
+/* Icon System (KEEP) */
+/* @import './base/icons.css'; */
+
+/* === MAP TO TAILWIND shared === */
+@theme {
+  /* Colors - Keep your system AND add Tailwind compatibility */
+  --color-primary: var(--color-primary);
+  --color-accent: var(--color-accent);
+  --color-sec: var(--color-sec);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+
+  /* Map your semantic system to Tailwind's scale */
+  --color-primary-50: var(--color-primary-lighter);
+  --color-primary-100: var(--color-primary-light);
+  --color-primary-200: var(--color-primary-light);
+  --color-primary-300: var(--color-primary);
+  --color-primary-400: var(--color-primary);
+  --color-primary-500: var(--color-primary);
+  --color-primary-600: var(--color-primary-dark);
+  --color-primary-700: var(--color-primary-dark);
+  --color-primary-800: var(--color-primary-darker);
+  --color-primary-900: var(--color-primary-darker);
+  --color-primary-950: var(--color-primary-darker);
+
+  --color-accent-50: var(--color-accent-lighter);
+  --color-accent-100: var(--color-accent-light);
+  --color-accent-200: var(--color-accent-light);
+  --color-accent-300: var(--color-accent);
+  --color-accent-400: var(--color-accent);
+  --color-accent-500: var(--color-accent);
+  --color-accent-600: var(--color-accent-dark);
+  --color-accent-700: var(--color-accent-dark);
+  --color-accent-800: var(--color-accent-darker);
+  --color-accent-900: var(--color-accent-darker);
+  --color-accent-950: var(--color-accent-darker);
+
+  --color-sec-50: var(--color-sec-lighter);
+  --color-sec-100: var(--color-sec-light);
+  --color-sec-200: var(--color-sec-light);
+  --color-sec-300: var(--color-sec);
+  --color-sec-400: var(--color-sec);
+  --color-sec-500: var(--color-sec);
+  --color-sec-600: var(--color-sec-dark);
+  --color-sec-700: var(--color-sec-dark);
+  --color-sec-800: var(--color-sec-darker);
+  --color-sec-900: var(--color-sec-darker);
+  --color-sec-950: var(--color-sec-darker);
+
+  --color-gray-50: oklch(0.984 0.003 247.858);
+  --color-gray-100: oklch(0.968 0.007 247.896);
+  --color-gray-200: oklch(0.929 0.013 255.508);
+  --color-gray-300: oklch(0.869 0.022 252.894);
+  --color-gray-400: oklch(0.704 0.04 256.788);
+  --color-gray-500: oklch(0.554 0.046 257.417);
+  --color-gray-600: oklch(0.446 0.043 257.281);
+  --color-gray-700: oklch(0.372 0.044 257.287);
+  --color-gray-800: oklch(0.279 0.041 260.031);
+  --color-gray-900: oklch(0.208 0.042 265.755);
+  --color-gray-950: oklch(0.129 0.042 264.695);
+
+  /* Typography */
+  --font-primary: var(--font-primary);
+  --font-secondary: var(--font-secondary);
+
+  /* Line Heights */
+  --leading-2xs: var(--line-height-2xs);
+  --leading-xs: var(--line-height-xs);
+  --leading-sm: var(--line-height-sm);
+  --leading-md: var(--line-height-md);
+  --leading-lg: var(--line-height-lg);
+  --leading-xl: var(--line-height-xl);
+
+  /* Spacing (from your util.css) */
+  --max-width-3xs: var(--max-width-3xs);
+  --max-width-2xs: var(--max-width-2xs);
+  --max-width-xs: var(--max-width-xs);
+  --max-width-md: var(--max-width-md);
+  --max-width-lg: var(--max-width-lg);
+  --max-width-xl: var(--max-width-xl);
+
+  /* Z-Index */
+  --z-header: var(--z-index-header);
+  --z-popover: var(--z-index-popover);
+  --z-fixed-element: var(--z-index-fixed-element);
+  --z-overlay: var(--z-index-overlay);
+  --z-modal: var(--z-index-modal);
+}
+
+/* === KEEP UNIQUE COMPONENTS === */
+/* Fonts */
+@import "./fonts/darkmode-on.css";
+@import "./fonts/ivypresto.css";
+/* @import './fonts/inter.css'; */
+
+/* Specialized Components */
+@import "./lib/cookies.css";
+/* @import './lib/patten.css';
+@import './lib/loader.css';
+@import './lib/typography-extra.css'; */
+
+/* Complex Components */
+/* @import './components/_1_radios-checkboxes.css'; */
+
+/* Design System */
+/* @import './style/design.css'; */

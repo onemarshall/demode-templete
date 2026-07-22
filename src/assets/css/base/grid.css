@@ -1,0 +1,288 @@
+/*! purgecss start ignore */
+
+:root {
+	--index-content: 10;
+	--index-figbar: 9;
+	--index-word: 8;
+	--index-grainy: 7;
+	--index-patten: 6;
+	--index-mask: 5;
+	--index-image: 4;
+	--index-bg-1: 3;
+	--index-bg-2: 2;
+	--index-bg-3: 1;
+	--mobile-grid-columns: var(--container-margin-x) 1fr 1fr 1fr 1fr var(--container-margin-x);
+	--mobile-grid-rows: minmax(var(--space-xl), 1em) auto auto auto auto minmax(var(--space-xl), 1em);
+	--desktop-grid-columns: var(--container-margin-x) minmax(min(100%, 1.8vw), auto)
+		minmax(min(100%, 3vw), auto) minmax(min(100%, 6.2vw), auto) minmax(4.2vw, auto)
+		minmax(3.3vw, auto) minmax(5vw, auto) minmax(15.2vw, auto) 1fr 1fr minmax(15.2vw, auto)
+		minmax(5vw, auto) minmax(3.3vw, auto) minmax(4.2vw, auto) minmax(min(100%, 6.2vw), auto)
+		minmax(min(100%, 3vw), auto) minmax(min(100%, 1.8vw), auto) var(--container-margin-x);
+	--desktop-grid-rows: auto minmax(var(--container-margin-x), auto) minmax(5vh, auto)
+		minmax(19.5vh, auto) minmax(7vh, auto) 1fr 1fr minmax(7vh, auto) minmax(19.5vh, auto)
+		minmax(5vh, auto) minmax(var(--container-margin-x), auto) auto;
+
+	/* Items */
+	--grid-figbar-top-column: 1 / -1;
+	--grid-figbar-top-row: 1 / 1;
+	--grid-figbar-bottom-column: 1 / -1;
+	--grid-figbar-bottom-row: -2/-1;
+	--grid-word-column: 2 / -2;
+	--grid-word-row: 2 / -2;
+	--grid-content-column: 2 / -2;
+	--grid-content-row: 3 / -3;
+	--grid-image-column: 1 / -1;
+	--grid-image-row: 5 / -1;
+	--grid-bg-1-column: 3 / -1;
+	--grid-bg-1-row: 1 / 5;
+	--grid-bg-2-column: 3 / -1;
+	--grid-bg-2-row: 5 / 5;
+	--grid-bg-3-column: 3 / -1;
+	--grid-bg-3-row: 5 / 5;
+	--grid-mask-column: 1 / -1;
+	--grid-mask-row: 1 / -1;
+	--grid-grainy-column: 1 / -1;
+	--grid-grainy-row: 6 / 3;
+	--grid-pattern-column: 1 / -1;
+	--grid-pattern-row: 1 / 3;
+	--grid-svg-column: 2 / 3;
+}
+
+.grid-auto-xs,
+.grid-auto-sm,
+.grid-auto-md,
+.grid-auto-lg,
+.grid-auto-xl {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(var(--col-min-width), 1fr));
+}
+
+.grid-auto-xs {
+	--col-min-width: 8rem;
+}
+
+.grid-auto-sm {
+	--col-min-width: 10rem;
+}
+
+.grid-auto-md {
+	--col-min-width: 15rem;
+}
+
+.grid-auto-lg {
+	--col-min-width: 20rem;
+}
+
+.grid-auto-xl {
+	--col-min-width: 25rem;
+}
+
+@media (min-width: 32rem) {
+	.grid-auto-xs\@xs {
+		--col-min-width: 8rem;
+	}
+	.grid-auto-sm\@xs {
+		--col-min-width: 10rem;
+	}
+	.grid-auto-md\@xs {
+		--col-min-width: 15rem;
+	}
+	.grid-auto-lg\@xs {
+		--col-min-width: 20rem;
+	}
+	.grid-auto-xl\@xs {
+		--col-min-width: 25rem;
+	}
+}
+@media (min-width: 48rem) {
+	.grid-auto-xs\@sm {
+		--col-min-width: 8rem;
+	}
+	.grid-auto-sm\@sm {
+		--col-min-width: 10rem;
+	}
+	.grid-auto-md\@sm {
+		--col-min-width: 15rem;
+	}
+	.grid-auto-lg\@sm {
+		--col-min-width: 20rem;
+	}
+	.grid-auto-xl\@sm {
+		--col-min-width: 25rem;
+	}
+}
+@media (min-width: 64rem) {
+	.grid-auto-xs\@md {
+		--col-min-width: 8rem;
+	}
+	.grid-auto-sm\@md {
+		--col-min-width: 10rem;
+	}
+	.grid-auto-md\@md {
+		--col-min-width: 15rem;
+	}
+	.grid-auto-lg\@md {
+		--col-min-width: 20rem;
+	}
+	.grid-auto-xl\@md {
+		--col-min-width: 25rem;
+	}
+}
+@media (min-width: 80rem) {
+	.grid-auto-xs\@lg {
+		--col-min-width: 8rem;
+	}
+	.grid-auto-sm\@lg {
+		--col-min-width: 10rem;
+	}
+	.grid-auto-md\@lg {
+		--col-min-width: 15rem;
+	}
+	.grid-auto-lg\@lg {
+		--col-min-width: 20rem;
+	}
+	.grid-auto-xl\@lg {
+		--col-min-width: 25rem;
+	}
+}
+@media (min-width: 90rem) {
+	.grid-auto-xs\@xl {
+		--col-min-width: 8rem;
+	}
+	.grid-auto-sm\@xl {
+		--col-min-width: 10rem;
+	}
+	.grid-auto-md\@xl {
+		--col-min-width: 15rem;
+	}
+	.grid-auto-lg\@xl {
+		--col-min-width: 20rem;
+	}
+	.grid-auto-xl\@xl {
+		--col-min-width: 25rem;
+	}
+}
+
+.grid-layout {
+	display: grid;
+	grid-template-columns: var(--desktop-grid-columns);
+	grid-template-rows: var(--desktop-grid-rows);
+	width: 100%;
+	position: relative;
+	gap: 0 0;
+}
+
+.grid-layout.grid-hero {
+	grid-template-columns: var(--container-margin-x) repeat(10, 1fr) var(--container-margin-x);
+	grid-template-rows: auto repeat(6, 1fr) auto;
+}
+
+.grid-figbar-top {
+	grid-column: var(--grid-figbar-top-column);
+	grid-row: var(--grid-figbar-top-row);
+	z-index: var(--index-figbar);
+}
+
+.grid-figbar-bottom {
+	grid-column: var(--grid-figbar-bottom-column);
+	grid-row: var(--grid-figbar-bottom-row);
+	z-index: var(--index-figbar);
+}
+
+.grid-word {
+	grid-column: var(--grid-word-column);
+	grid-row: var(--grid-word-row);
+	z-index: var(--index-word);
+}
+
+.grid-content {
+	grid-column: var(--grid-content-column);
+	grid-row: var(--grid-content-row);
+	z-index: var(--index-content);
+}
+
+.grid-image {
+	grid-column: var(--grid-image-column);
+	grid-row: var(--grid-image-row);
+	z-index: var(--index-image);
+}
+
+.grid-bg-1 {
+	grid-column: var(--grid-bg-1-column);
+	grid-row: var(--grid-bg-1-row);
+	z-index: var(--index-bg-1);
+	background: oklch(var(--darker) / var(--bg-opacity, 1));
+}
+
+.grid-bg-2 {
+	grid-column: var(--grid-bg-2-column);
+	grid-row: var(--grid-bg-2-row);
+	z-index: var(--index-bg-2);
+	background: oklch(var(--dark) / var(--bg-opacity, 1));
+}
+
+.grid-bg-3 {
+	grid-column: var(--grid-bg-3-column);
+	grid-row: var(--grid-bg-3-row);
+	z-index: var(--index-bg-3);
+	background: oklch(var(--low) / var(--bg-opacity, 0.5));
+}
+
+.grid-mask {
+	grid-column: var(--grid-mask-column);
+	grid-row: var(--grid-mask-row);
+	z-index: var(--index-mask);
+}
+
+.grid-grainy {
+	grid-column: var(--grid-grainy-column);
+	grid-row: var(--grid-grainy-row);
+	z-index: var(--index-grainy);
+}
+
+.grid-pattern {
+	grid-column: var(--grid-pattern-column);
+	grid-row: var(--grid-pattern-row);
+	z-index: var(--index-patten);
+}
+
+@media (--media-md) {
+	.grid-layout {
+		grid-template-columns: var(--desktop-grid-columns);
+		grid-template-rows: var(--desktop-grid-rows);
+	}
+	.grid-word {
+		/* --grid-word-column: 2 / -2; */
+		--grid-word-row: 3/ -3;
+	}
+	.grid-pattern {
+		--grid-pattern-column: 2 / -2;
+		--grid-pattern-row: 4 / -4;
+	}
+
+	.grid-grainy {
+		--grid-grainy-column: 2 / -2;
+		--grid-grainy-row: 3 / -3;
+	}
+
+	.grid-bg-1 {
+		--grid-bg-1-column: 1 / -1;
+		--grid-bg-1-row: 1 / -1;
+	}
+
+	.grid-bg-2 {
+		--grid-bg-2-column: 1 / -1;
+		--grid-bg-2-row: 1 / -1;
+	}
+
+	.grid-bg-3 {
+		--grid-bg-3-column: 1 / -1;
+		--grid-bg-3-row: 1 / -1;
+	}
+
+	.grid-image {
+		--grid-image-column: 1 / -1;
+		--grid-image-row: 1 / -1;
+	}
+}
+/*! purgecss end ignore */

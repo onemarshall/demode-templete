@@ -115,6 +115,16 @@ export const cursix: Action<HTMLElement, CursixOptions | undefined> = (node, opt
     hideTimeout = 300,
   } = options;
 
+  // Skip on touch devices and for users who prefer reduced motion
+  const shouldRun =
+    typeof window !== "undefined" &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
+    !window.matchMedia("(pointer: coarse)").matches;
+
+  if (!shouldRun) {
+    return { destroy() {} };
+  }
+
   let cursor: Cursix | null = null;
   let heroElement: Element | null = null;
   const interactiveElements = new Set<Element>();

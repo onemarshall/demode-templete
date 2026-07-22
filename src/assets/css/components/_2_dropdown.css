@@ -1,0 +1,130 @@
+/*! purgecss start ignore */
+/* -------------------------------- 
+
+File#: _2_dropdown
+Title: dropdown
+Descr: A hoverable link that toggles the visibility of a dropdown list
+Usage: codyhouse.co/license
+
+-------------------------------- */
+:root {
+	--dropdown-item-padding: var(--space-2xs) var(--space-sm);
+}
+
+.dropdown {
+	position: relative;
+}
+
+.dropdown__menu {
+	width: 200px;
+	border-radius: var(--radius-md);
+	padding: var(--space-3xs) 0;
+	background-color: var(--color-bg-light);
+	box-shadow: var(--inner-glow), var(--shadow-sm);
+	z-index: var(--z-index-popover, 5);
+	position: absolute;
+	left: 0;
+	top: 100%;
+	font-size: 1rem;
+	opacity: 0;
+	visibility: hidden;
+	transition:
+		opacity 0.2s,
+		visibility 0s 0.2s;
+}
+
+@media (pointer: fine) {
+	.dropdown__wrapper:hover > .dropdown__menu,
+	.dropdown__sub-wrapper:hover > .dropdown__menu {
+		opacity: 1;
+		visibility: visible;
+		transition: opacity 0.2s;
+	}
+	.dropdown__sub-wrapper:hover > .dropdown__menu {
+		left: 100%;
+	}
+}
+@media not all and (pointer: fine) {
+	.dropdown__trigger-icon {
+		display: none;
+	}
+}
+.dropdown__item {
+	display: block;
+	text-decoration: none;
+	color: var(--color-contrast-high);
+	padding: var(--dropdown-item-padding);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	transition: 0.2s;
+}
+.dropdown__item:hover,
+.dropdown__item.dropdown__item--hover {
+	background-color: hsla(
+		var(--color-contrast-higher-h),
+		var(--color-contrast-higher-s),
+		var(--color-contrast-higher-l),
+		0.075
+	);
+}
+
+.dropdown__separator {
+	height: 1px;
+	background-color: var(--color-contrast-lower);
+	margin: var(--dropdown-item-padding);
+}
+
+.dropdown__sub-wrapper {
+	position: relative;
+}
+.dropdown__sub-wrapper > .dropdown__item {
+	position: relative;
+	padding-right: calc(var(--space-sm) + 12px);
+}
+.dropdown__sub-wrapper > .dropdown__item .icon {
+	position: absolute;
+	display: block;
+	width: 12px;
+	height: 12px;
+	right: var(--space-2xs);
+	top: calc(50% - 6px);
+}
+.dropdown__sub-wrapper > .dropdown__menu {
+	top: calc(var(--space-2xs) * -1);
+	box-shadow: var(--inner-glow), var(--shadow-md);
+}
+
+.dropdown__menu {
+	top: calc(100% + 4px);
+}
+
+.dropdown__sub-wrapper .dropdown__menu {
+	top: calc(var(--space-2xs) * -1);
+}
+
+@media (pointer: fine) {
+	.dropdown__menu--is-visible {
+		opacity: 1;
+		visibility: visible;
+		transition: opacity 0.2s;
+	}
+}
+.dropdown__menu--hide {
+	opacity: 0;
+	visibility: hidden;
+	transition:
+		opacity 0.2s,
+		visibility 0s 0.2s;
+}
+
+.dropdown__sub-wrapper > .dropdown__menu--is-visible,
+.dropdown__sub-wrapper > .dropdown__menu--hide {
+	left: 100%;
+}
+.dropdown__sub-wrapper > .dropdown__menu--is-visible.dropdown__menu--left,
+.dropdown__sub-wrapper > .dropdown__menu--hide.dropdown__menu--left {
+	left: -100%;
+}
+
+/*! purgecss end ignore */

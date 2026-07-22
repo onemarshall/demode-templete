@@ -1,19 +1,25 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
-	import type { Snippet } from "svelte";
-	import type { HTMLAttributes } from "svelte/elements";
-
-	interface Props extends HTMLAttributes<HTMLParagraphElement> {
+	interface TitleProps {
 		tagline?: string | null;
-		children?: Snippet;
+		class?: string;
+		as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div';
+		'data-directus'?: string;
 	}
 
-	let { tagline, class: className, children, ...rest }: Props = $props();
+	const {
+		tagline,
+		class: className = '',
+		as = 'p',
+		'data-directus': dataDirectus
+	}: TitleProps = $props();
 </script>
 
-{#if tagline || children}
-	<p class={cn("text-sm font-medium uppercase tracking-[0.14em] text-muted-foreground", className)} {...rest}>
-		{#if tagline}{tagline}{/if}
-		{@render children?.()}
-	</p>
+{#if tagline}
+	<svelte:element
+		this={as}
+		class={`font-heading text-lg font-normal uppercase text-accent md:text-xl lg:text-tagline ${className}`}
+		data-directus={dataDirectus}
+	>
+		{tagline}
+	</svelte:element>
 {/if}

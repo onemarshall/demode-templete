@@ -1,49 +1,21 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
-	import type { Snippet } from "svelte";
-	import type { HTMLAttributes } from "svelte/elements";
-
-	interface Props extends HTMLAttributes<HTMLElement> {
-		headline?: string | null;
-		as?: "h1" | "h2" | "h3";
-		size?: "sm" | "md" | "lg" | "xl";
-		children?: Snippet;
+	interface Props {
+		headline?: string | null
+		as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div'
+		[key: string]: unknown
+		'data-directus'?: string
 	}
 
-	let {
-		headline,
-		as = "h2",
-		size = "md",
-		class: className,
-		children,
-		...rest
-	}: Props = $props();
-
-	const sizeClass = $derived(
-		({
-			sm: "text-2xl",
-			md: "text-3xl md:text-4xl",
-			lg: "text-4xl md:text-5xl",
-			xl: "text-5xl md:text-6xl",
-		})[size],
-	);
+	let { headline, as = 'p', 'data-directus': dataDirectus, ...props }: Props = $props()
 </script>
 
-{#if headline || children}
-	{#if as === "h1"}
-		<h1 class={cn("font-serif font-semibold leading-tight text-balance", sizeClass, className)} {...rest}>
-			{#if headline}{headline}{/if}
-			{@render children?.()}
-		</h1>
-	{:else if as === "h3"}
-		<h3 class={cn("font-serif font-semibold leading-tight text-balance", sizeClass, className)} {...rest}>
-			{#if headline}{headline}{/if}
-			{@render children?.()}
-		</h3>
-	{:else}
-		<h2 class={cn("font-serif font-semibold leading-tight text-balance", sizeClass, className)} {...rest}>
-			{#if headline}{headline}{/if}
-			{@render children?.()}
-		</h2>
-	{/if}
+{#if headline}
+	<svelte:element
+		this={as}
+		class="font-heading font-normal text-foreground {props.class}
+         text-5xl md:text-5xl lg:text-headline"
+		data-directus={dataDirectus}
+	>
+		{headline}
+	</svelte:element>
 {/if}

@@ -1,0 +1,94 @@
+/* 
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
+For Typography
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠ 
+*/
+
+/*! purgecss start ignore */
+[data-split],
+.font-kerning-none {
+	font-kerning: none;
+}
+.char-wrap {
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+}
+
+/*
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
+For Images
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠ 
+*/
+
+[data-reveal='left'] {
+	visibility: hidden;
+	position: relative;
+	overflow: hidden;
+}
+[data-reveal='left'] img {
+	transform-origin: left;
+}
+
+[data-fx-style='FxType11'],
+[data-fx-style='FxType12'] {
+	.p-line,
+	.line {
+		overflow: hidden;
+		display: inline-flex;
+	}
+
+	.p-line-wrap,
+	.line-wrap {
+		display: inline-flex;
+	}
+}
+
+/*! purgecss end ignore */
+/* 
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
+For Lenis scroll-behavior
+≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠ 
+*/
+/*! purgecss start ignore */
+
+html.lenis,
+html.lenis body {
+	height: auto;
+}
+
+.lenis.lenis-smooth {
+	scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+	overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+	overflow: hidden;
+}
+
+.js .is-navigating,
+.js .is-hide {
+	.hero {
+		margin-top: 0 !important;
+	}
+	.fx-navbar,
+	.dr-nav-button,
+	.fx-hero .grid-image .bg-media,
+	.fx-hero .hero-title,
+	.fx-hero .hero-title_sub,
+	.fx-hero .hero-title_buttons,
+	.fx-hero .grid-figbar-bottom,
+	.fx-hero .grid-pattern,
+	.fx-hero .grid-grainy,
+	.fx-hero .grid-bg-1,
+	.fx-hero .grid-bg-2,
+	.fx-hero .grid-bg-3 {
+		visibility: hidden;
+		opacity: 0;
+		display: none;
+	}
+}
+/*! purgecss end ignore */

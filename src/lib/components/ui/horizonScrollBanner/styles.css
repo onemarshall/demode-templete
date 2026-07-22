@@ -1,0 +1,31 @@
+/*! purgecss start ignore */
+.horizon-scroll-banner__title {
+	width: max-content;
+	transform-origin: center;
+	height: auto;
+	overflow-x: hidden;
+	display: inline-block;
+}
+
+.horizon-scroll-banner__title * {
+	max-inline-size: none;
+}
+.horizon-scroll-banner {
+	z-index: 1000;
+}
+.horizon-scroll-banner a {
+	color: currentColor;
+	transition: opacity 0.35s;
+}
+.horizon-scroll-banner a:hover {
+	color: currentColor;
+	opacity: 0.7;
+	transition: opacity 0.35s;
+}
+
+.text-underline {
+	text-underline-offset: calc(1.5 * 0.2ch);
+	text-decoration-thickness: 0.1ch;
+}
+
+/*! purgecss end ignore */

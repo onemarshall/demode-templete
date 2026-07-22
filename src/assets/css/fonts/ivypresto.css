@@ -1,0 +1,23 @@
+/* IvyPresto Display Font Face Declarations */
+:root {
+	--font-serif: 'ivypresto-display', sans-serif;
+	font-variation-settings:
+		/* opsz Max 96 */
+		'dlig',
+		'frac' 1,
+		'liga',
+		'lnum',
+		'ouum',
+		'ordn';
+}
+
+/* Note: @font-face rule removed until IvyPresto font files are available */
+/* To add IvyPresto font support, add font files to /static/assets/fonts/ and uncomment:
+@font-face {
+	font-family: 'ivypresto-display', serif;
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 900;
+	src: url('/assets/fonts/ivypresto-display.woff2') format('woff2');
+}
+*/

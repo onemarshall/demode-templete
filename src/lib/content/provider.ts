@@ -1,6 +1,6 @@
 import type { PageModel, PostDetail, PostSummary, SiteData } from "./schema";
 
-export type ContentProviderType = "static" | "directus" | "wordpress";
+export type ContentProviderType = "static" | "directus";
 
 export interface PageLoadOptions {
   postPages?: Record<string, number>;

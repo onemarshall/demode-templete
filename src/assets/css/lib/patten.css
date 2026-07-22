@@ -1,0 +1,349 @@
+:root {
+	--pattern-size-sm: 5px;
+	--pattern-size-md: 10px;
+	--pattern-size-lg: 50px;
+	--pattern-size-xl: 100px;
+
+	--dots-size-sm: 0.8px;
+	--dots-size-md: 1.1px;
+	--dots-size-lg: 1.5px;
+	--dots-size-xl: 2px;
+}
+
+/* Checks pattern */
+.pattern-checks-sm,
+.pattern-checks-md,
+.pattern-checks-lg,
+.pattern-checks-xl {
+	background-image: repeating-linear-gradient(
+			45deg,
+			currentColor 25%,
+			transparent 25%,
+			transparent 75%,
+			currentColor 75%,
+			currentColor
+		),
+		repeating-linear-gradient(
+			45deg,
+			currentColor 25%,
+			transparent 25%,
+			transparent 75%,
+			currentColor 75%,
+			currentColor
+		);
+	background-position:
+		0 0,
+		var(--size) var(--size);
+	background-size: calc(2 * var(--size)) calc(2 * var(--size));
+}
+
+.pattern-checks-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-checks-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-checks-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-checks-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Grid pattern */
+.pattern-grid-sm,
+.pattern-grid-md,
+.pattern-grid-lg,
+.pattern-grid-xl {
+	background-image: linear-gradient(currentColor 1px, transparent 1px),
+		linear-gradient(to right, currentColor 1px, transparent 1px);
+	background-size: var(--size) var(--size);
+}
+.pattern-grid-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-grid-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-grid-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-grid-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Dots pattern */
+.pattern-dots-sm,
+.pattern-dots-md,
+.pattern-dots-lg,
+.pattern-dots-xl {
+	background-image: radial-gradient(currentColor var(--size), transparent var(--size));
+	background-size: calc(10 * var(--size)) calc(10 * var(--size));
+}
+
+.pattern-dots-sm {
+	--size: var(--dots-size-sm);
+}
+.pattern-dots-md {
+	--size: var(--dots-size-md);
+}
+.pattern-dots-lg {
+	--size: var(--dots-size-lg);
+}
+.pattern-dots-xl {
+	--size: var(--dots-size-xl);
+}
+
+/* Cross-dots pattern */
+.pattern-cross-dots-sm,
+.pattern-cross-dots-md,
+.pattern-cross-dots-lg,
+.pattern-cross-dots-xl {
+	background-image: radial-gradient(currentColor var(--size), transparent var(--size)),
+		radial-gradient(currentColor var(--size), transparent var(--size));
+	background-size: calc(20 * var(--size)) calc(20 * var(--size));
+	background-position:
+		0 0,
+		calc(10 * var(--size)) calc(10 * var(--size));
+}
+.pattern-cross-dots-sm {
+	--size: var(--dots-size-sm);
+}
+.pattern-cross-dots-md {
+	--size: var(--dots-size-md);
+}
+.pattern-cross-dots-lg {
+	--size: var(--dots-size-lg);
+}
+.pattern-cross-dots-xl {
+	--size: var(--dots-size-xl);
+}
+
+/* Vertical lines pattern */
+.pattern-vertical-lines-sm,
+.pattern-vertical-lines-md,
+.pattern-vertical-lines-lg,
+.pattern-vertical-lines-xl {
+	background-image: repeating-linear-gradient(
+		to right,
+		currentColor,
+		currentColor 1px,
+		transparent 1px,
+		transparent
+	);
+	background-size: var(--size) var(--size);
+}
+.pattern-vertical-lines-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-vertical-lines-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-vertical-lines-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-vertical-lines-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Horizontal lines pattern */
+.pattern-horizontal-lines-sm,
+.pattern-horizontal-lines-md,
+.pattern-horizontal-lines-lg,
+.pattern-horizontal-lines-xl {
+	background-image: repeating-linear-gradient(
+		0deg,
+		currentColor,
+		currentColor 1px,
+		transparent 1px,
+		transparent
+	);
+	background-size: var(--size) var(--size);
+}
+.pattern-horizontal-lines-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-horizontal-lines-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-horizontal-lines-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-horizontal-lines-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Diagonal lines pattern */
+.pattern-diagonal-lines-sm,
+.pattern-diagonal-lines-md,
+.pattern-diagonal-lines-lg,
+.pattern-diagonal-lines-xl {
+	background-image: repeating-linear-gradient(
+		45deg,
+		currentColor 0,
+		currentColor 1px,
+		transparent 0,
+		transparent 50%
+	);
+	background-size: var(--size) var(--size);
+}
+.pattern-diagonal-lines-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-diagonal-lines-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-diagonal-lines-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-diagonal-lines-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Vertical stripes pattern */
+.pattern-vertical-stripes-sm,
+.pattern-vertical-stripes-md,
+.pattern-vertical-stripes-lg,
+.pattern-vertical-stripes-xl {
+	background-image: linear-gradient(90deg, transparent 50%, currentColor 50%);
+	background-size: var(--size) var(--size);
+}
+.pattern-vertical-stripes-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-vertical-stripes-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-vertical-stripes-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-vertical-stripes-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Horizontal stripes pattern */
+.pattern-horizontal-stripes-sm,
+.pattern-horizontal-stripes-md,
+.pattern-horizontal-stripes-lg,
+.pattern-horizontal-stripes-xl {
+	background-image: linear-gradient(0deg, transparent 50%, currentColor 50%);
+	background-size: var(--size) var(--size);
+}
+.pattern-horizontal-stripes-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-horizontal-stripes-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-horizontal-stripes-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-horizontal-stripes-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Diagonal stripes pattern */
+.pattern-diagonal-stripes-sm,
+.pattern-diagonal-stripes-md,
+.pattern-diagonal-stripes-lg,
+.pattern-diagonal-stripes-xl {
+	background: repeating-linear-gradient(
+		45deg,
+		transparent,
+		transparent var(--size),
+		currentColor var(--size),
+		currentColor calc(2 * var(--size))
+	);
+}
+.pattern-diagonal-stripes-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-diagonal-stripes-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-diagonal-stripes-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-diagonal-stripes-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Triangles pattern */
+.pattern-triangles-sm,
+.pattern-triangles-md,
+.pattern-triangles-lg,
+.pattern-triangles-xl {
+	background-image: linear-gradient(45deg, currentColor 50%, transparent 50%);
+	background-size: var(--size) var(--size);
+}
+.pattern-triangles-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-triangles-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-triangles-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-triangles-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Zigzag pattern */
+.pattern-zigzag-sm,
+.pattern-zigzag-md,
+.pattern-zigzag-lg,
+.pattern-zigzag-xl {
+	background:
+		linear-gradient(135deg, currentColor 25%, transparent 25%) calc(-1 * var(--size)) 0,
+		linear-gradient(225deg, currentColor 25%, transparent 25%) calc(-1 * var(--size)) 0,
+		linear-gradient(315deg, currentColor 25%, transparent 25%),
+		linear-gradient(45deg, currentColor 25%, transparent 25%);
+	background-size: calc(2 * var(--size)) calc(2 * var(--size));
+}
+.pattern-zigzag-sm {
+	--size: var(--pattern-size-sm);
+}
+.pattern-zigzag-md {
+	--size: var(--pattern-size-md);
+}
+.pattern-zigzag-lg {
+	--size: var(--pattern-size-lg);
+}
+.pattern-zigzag-xl {
+	--size: var(--pattern-size-xl);
+}
+
+/* Text pattern */
+.text-pattern {
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+}
+
+/* Width and Height */
+.pattern-w-sm {
+	width: var(--pattern-size-sm);
+}
+.pattern-h-sm {
+	height: var(--pattern-size-sm);
+}
+.pattern-w-md {
+	width: var(--pattern-size-md);
+}
+.pattern-h-md {
+	height: var(--pattern-size-md);
+}
+.pattern-w-lg {
+	width: var(--pattern-size-lg);
+}
+.pattern-h-lg {
+	height: var(--pattern-size-lg);
+}
+.pattern-w-xl {
+	width: var(--pattern-size-xl);
+}
+.pattern-h-xl {
+	height: var(--pattern-size-xl);
+}
