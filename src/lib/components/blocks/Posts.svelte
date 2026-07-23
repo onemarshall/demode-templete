@@ -88,7 +88,7 @@
 	const buildPageHref = (targetPage: number): string => {
 		if (!pagination) return page.url.pathname;
 
-		const nextUrl = new URL(page.url);
+		const nextUrl = new URL(page.url.toString());
 		if (targetPage <= 1) {
 			nextUrl.searchParams.delete(pagination.paramName);
 		} else {

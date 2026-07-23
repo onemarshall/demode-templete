@@ -1,82 +1,89 @@
 <script lang="ts">
-	import { Button, buttonVariants } from '$lib/components/ui/button'
+	import { Button, buttonVariants } from "$lib/components/ui/button";
 
-	import { Search } from '@lucide/svelte'
+	import { Search } from "@lucide/svelte";
 
-	import { debounce } from '$lib/utils'
-	import Badge from './badge/badge.svelte'
-	import { goto } from '$app/navigation'
-	import { resolve } from '$app/paths'
+	import { debounce } from "$lib/utils";
+	import Badge from "$lib/components/ui/badge/badge.svelte";
+	import { goto } from "$app/navigation";
+	import { resolve } from "$app/paths";
 
-	let open = $state(false)
-	let search = $state('')
-	let searched = $state(false)
-	let loading = $state(false)
-	let results = $state<SearchResult[]>([])
+	let open = $state(false);
+	let search = $state("");
+	let searched = $state(false);
+	let loading = $state(false);
+	let results = $state<SearchResult[]>([]);
 
 	type SearchResult = {
-		id: string
-		title: string
-		description: string
-		type: string
-		link: string
-	}
+		id: string;
+		title: string;
+		description: string;
+		type: string;
+		link: string;
+	};
 
 	const handleKeydown = (e: KeyboardEvent) => {
-		if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-			e.preventDefault()
-			open = !open
+		if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+			e.preventDefault();
+			open = !open;
 		}
-	}
+	};
 
 	$effect(() => {
 		if (!open) {
 			// results = [];
-			searched = false
-			loading = false
+			searched = false;
+			loading = false;
 		}
-	})
+	});
 
 	const fetchResults = async (searchTerm: string) => {
 		if (searchTerm.length < 3 || !open) {
-			results = []
+			results = [];
 			// searched = false;
-			return
+			return;
 		}
 
-		loading = true
+		loading = true;
 		// searched = true;
 
 		try {
-			const res = await fetch(`/api/search?search=${encodeURIComponent(searchTerm)}`)
-			if (!res.ok) throw new Error('Failed to fetch results')
-			const data: SearchResult[] = await res.json()
-			results = data.filter((r) => r.link)
+			const res = await fetch(
+				`/api/search?search=${encodeURIComponent(searchTerm)}`,
+			);
+			if (!res.ok) throw new Error("Failed to fetch results");
+			const data: SearchResult[] = await res.json();
+			results = data.filter((r) => r.link);
 		} catch (error) {
-			console.error('Error fetching search results:', error)
-			results = []
+			console.error("Error fetching search results:", error);
+			results = [];
 		} finally {
-			loading = false
+			loading = false;
 		}
-	}
+	};
 	const debouncedFetchResults = debounce((value: unknown) => {
-		void fetchResults(typeof value === 'string' ? value : '')
-	}, 300)
+		void fetchResults(typeof value === "string" ? value : "");
+	}, 300);
 
 	$effect(() => {
-		debouncedFetchResults(search)
-	})
+		debouncedFetchResults(search);
+	});
 
 	const handleSelect = (result: SearchResult) => {
-		void goto(resolve(result.link as `/${string}`))
-		open = false
-	}
+		void goto(resolve(result.link as `/${string}`));
+		open = false;
+	};
 </script>
 
 <svelte:document onkeydown={handleKeydown} />
 
 <div class="max-w-full sm:max-w-[540px]">
-	<Button variant="ghost" size="icon" aria-label="Search" onclick={() => (open = true)}>
+	<Button
+		variant="ghost"
+		size="icon"
+		aria-label="Search"
+		onclick={() => (open = true)}
+	>
 		<Search class="size-5" />
 	</Button>
 
@@ -110,8 +117,12 @@
 						>
 							<Badge variant="default">{result.type}</Badge>
 							<div class="ml-2 w-full">
-								<p class="text-base font-medium">{result.title}</p>
-								<p class="mt-1 line-clamp-2 text-sm">{result.description}</p>
+								<p class="text-base font-medium">
+									{result.title}
+								</p>
+								<p class="mt-1 line-clamp-2 text-sm">
+									{result.description}
+								</p>
 							</div>
 						</button>
 					{/each}

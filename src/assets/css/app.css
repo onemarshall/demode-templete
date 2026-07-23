@@ -9,50 +9,64 @@
 
 /* === MAP TO TAILWIND shared === */
 @theme {
-  /* Colors - Keep your system AND add Tailwind compatibility */
-  --color-primary: var(--color-primary);
-  --color-accent: var(--color-accent);
-  --color-sec: var(--color-sec);
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
-  --color-error: var(--color-error);
+  /* Colors - source palette in colour.css, exposed here to Tailwind */
+  --color-primary: var(--brand-primary);
+  --color-primary-lighter: var(--brand-primary-lighter);
+  --color-primary-light: var(--brand-primary-light);
+  --color-primary-dark: var(--brand-primary-dark);
+  --color-primary-darker: var(--brand-primary-darker);
+  --color-accent: var(--brand-accent);
+  --color-accent-lighter: var(--brand-accent-lighter);
+  --color-accent-light: var(--brand-accent-light);
+  --color-accent-dark: var(--brand-accent-dark);
+  --color-accent-darker: var(--brand-accent-darker);
+  --color-sec: var(--brand-sec);
+  --color-sec-lighter: var(--brand-sec-lighter);
+  --color-sec-light: var(--brand-sec-light);
+  --color-sec-dark: var(--brand-sec-dark);
+  --color-sec-darker: var(--brand-sec-darker);
+  --color-success: var(--brand-success);
+  --color-warning: var(--brand-warning);
+  --color-error: var(--brand-error);
+  --color-white: white;
+  --color-black: black;
 
-  /* Map your semantic system to Tailwind's scale */
-  --color-primary-50: var(--color-primary-lighter);
-  --color-primary-100: var(--color-primary-light);
-  --color-primary-200: var(--color-primary-light);
-  --color-primary-300: var(--color-primary);
-  --color-primary-400: var(--color-primary);
-  --color-primary-500: var(--color-primary);
-  --color-primary-600: var(--color-primary-dark);
-  --color-primary-700: var(--color-primary-dark);
-  --color-primary-800: var(--color-primary-darker);
-  --color-primary-900: var(--color-primary-darker);
-  --color-primary-950: var(--color-primary-darker);
+  /* Map your semantic system to Tailwind's numeric scale */
+  --color-primary-50: var(--brand-primary-lighter);
+  --color-primary-100: var(--brand-primary-light);
+  --color-primary-200: var(--brand-primary-light);
+  --color-primary-300: var(--brand-primary);
+  --color-primary-400: var(--brand-primary);
+  --color-primary-500: var(--brand-primary);
+  --color-primary-600: var(--brand-primary-dark);
+  --color-primary-700: var(--brand-primary-dark);
+  --color-primary-800: var(--brand-primary-darker);
+  --color-primary-900: var(--brand-primary-darker);
+  --color-primary-950: var(--brand-primary-darker);
 
-  --color-accent-50: var(--color-accent-lighter);
-  --color-accent-100: var(--color-accent-light);
-  --color-accent-200: var(--color-accent-light);
-  --color-accent-300: var(--color-accent);
-  --color-accent-400: var(--color-accent);
-  --color-accent-500: var(--color-accent);
-  --color-accent-600: var(--color-accent-dark);
-  --color-accent-700: var(--color-accent-dark);
-  --color-accent-800: var(--color-accent-darker);
-  --color-accent-900: var(--color-accent-darker);
-  --color-accent-950: var(--color-accent-darker);
+  --color-accent-50: var(--brand-accent-lighter);
+  --color-accent-100: var(--brand-accent-light);
+  --color-accent-200: var(--brand-accent-light);
+  --color-accent-300: var(--brand-accent);
+  --color-accent-400: var(--brand-accent);
+  --color-accent-500: var(--brand-accent);
+  --color-accent-600: var(--brand-accent-dark);
+  --color-accent-700: var(--brand-accent-dark);
+  --color-accent-800: var(--brand-accent-darker);
+  --color-accent-900: var(--brand-accent-darker);
+  --color-accent-950: var(--brand-accent-darker);
 
-  --color-sec-50: var(--color-sec-lighter);
-  --color-sec-100: var(--color-sec-light);
-  --color-sec-200: var(--color-sec-light);
-  --color-sec-300: var(--color-sec);
-  --color-sec-400: var(--color-sec);
-  --color-sec-500: var(--color-sec);
-  --color-sec-600: var(--color-sec-dark);
-  --color-sec-700: var(--color-sec-dark);
-  --color-sec-800: var(--color-sec-darker);
-  --color-sec-900: var(--color-sec-darker);
-  --color-sec-950: var(--color-sec-darker);
+  --color-sec-50: var(--brand-sec-lighter);
+  --color-sec-100: var(--brand-sec-light);
+  --color-sec-200: var(--brand-sec-light);
+  --color-sec-300: var(--brand-sec);
+  --color-sec-400: var(--brand-sec);
+  --color-sec-500: var(--brand-sec);
+  --color-sec-600: var(--brand-sec-dark);
+  --color-sec-700: var(--brand-sec-dark);
+  --color-sec-800: var(--brand-sec-darker);
+  --color-sec-900: var(--brand-sec-darker);
+  --color-sec-950: var(--brand-sec-darker);
 
   --color-gray-50: oklch(0.984 0.003 247.858);
   --color-gray-100: oklch(0.968 0.007 247.896);

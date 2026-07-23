@@ -22,35 +22,35 @@ export const defaultConsentPreferences: ConsentPreferences = {
   rejectedServices: {},
 };
 
-let _ready = $state(false);
-let _hasConsent = $state(false);
-let _preferences = $state<ConsentPreferences>({ ...defaultConsentPreferences });
+let readyState = $state(false);
+let hasConsentState = $state(false);
+let preferencesState = $state<ConsentPreferences>({ ...defaultConsentPreferences });
 
 export const cookieConsentState = {
   get ready() {
-    return _ready;
+    return readyState;
   },
   get hasConsent() {
-    return _hasConsent;
+    return hasConsentState;
   },
   get preferences() {
-    return _preferences;
+    return preferencesState;
   },
 
   setReady(ready: boolean) {
-    _ready = ready;
+    readyState = ready;
   },
   setPreferences(preferences: Partial<ConsentPreferences>, hasConsent = true) {
-    _hasConsent = hasConsent;
-    _preferences = { ...defaultConsentPreferences, ..._preferences, ...preferences };
+    hasConsentState = hasConsent;
+    preferencesState = { ...defaultConsentPreferences, ...preferencesState, ...preferences };
   },
   reset() {
-    _ready = false;
-    _hasConsent = false;
-    _preferences = { ...defaultConsentPreferences };
+    readyState = false;
+    hasConsentState = false;
+    preferencesState = { ...defaultConsentPreferences };
   },
 };
 
-export const isAnalyticsAllowed = () => _preferences.acceptedCategories.includes("analytics");
+export const isAnalyticsAllowed = () => preferencesState.acceptedCategories.includes("analytics");
 
-export const isAdsAllowed = () => _preferences.acceptedCategories.includes("ads");
+export const isAdsAllowed = () => preferencesState.acceptedCategories.includes("ads");

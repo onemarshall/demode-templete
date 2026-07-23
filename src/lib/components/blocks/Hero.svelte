@@ -1,12 +1,11 @@
 <script lang="ts">
-	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
+	import HeroMedia from "$lib/components/shared/HeroMedia.svelte";
 	import BaseText from "$lib/components/ui/Text.svelte";
 	import ButtonGroup from "./ButtonGroup.svelte";
 	import type { ButtonProps } from "./Button.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 	import setAttr from "$lib/features/directus/visualEditing";
 	import { fade } from "scripts/actions";
-	import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
 
 	interface Props {
 		data: {
@@ -71,7 +70,7 @@
 	const mediaType = $derived(hasVideo ? "video" : hasImage ? "image" : null);
 
 	// Get poster image for video (fallback to image if available)
-	const posterImage = $derived(video?.poster ?? null);
+	const poster = $derived(video?.poster ?? null);
 
 	type LayoutPosition = "top" | "middle" | "bottom";
 
@@ -131,33 +130,13 @@
 				mode: "modal",
 			})}
 		>
-			{#if mediaType === "video"}
-				<div class="hero-video-wrapper absolute inset-0">
-					<img
-						src={getDirectusAssetURL(videoAssetId)}
-						alt={headline || "Video Preview"}
-						class="h-full w-full object-cover"
-					/>
-					<video
-						autoplay
-						loop
-						muted
-						playsinline
-						src={getDirectusAssetURL(videoAssetId)}
-						class="h-full w-full object-cover"
-					></video>
-				</div>
-			{:else if mediaType === "image"}
-				<DirectusImage
-					uuid={image}
-					layout="fullWidth"
-					loading="eager"
-					fetchpriority="high"
-					alt={headline || "Hero Image"}
-					sizes="100vw"
-					class="h-full w-full object-cover object-top"
-				/>
-			{/if}
+			<HeroMedia
+				{mediaType}
+				{image}
+				videoId={videoAssetId}
+				{poster}
+				alt={headline || "Hero Image"}
+			/>
 			<div
 				class="absolute inset-0 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-contrast-high)_18%,transparent)_0%,color-mix(in_srgb,var(--color-contrast-high)_28%,transparent)_42%,color-mix(in_srgb,var(--color-contrast-high)_78%,transparent)_100%)] md:bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-contrast-high)_52%,transparent)_0%,color-mix(in_srgb,var(--color-contrast-high)_25%,transparent)_32%,color-mix(in_srgb,var(--color-contrast-high)_22%,transparent)_58%,color-mix(in_srgb,var(--color-contrast-high)_8%,transparent)_100%)]"
 			></div>
@@ -316,26 +295,3 @@
 		</div> -->
 	</div>
 </section>
-
-<style>
-	:global(.hero-video-wrapper img),
-	:global(.hero-video-wrapper video) {
-		position: absolute;
-		top: 0;
-		left: 0;
-		object-fit: cover;
-		height: 100%;
-		width: 100%;
-	}
-	:global(.hero-video-wrapper img) {
-		display: none;
-	}
-	@media (prefers-reduced-motion: reduce) {
-		:global(.hero-video-wrapper video) {
-			visibility: hidden;
-		}
-		:global(.hero-video-wrapper img) {
-			display: block;
-		}
-	}
-</style>

@@ -114,37 +114,37 @@
 Colours
 +++++++++++++++++++++++++++++++++
 */
-  --color-primary-lighter: oklch(var(--color-lighter) var(--primary));
-  --color-primary-light: oklch(var(--color-light) var(--primary));
-  --color-primary: oklch(var(--color-background) var(--primary));
-  --color-primary-dark: oklch(var(--color-dark) var(--primary));
-  --color-primary-darker: oklch(var(--color-darker) var(--primary));
-  --color-accent-lighter: oklch(var(--color-lighter) var(--accent));
-  --color-accent-light: oklch(var(--color-light) var(--accent));
-  --color-accent: oklch(var(--color-background) var(--accent));
-  --color-accent-dark: oklch(var(--color-dark) var(--accent));
-  --color-accent-darker: oklch(var(--color-darker) var(--accent));
-  --color-sec-lighter: oklch(var(--color-lighter) var(--sec));
-  --color-sec-light: oklch(var(--color-light) var(--sec));
-  --color-sec: oklch(var(--300) var(--sec));
-  --color-sec-dark: oklch(var(--color-dark) var(--sec));
-  --color-sec-darker: oklch(var(--color-darker) var(--sec));
+  --brand-primary-lighter: oklch(var(--color-lighter) var(--primary));
+  --brand-primary-light: oklch(var(--color-light) var(--primary));
+  --brand-primary: oklch(var(--color-background) var(--primary));
+  --brand-primary-dark: oklch(var(--color-dark) var(--primary));
+  --brand-primary-darker: oklch(var(--color-darker) var(--primary));
+  --brand-accent-lighter: oklch(var(--color-lighter) var(--accent));
+  --brand-accent-light: oklch(var(--color-light) var(--accent));
+  --brand-accent: oklch(var(--color-background) var(--accent));
+  --brand-accent-dark: oklch(var(--color-dark) var(--accent));
+  --brand-accent-darker: oklch(var(--color-darker) var(--accent));
+  --brand-sec-lighter: oklch(var(--color-lighter) var(--sec));
+  --brand-sec-light: oklch(var(--color-light) var(--sec));
+  --brand-sec: oklch(var(--300) var(--sec));
+  --brand-sec-dark: oklch(var(--color-dark) var(--sec));
+  --brand-sec-darker: oklch(var(--color-darker) var(--sec));
 
-  --color-success-lighter: oklch(var(--100) var(--system-chroma) var(--success));
-  --color-success-light: oklch(var(--500) var(--system-chroma) var(--success));
-  --color-success: oklch(var(--600) var(--system-chroma) var(--success));
-  --color-success-dark: oklch(var(--700) var(--system-chroma) var(--success));
-  --color-success-darker: oklch(var(--900) var(--system-chroma) var(--success));
-  --color-warning-lighter: oklch(var(--100) var(--warning-chroma) var(--warning));
-  --color-warning-light: oklch(var(--300) var(--warning-chroma) var(--warning));
-  --color-warning: oklch(var(--300) var(--system-chroma) var(--warning));
-  --color-warning-dark: oklch(var(--300) var(--warning-chroma) var(--warning));
-  --color-warning-darker: oklch(var(--600) var(--warning-chroma) var(--warning));
-  --color-error-lighter: oklch(var(--400) var(--system-chroma) var(--error));
-  --color-error-light: oklch(var(--500) var(--system-chroma) var(--error));
-  --color-error: oklch(var(--500) var(--system-chroma) var(--error));
-  --color-error-dark: oklch(var(--700) var(--system-chroma) var(--error));
-  --color-error-darker: oklch(var(--900) var(--system-chroma) var(--error));
+  --brand-success-lighter: oklch(var(--100) var(--system-chroma) var(--success));
+  --brand-success-light: oklch(var(--500) var(--system-chroma) var(--success));
+  --brand-success: oklch(var(--600) var(--system-chroma) var(--success));
+  --brand-success-dark: oklch(var(--700) var(--system-chroma) var(--success));
+  --brand-success-darker: oklch(var(--900) var(--system-chroma) var(--success));
+  --brand-warning-lighter: oklch(var(--100) var(--warning-chroma) var(--warning));
+  --brand-warning-light: oklch(var(--300) var(--warning-chroma) var(--warning));
+  --brand-warning: oklch(var(--300) var(--system-chroma) var(--warning));
+  --brand-warning-dark: oklch(var(--300) var(--warning-chroma) var(--warning));
+  --brand-warning-darker: oklch(var(--600) var(--warning-chroma) var(--warning));
+  --brand-error-lighter: oklch(var(--400) var(--system-chroma) var(--error));
+  --brand-error-light: oklch(var(--500) var(--system-chroma) var(--error));
+  --brand-error: oklch(var(--500) var(--system-chroma) var(--error));
+  --brand-error-dark: oklch(var(--700) var(--system-chroma) var(--error));
+  --brand-error-darker: oklch(var(--900) var(--system-chroma) var(--error));
 }
 
 /* ≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠*/
@@ -205,9 +205,9 @@ Colours
 [data-theme="sec"]:hover,
 [data-theme="primary"]:hover,
 [data-theme="dark"]:hover {
-  --color-primary: oklch(var(--color-darker) var(--primary));
-  --color-accent: oklch(var(--color-darker) var(--accent));
-  --color-sec: oklch(var(--color-darker) var(--sec));
+  --brand-primary: oklch(var(--color-darker) var(--primary));
+  --brand-accent: oklch(var(--color-darker) var(--accent));
+  --brand-sec: oklch(var(--color-darker) var(--sec));
 }
 /* Standard dark mode support for shadcn/ui compatibility */
 .dark,
@@ -303,66 +303,3 @@ Colours
 .color-contrast-higher {
   color: oklch(var(--higher) / var(--color-opacity, 1));
 }
-
-/* Background Contrast Colors */
-.bg-contrast-lower {
-  background-color: oklch(var(--lower) / var(--bg-opacity, 1));
-}
-.bg-contrast-low {
-  background-color: oklch(var(--low) / var(--bg-opacity, 1));
-}
-.bg-contrast-medium {
-  background-color: oklch(var(--medium) / var(--bg-opacity, 1));
-}
-.bg-contrast-high {
-  background-color: oklch(var(--high) / var(--bg-opacity, 1));
-}
-.bg-contrast-higher {
-  background-color: oklch(var(--higher) / var(--bg-opacity, 1));
-}
-
-/* ≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠*/
-/*
-/* Border
-/*
-/* ≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠*/
-/* .border-white {
-	background-color: oklch(var(--bg) / var(--bg-opacity, 1));
-}
-.border-contrast-lower {
-	border-color: oklch(var(--lower) / var(--border-opacity, 1));
-}
-.border-contrast-low {
-	border-color: oklch(var(--low) / var(--border-opacity, 1));
-}
-.border-contrast-medium {
-	border-color: oklch(var(--medium) / var(--border-opacity, 1));
-}
-.border-contrast-high {
-	border-color: oklch(var(--high) / var(--border-opacity, 1));
-}
-.border-contrast-higher {
-	border-color: oklch(var(--higher) / var(--border-opacity, 1));
-}
-.border-bg-darker {
-	border-color: oklch(var(--darker) / var(--border-opacity, 1));
-}
-.border-bg-dark {
-	border-color: oklch(var(--dark) / var(--border-opacity, 1));
-}
-.border-bg {
-	border-color: oklch(var(--bg) / var(--border-opacity, 1));
-}
-.border-bg-light {
-	border-color: oklch(var(--light) / var(--border-opacity, 1));
-}
-.border-bg-lighter {
-	border-color: oklch(var(--lighter) / var(--border-opacity, 1));
-}
-
-.border-primary {
-	border-color: oklch(var(--color-background) var(--primary) / var(--color-opacity, 1));
-}
-.border-primary-dark {
-	border-color: oklch(var(--color-dark) var(--primary) / var(--color-opacity, 1));
-} */

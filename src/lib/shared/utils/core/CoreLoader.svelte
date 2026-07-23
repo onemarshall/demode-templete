@@ -1,5 +1,58 @@
+<script lang="ts">
+	import { onMount } from "svelte";
+
+	let loader: HTMLDivElement | undefined = $state(undefined);
+	let isLoaded = $state(false);
+	let reducedMotion = $state(false);
+	let hidden = $state(false);
+
+	onMount(() => {
+		const body = document.body;
+		const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+		reducedMotion = media.matches;
+
+		const onMediaChange = (e: MediaQueryListEvent) => {
+			reducedMotion = e.matches;
+		};
+
+		const setLoaded = () => {
+			const loaded = body.classList.contains("is-loaded");
+			isLoaded = loaded;
+
+			if (loaded && reducedMotion) {
+				hidden = true;
+			} else if (!loaded) {
+				hidden = false;
+			}
+		};
+
+		const onTransitionEnd = () => {
+			if (isLoaded) hidden = true;
+		};
+
+		loader?.addEventListener("transitionend", onTransitionEnd);
+		media.addEventListener("change", onMediaChange);
+		const observer = new MutationObserver(setLoaded);
+		observer.observe(body, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+
+		setLoaded();
+
+		return () => {
+			loader?.removeEventListener("transitionend", onTransitionEnd);
+			media.removeEventListener("change", onMediaChange);
+			observer.disconnect();
+		};
+	});
+</script>
+
 <div
-	class="loader fixed inset-0 z-3002 grid h-full w-full place-items-center bg-gray-950 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+	bind:this={loader}
+	class:hidden
+	aria-hidden={isLoaded ? "true" : undefined}
+	class="loader fixed inset-0 z-[3002] grid h-full w-full place-items-center bg-gray-950 motion-safe:transition-all motion-safe:duration-500 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)]"
 	role="status"
 	aria-live="polite"
 	aria-atomic="true"
@@ -22,6 +75,10 @@
 		opacity: 0;
 		visibility: hidden;
 		pointer-events: none;
+	}
+
+	.loader.hidden {
+		display: none;
 	}
 
 	@keyframes -global-circle-loader {

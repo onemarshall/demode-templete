@@ -18,6 +18,7 @@
 	}: { children: import("svelte").Snippet; data: LayoutData } = $props();
 	let hasCompletedInitialLoad = false;
 	let isNavigating = $state(false);
+	let prefersReducedMotion = $state(false);
 
 	setContext(
 		contenNavigationContext,
@@ -38,7 +39,9 @@
 	}
 
 	async function revealPage() {
-		await waitForNextPaint();
+		if (!prefersReducedMotion) {
+			await waitForNextPaint();
+		}
 		hasCompletedInitialLoad = true;
 		isNavigating = false;
 		setLoadingState(false);
@@ -59,6 +62,13 @@
 	});
 
 	onMount(() => {
+		const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+		prefersReducedMotion = media.matches;
+		const onChange = (e: MediaQueryListEvent) => {
+			prefersReducedMotion = e.matches;
+		};
+		media.addEventListener("change", onChange);
+
 		if (document.readyState !== "loading") {
 			void revealPage();
 		} else {
@@ -70,6 +80,7 @@
 		}
 
 		return () => {
+			media.removeEventListener("change", onChange);
 			document.removeEventListener(
 				"DOMContentLoaded",
 				handleInitialDOMContentLoaded,
@@ -80,7 +91,17 @@
 </script>
 
 <svelte:head>
-	<link rel="stylesheet" href="https://use.typekit.net/tck6tzf.css" />
+	<link
+		rel="preload"
+		href="https://use.typekit.net/tck6tzf.css"
+		as="style"
+		onload={(e) => {
+			(e.currentTarget as HTMLLinkElement).rel = "stylesheet";
+		}}
+	/>
+	<noscript>
+		<link rel="stylesheet" href="https://use.typekit.net/tck6tzf.css" />
+	</noscript>
 </svelte:head>
 
 <div use:cursix={{ speed: 0.6 }}>
@@ -88,7 +109,7 @@
 	<MenuMain globals={data.global?.globals} />
 
 	<div
-		class="pointer-events-none fixed top-0 left-0 z-4000 h-05 w-[min(28vw,16rem)] bg-linear-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-200 ease-out motion-safe:animate-[route-progress-slide_0.9s_ease-in-out_infinite]"
+		class="pointer-events-none fixed top-0 left-0 z-4000 h-05 w-[min(28vw,16rem)] bg-linear-to-r from-transparent via-primary to-transparent opacity-0 motion-safe:transition-opacity motion-safe:duration-200 motion-safe:ease-out motion-safe:animate-[route-progress-slide_0.9s_ease-in-out_infinite]"
 		class:opacity-100={isNavigating}
 		aria-hidden="true"
 	></div>

@@ -1660,7 +1660,7 @@ export interface DirectusSettings {
     output: number;
     attachment: boolean;
     reasoning: boolean;
-    providerOptions: Record<string, any>;
+    providerOptions: Record<string, unknown>;
   }> | null;
   ai_openai_compatible_headers?: Array<{ header: string; value: string }> | null;
   ai_openai_allowed_models?: Array<
@@ -1695,7 +1695,7 @@ export interface DirectusSettings {
   > | null;
   collaborative_editing_enabled?: boolean;
   /** @description Settings for the Command Palette Module. */
-  command_palette_settings?: Record<string, any> | null;
+  command_palette_settings?: Record<string, unknown> | null;
 }
 
 export interface DirectusUser {

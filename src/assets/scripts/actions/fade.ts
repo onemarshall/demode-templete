@@ -62,6 +62,11 @@ export const fade: Action<HTMLElement, FadeOptions | undefined> = (node, options
   const val = x !== 0 ? x : y;
 
   const init = () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set(node, { autoAlpha: 1, [dir]: 0, clearProps: "opacity,visibility,transform" });
+      return () => {};
+    }
+
     gsap.set(node, { autoAlpha: 0, [dir]: val, willChange: "opacity, transform" });
 
     const trigger = ScrollTrigger.create({
@@ -151,6 +156,11 @@ export const staggerFade: Action<HTMLElement, StaggerFadeOptions | undefined> = 
   };
 
   const init = () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set(targets, { opacity: 1, x: 0, y: 0, clearProps: "all" });
+      return () => {};
+    }
+
     // Set initial hidden state
     gsap.set(targets, initialState);
 

@@ -7,6 +7,9 @@
 	import Text from "$lib/components/ui/Text.svelte";
 	import ButtonGroup from "$lib/components/blocks/ButtonGroup.svelte";
 	import type { ButtonProps } from "$lib/components/blocks/Button.svelte";
+	import MediaPlayer from "$lib/components/shared/MediaPlayer.svelte";
+	import TypoEventDetails from "$lib/components/shared/TypoEventDetails.svelte";
+	import TypoEventResources from "$lib/components/shared/TypoEventResources.svelte";
 
 	interface ImageWithFocalPoint {
 		id: string;
@@ -100,55 +103,6 @@
 	const showVideo = $derived(data.show_video === true);
 	const video = $derived(data.video ?? null);
 
-	const videoEmbedUrl = $derived.by(() => {
-		if (!video?.service || !video?.id) return null;
-		if (video.service === "youtube")
-			return `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=0&rel=0`;
-		if (video.service === "vimeo")
-			return `https://player.vimeo.com/video/${video.id}?dnt=1`;
-		return null;
-	});
-
-	const directusVideoUrl = $derived.by(() => {
-		if (!video?.id || video?.service) return null;
-		return getDirectusAssetURL(video.id);
-	});
-
-	let videoTitle = $state<string | null>(null);
-
-	$effect(() => {
-		if (!showVideo || !video?.service || !video?.id) {
-			videoTitle = null;
-			return;
-		}
-
-		const service = video.service;
-		const vid = video.id;
-		let cancelled = false;
-
-		const oembedUrl =
-			service === "vimeo"
-				? `https://vimeo.com/api/oembed.json?url=https://vimeo.com/${vid}`
-				: service === "youtube"
-					? `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${vid}&format=json`
-					: null;
-
-		if (!oembedUrl) return;
-
-		fetch(oembedUrl)
-			.then((r) => r.json())
-			.then((data) => {
-				if (!cancelled) videoTitle = data.title ?? null;
-			})
-			.catch(() => {
-				if (!cancelled) videoTitle = null;
-			});
-
-		return () => {
-			cancelled = true;
-		};
-	});
-
 	const showEventInfo = $derived(Boolean(data.show_event_info));
 	const subtitle = $derived(
 		showEventInfo ? data.subtitle?.trim() || null : null,
@@ -206,10 +160,6 @@
 			: null,
 	);
 
-	const hasResources = $derived(
-		Boolean(programmePdfUrl || galleryUrl || pressReleaseUrl),
-	);
-
 	const buttons = $derived<ButtonProps[]>(
 		(data.buttons?.buttons ?? []).map(
 			(button: Record<string, unknown>) => ({
@@ -226,118 +176,6 @@
 		),
 	);
 </script>
-
-{#snippet eventSubtitle()}
-	{#if subtitle}
-		<p class="-mt-3 text-sm uppercase tracking-[0.2em] text-black/50">
-			{subtitle}
-		</p>
-	{/if}
-{/snippet}
-
-{#snippet eventPartner()}
-	{#if partnerName}
-		<p class="text-sm text-black/60">
-			In partnership with
-			{#if partnerUrl}
-				<a
-					href={partnerUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-					class="font-medium text-black underline decoration-black/30 underline-offset-2 hover:decoration-black"
-				>
-					{partnerName}
-				</a>
-			{:else}
-				<span class="font-medium text-black">{partnerName}</span>
-			{/if}
-			.
-		</p>
-	{/if}
-{/snippet}
-
-{#snippet eventResources()}
-	{#if hasResources}
-		<div class="mt-6 border-t border-black/10 pt-5">
-			<p
-				class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-black/40"
-			>
-				Resources
-			</p>
-			<ul class="space-y-2 text-sm">
-				{#if programmePdfUrl}
-					<li>
-						<a
-							href={programmePdfUrl}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="inline-flex items-center gap-2 text-black/70 transition-colors hover:text-black"
-						>
-							<span aria-hidden="true">→</span>
-							{programmePdfLabel}
-						</a>
-					</li>
-				{/if}
-				{#if galleryUrl}
-					<li>
-						<a
-							href={galleryUrl}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="inline-flex items-center gap-2 text-black/70 transition-colors hover:text-black"
-						>
-							<span aria-hidden="true">→</span>
-							Browse the photo gallery
-						</a>
-					</li>
-				{/if}
-				{#if pressReleaseUrl}
-					<li>
-						<a
-							href={pressReleaseUrl}
-							class="inline-flex items-center gap-2 text-black/70 transition-colors hover:text-black"
-						>
-							<span aria-hidden="true">→</span>
-							{pressReleaseLabel}
-						</a>
-					</li>
-				{/if}
-			</ul>
-		</div>
-	{/if}
-{/snippet}
-
-{#snippet videoPlayer()}
-	{#if showVideo && video}
-		<div>
-			<div class="aspect-video w-full overflow-hidden rounded-sm">
-				{#if videoEmbedUrl}
-					<iframe
-						src={videoEmbedUrl}
-						title={videoTitle || title || "Video"}
-						class="h-full w-full"
-						frameborder="0"
-						allow="autoplay; fullscreen; picture-in-picture"
-						allowfullscreen
-					></iframe>
-				{:else if directusVideoUrl}
-					<video
-						controls
-						playsinline
-						preload="metadata"
-						class="h-full w-full object-cover"
-						src={directusVideoUrl}
-					>
-						<track kind="captions" />
-					</video>
-				{/if}
-			</div>
-			{#if videoTitle}
-				<p class="mt-3 text-sm text-black/50 italic">{videoTitle}</p>
-			{/if}
-		</div>
-	{/if}
-{/snippet}
 
 <section
 	class="py-16 lg:py-24"
@@ -402,7 +240,7 @@
 							{/if}
 						</div>
 					{:else if showVideo && video}
-						{@render videoPlayer()}
+						<MediaPlayer {video} {title} />
 					{:else if title}
 						<!-- Fallback: dark card without image -->
 						<div
@@ -467,8 +305,11 @@
 								{title}
 							</h2>
 						{/if}
-						{@render eventSubtitle()}
-						{@render eventPartner()}
+						<TypoEventDetails
+							{subtitle}
+							{partnerName}
+							{partnerUrl}
+						/>
 						{#if content}
 							<div
 								class="text-[0.95rem] leading-relaxed text-black/70"
@@ -476,7 +317,13 @@
 								<Text {content} />
 							</div>
 						{/if}
-						{@render eventResources()}
+						<TypoEventResources
+							{programmePdfUrl}
+							{programmePdfLabel}
+							{galleryUrl}
+							{pressReleaseUrl}
+							{pressReleaseLabel}
+						/>
 						{#if showButton && buttons.length > 0}
 							<div class="flex flex-col items-start gap-3 pt-2">
 								<ButtonGroup {buttons} />
@@ -498,7 +345,7 @@
 					</div>
 				{:else if showVideo && video}
 					<div use:fade={{ x: 30, duration: 1.4 }}>
-						{@render videoPlayer()}
+						<MediaPlayer {video} {title} />
 					</div>
 				{/if}
 			</div>
@@ -538,7 +385,7 @@
 					</div>
 				{:else if showVideo && video}
 					<div use:fade={{ x: -30, duration: 1.4 }}>
-						{@render videoPlayer()}
+						<MediaPlayer {video} {title} />
 					</div>
 				{/if}
 				{#if showContent}
@@ -612,7 +459,7 @@
 				</div>
 			{:else if showVideo && video}
 				<div use:fade={{ duration: 1.4 }}>
-					{@render videoPlayer()}
+					<MediaPlayer {video} {title} />
 				</div>
 			{/if}
 			{#if showContent}
@@ -689,7 +536,7 @@
 						use:fade={{ x: 30, duration: 1.4 }}
 						class="-mr-(--container-px,1.5rem)"
 					>
-						{@render videoPlayer()}
+						<MediaPlayer {video} {title} />
 					</div>
 				{/if}
 			</div>
@@ -764,7 +611,7 @@
 						use:fade={{ x: 30, duration: 1.4 }}
 						class="-mr-(--container-px,1.5rem)"
 					>
-						{@render videoPlayer()}
+						<MediaPlayer {video} {title} />
 					</div>
 				{/if}
 			</div>

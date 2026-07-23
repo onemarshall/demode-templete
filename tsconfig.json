@@ -13,6 +13,7 @@
     "moduleResolution": "bundler"
   },
   "exclude": [
+    "vite.config.ts",
     "worker-configuration.d.ts",
     "src/service-worker.js",
     "src/service-worker/**/*.js",
