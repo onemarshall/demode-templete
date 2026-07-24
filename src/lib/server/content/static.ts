@@ -13,8 +13,8 @@ import {
   SiteDataSchema,
   type NavigationItem,
   type SiteData,
-} from "../schema";
-import type { ContentProvider, PostFilters } from "../provider";
+} from "$lib/content/schema";
+import type { ContentProvider, PostFilters } from "$lib/content/provider";
 
 interface StaticNavigationLink {
   id: string;

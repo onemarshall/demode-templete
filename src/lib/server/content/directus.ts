@@ -10,7 +10,7 @@ import {
   fetchDirectusNavigationTree,
   fetchDirectusGlobals,
   fetchPageData,
-} from "$lib/services/directus/fetchers";
+} from "$lib/server/directus/fetchers";
 import {
   fetchPostBySlug,
   fetchPostsList,
@@ -21,9 +21,9 @@ import {
   fetchTagsBySlugs,
   fetchAvailableCategories,
   fetchAvailablePostTypes,
-} from "$lib/services/directus/fetchers/post-fetcher";
+} from "$lib/server/directus/fetchers/post-fetcher";
 import type { Post } from "$lib/types/directus-schema";
-import type { ContentProvider, PageLoadOptions, PostFilters } from "../provider";
+import type { ContentProvider, PageLoadOptions, PostFilters } from "$lib/content/provider";
 
 const is404 = (err: unknown): boolean =>
   !!err &&

@@ -1,4 +1,4 @@
-import { fetchAuthorById, fetchPostBySlug, fetchRelatedPosts } from '$lib/services/directus/fetchers'
+import { fetchAuthorById, fetchPostBySlug, fetchRelatedPosts } from '$lib/server/directus/fetchers'
 import { DRAFT_MODE_SECRET } from '$app/env/private'
 import { getDirectusAssetURL } from '$lib/services/directus/asset-utils'
 import type { PageServerLoad } from './$types'

@@ -1,5 +1,5 @@
-import { createDirectusContentProvider } from '$lib/content/providers/directus';
-import { staticContentProvider } from '$lib/content/providers/static';
+import { createDirectusContentProvider } from './directus';
+import { staticContentProvider } from './static';
 import { CMS_PROVIDER } from '$app/env/private';
 import { PUBLIC_CMS_PROVIDER } from '$app/env/public';
 import type { ContentProvider, ContentProviderType } from '$lib/content/provider';

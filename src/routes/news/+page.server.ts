@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { PageServerLoad } from "./$types";
-import { getContentProvider } from "$lib/content";
+import { getContentProvider } from "$lib/server/content/get-provider";
 import type { PostFilters } from "$lib/content/provider";
 
 const QuerySchema = z.object({

@@ -7,7 +7,7 @@
 import { readItems, readSingleton } from "@directus/sdk";
 import type { Post } from "$lib/types/directus-schema";
 import { createDirectusClient, type DirectusClient, PUBLISHED_FILTER, POST_SORT } from "./shared";
-import { getDirectusAssetURL } from "../asset-utils";
+import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 import { createScopedLogger } from "$lib/utils/logger";
 
 const log = createScopedLogger(["Directus", "RSS"]);
