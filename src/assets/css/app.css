@@ -80,6 +80,25 @@
   --color-gray-900: oklch(0.208 0.042 265.755);
   --color-gray-950: oklch(0.129 0.042 264.695);
 
+  /* shadcn-svelte semantic tokens — wired to the custom colour system */
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-contrast-higher);
+  --color-card: var(--color-bg);
+  --color-card-foreground: var(--color-contrast-higher);
+  --color-popover: var(--color-bg);
+  --color-popover-foreground: var(--color-contrast-higher);
+  --color-primary-foreground: var(--color-white);
+  --color-secondary: var(--color-bg-light);
+  --color-secondary-foreground: var(--color-contrast-higher);
+  --color-muted: var(--color-bg-light);
+  --color-muted-foreground: var(--color-contrast-low);
+  --color-accent-foreground: var(--color-contrast-higher);
+  --color-destructive: var(--brand-error);
+  --color-destructive-foreground: var(--color-white);
+  --color-border: var(--color-contrast-lower);
+  --color-input: var(--color-contrast-lower);
+  --color-ring: var(--brand-primary);
+
   /* Typography */
   --font-primary: var(--font-sans);
   --font-secondary: var(--font-serif);

@@ -8,7 +8,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const cwd = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [
@@ -61,13 +61,14 @@ export default defineConfig({
           open: false,
           gzipSize: true,
           brotliSize: true,
+          // oxlint-disable-next-line no-explicit-any
         }) as any,
       ],
     },
   },
   resolve: {
     alias: {
-      "@vinejs/vine": path.resolve(__dirname, "./src/lib/utils/stub-vine.ts"),
+      "@vinejs/vine": path.resolve(cwd, "./src/lib/utils/stub-vine.ts"),
     },
   },
   test: {

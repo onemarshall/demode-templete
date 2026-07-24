@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+  import { formatDate } from "$lib/shared/utils/date";
 
   interface HeroPost {
     id: string | number;
@@ -35,15 +36,6 @@
       .split("")
       .reduce((a, c) => a + c.charCodeAt(0), 0);
     return gradients[hash % gradients.length];
-  };
-
-  const formatDate = (dateStr?: string | null) => {
-    if (!dateStr) return null;
-    return new Date(dateStr).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
   };
 
   const avatarUrl = (avatar: unknown) => {
@@ -134,9 +126,9 @@
             </div>
           {/if}
         {/if}
-        {#if formatDate(post.published_at)}
+        {#if formatDate(post.published_at, { month: "long" })}
           <span class="text-xs text-white/50"
-            >{formatDate(post.published_at)}</span
+            >{formatDate(post.published_at, { month: "long" })}</span
           >
         {/if}
         {#if post.read_time}

@@ -9,6 +9,7 @@
 	import { scale } from "svelte/transition";
 	import Container from "$lib/components/ui/Container.svelte";
 	import { fade } from "scripts/actions";
+	import { formatDate } from "$lib/shared/utils/date";
 	type BlockPostsPagination = {
 		currentPage: number;
 		perPage: number;
@@ -28,15 +29,6 @@
 				return tagId.title;
 			})
 			.filter((title): title is string => Boolean(title));
-	};
-
-	const formatDate = (dateStr?: string | null) => {
-		if (!dateStr) return null;
-		return new Date(dateStr).toLocaleDateString("en-GB", {
-			day: "numeric",
-			month: "short",
-			year: "numeric",
-		});
 	};
 
 	interface PostsProps {

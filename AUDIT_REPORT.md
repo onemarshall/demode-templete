@@ -16,7 +16,7 @@ Resolved. `colour.css` now defines raw source tokens as `--brand-primary`, `--br
 
 ### 3.4 shadcn-svelte base colour mismatch
 
-Partially addressed. The site-level palette now maps cleanly to `--color-primary`, `--color-accent`, `--color-sec`, `--color-success`, `--color-warning`, and `--color-error` in `app.css` `@theme`, so shadcn components will pick up the brand colours. The `baseColor: "neutral"` in `components.json` only affects future `shadcn-svelte` installs; if new shadcn components look grey instead of brand, add semantic shadcn tokens (`--color-background`, `--color-foreground`, `--color-muted`, `--color-border`, `--color-ring`) to `app.css` `@theme` mapped to the existing `colour.css` semantic variables.
+Resolved. The shadcn-svelte semantic tokens are now mapped to the custom palette in `app.css` `@theme`: `background`, `foreground`, `card`, `popover`, `primary-foreground`, `secondary`, `muted`, `accent-foreground`, `destructive`, `border`, `input`, and `ring` all resolve to the existing `colour.css` variables. `baseColor: "neutral"` in `components.json` only matters for future `shadcn-svelte` installs; at runtime the components use the custom colours.
 
 ## 4. Component Architecture (Medium Priority)
 
@@ -77,16 +77,24 @@ Resolved. The Typekit CSS is now loaded with `rel="preload" as="style"` and a Sv
 
 ## 8. Testing & Tooling (Low/Medium Priority)
 
-- `vitest` is configured with browser (Playwright) and server projects, but there is almost no test surface in `src/`.
-- The `vitest-examples/` directory suggests examples, not real coverage.
-- `worker-configuration.d.ts` is 550 KiB generated code; keep it in `.gitignore` if it is auto-generated and regenerate in CI.
+**Resolved.** Server-side unit tests now cover the high-value utilities:
 
-**Recommendation:** Add component/unit tests for high-value utilities (`fade.ts`, date formatting, Directus helpers) and at least one critical user flow (navigation, consent banner).
+- `src/lib/shared/utils/date.ts` / `date.spec.ts` — `formatDate` helper (extracted from inline component functions).
+- `src/lib/shared/utils/directus-links.spec.ts` — `resolveDirectusLink`.
+- `src/lib/shared/utils/get-image-uuid.spec.ts` — `getImageUuid` and `getImageObjectPosition`.
+- `src/lib/features/directus/asset-utils.spec.ts` — `getDirectusAssetURL`, `getDirectusResponsiveWidths`, `getDirectusDefaultSrcWidth`.
+- `src/lib/utils.spec.ts` — `cn` and `debounce`.
+- `src/assets/scripts/actions/fade.spec.ts` — `fade` and `staggerFade` actions with mocked GSAP/ScrollTrigger.
+- `src/lib/features/cookie-consent/store.svelte.spec.ts` — cookie-consent state flow.
+
+`vitest` already has browser (Playwright) and server projects; the server suite passes. The browser suite requires `npx playwright install` to be run once to download Chromium.
+
+- `worker-configuration.d.ts` is 550 KiB generated code; keep it in `.gitignore` if it is auto-generated and regenerate in CI.
 
 ## 9. Recommended Next Steps (Priority Order)
 
-1. **Start a `DESIGN.md` or design-token spec** documenting the colour, typography, spacing, and z-index system.
-2. **Write tests** for the most-used utilities and one critical flow.
+1. **Run `npx playwright install` and verify the browser project** (`bunx vitest --run --project client`).
+2. **Start a `DESIGN.md` or design-token spec** documenting the colour, typography, spacing, and z-index system.
 
 ## 10. Quick Wins
 

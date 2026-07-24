@@ -3,6 +3,7 @@
   import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
   import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
   import setAttr from "$lib/features/directus/visualEditing";
+  import { formatDate } from "$lib/shared/utils/date";
 
   interface Author {
     avatar?: unknown;
@@ -43,15 +44,6 @@
     relatedPosts: RelatedPost[];
   } = $props();
 
-  const formatDate = (dateStr?: string | null) => {
-    if (!dateStr) return null;
-    return new Date(dateStr).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
-
   const gradients = [
     "from-primary/80 to-primary-900",
     "from-sec/60 to-primary/90",
@@ -59,7 +51,9 @@
     "from-gray-700 to-primary/80",
   ];
   const fallbackGradient = (id: string | number) => {
-    const hash = String(id).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+    const hash = String(id)
+      .split("")
+      .reduce((a, c) => a + c.charCodeAt(0), 0);
     return gradients[hash % gradients.length];
   };
 
@@ -155,7 +149,9 @@
           >
             Published
           </p>
-          <p class="text-sm text-gray-700">{formatDate(post.published_at)}</p>
+          <p class="text-sm text-gray-700">
+            {formatDate(post.published_at, { month: "long" })}
+          </p>
         </div>
       {/if}
 
@@ -208,9 +204,7 @@
               href={resolve(`/news/${relatedPost.slug}`)}
               class="group flex gap-4"
             >
-              <div
-                class="relative size-20 shrink-0 overflow-hidden rounded-sm"
-              >
+              <div class="relative size-20 shrink-0 overflow-hidden rounded-sm">
                 {#if relatedImageUrl(relatedPost.image)}
                   <img
                     src={relatedImageUrl(relatedPost.image)}
@@ -220,7 +214,9 @@
                   />
                 {:else}
                   <div
-                    class="size-full bg-gradient-to-br {fallbackGradient(relatedPost.id)}"
+                    class="size-full bg-gradient-to-br {fallbackGradient(
+                      relatedPost.id,
+                    )}"
                   ></div>
                 {/if}
               </div>
@@ -232,7 +228,7 @@
                 </h3>
                 {#if relatedPost.published_at}
                   <p class="mt-1 text-xs text-gray-400">
-                    {formatDate(relatedPost.published_at)}
+                    {formatDate(relatedPost.published_at, { month: "long" })}
                   </p>
                 {/if}
               </div>
