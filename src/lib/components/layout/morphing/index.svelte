@@ -22,11 +22,10 @@
 		PreviousMeetings,
 		TheAnimalThing,
 	} from "$lib/components/icons";
-	import { getContext } from "svelte";
 	import { slide } from "svelte/transition";
 	import type { Component } from "svelte";
 	import type { SVGAttributes } from "svelte/elements";
-	import { contenNavigationContext } from "$lib/content/context";
+	import { getNavigationContext } from "$lib/content/context";
 	import type { NavigationItem, NavigationTree } from "$lib/content/schema";
 	import SiteLogo from "$lib/components/layout/SiteLogo.svelte";
 	import type { SiteGlobals } from "$lib/content/schema";
@@ -65,9 +64,7 @@
 		theanimalth: TheAnimalThing,
 	};
 
-	const getNavigation = getContext<() => NavigationTree>(
-		contenNavigationContext,
-	);
+	const getNavigation = getNavigationContext();
 
 	const navigation = $derived(
 		(getNavigation?.() ?? []).filter((item) => item.is_visible !== false),

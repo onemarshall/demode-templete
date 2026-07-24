@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { onMount, setContext } from "svelte";
+	import { onMount } from "svelte";
 	import { afterNavigate, beforeNavigate } from "$app/navigation";
 	import "$lib/components/ui/cursix/styles.css";
 	import "css/app.css";
-	import { contenNavigationContext } from "$lib/content/context";
+	import { setNavigationContext } from "$lib/content/context";
 	import { CookieConsent, Loader } from "$lib/components/core";
 	import { ScrollToTop } from "$lib/components/ui";
 	import type { LayoutData } from "./$types";
@@ -20,10 +20,7 @@
 	let isNavigating = $state(false);
 	let prefersReducedMotion = $state(false);
 
-	setContext(
-		contenNavigationContext,
-		() => data.headerNavigation ?? [],
-	);
+	setNavigationContext(() => data.headerNavigation ?? []);
 
 	const waitForNextPaint = () =>
 		new Promise<void>((resolve) => {

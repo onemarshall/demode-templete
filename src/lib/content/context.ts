@@ -1,1 +1,4 @@
-export const contenNavigationContext = 'content-navigation'
+import { createContext } from "svelte";
+import type { NavigationTree } from "./schema";
+
+export const [getNavigationContext, setNavigationContext] = createContext<() => NavigationTree>();
