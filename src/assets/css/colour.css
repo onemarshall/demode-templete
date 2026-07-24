@@ -46,6 +46,8 @@
   --sec: var(--brand-3);
 
   --theme-primary: var(--primary);
+  --theme-accent: var(--accent);
+  --theme-sec: var(--sec);
 
   --color-white: white;
   --color-black: black;
@@ -121,16 +123,16 @@ Colours
   --brand-primary: oklch(var(--color-background) var(--theme-primary));
   --brand-primary-dark: oklch(var(--color-dark) var(--theme-primary));
   --brand-primary-darker: oklch(var(--color-darker) var(--theme-primary));
-  --brand-accent-lighter: oklch(var(--color-lighter) var(--accent));
-  --brand-accent-light: oklch(var(--color-light) var(--accent));
-  --brand-accent: oklch(var(--color-background) var(--accent));
-  --brand-accent-dark: oklch(var(--color-dark) var(--accent));
-  --brand-accent-darker: oklch(var(--color-darker) var(--accent));
-  --brand-sec-lighter: oklch(var(--color-lighter) var(--sec));
-  --brand-sec-light: oklch(var(--color-light) var(--sec));
-  --brand-sec: oklch(var(--300) var(--sec));
-  --brand-sec-dark: oklch(var(--color-dark) var(--sec));
-  --brand-sec-darker: oklch(var(--color-darker) var(--sec));
+  --brand-accent-lighter: oklch(var(--color-lighter) var(--theme-accent));
+  --brand-accent-light: oklch(var(--color-light) var(--theme-accent));
+  --brand-accent: oklch(var(--color-background) var(--theme-accent));
+  --brand-accent-dark: oklch(var(--color-dark) var(--theme-accent));
+  --brand-accent-darker: oklch(var(--color-darker) var(--theme-accent));
+  --brand-sec-lighter: oklch(var(--color-lighter) var(--theme-sec));
+  --brand-sec-light: oklch(var(--color-light) var(--theme-sec));
+  --brand-sec: oklch(var(--300) var(--theme-sec));
+  --brand-sec-dark: oklch(var(--color-dark) var(--theme-sec));
+  --brand-sec-darker: oklch(var(--color-darker) var(--theme-sec));
 
   --brand-success-lighter: oklch(var(--100) var(--system-chroma) var(--success));
   --brand-success-light: oklch(var(--500) var(--system-chroma) var(--success));
@@ -208,8 +210,8 @@ Colours
 [data-theme="primary"]:hover,
 [data-theme="dark"]:hover {
   --brand-primary: oklch(var(--color-darker) var(--theme-primary));
-  --brand-accent: oklch(var(--color-darker) var(--accent));
-  --brand-sec: oklch(var(--color-darker) var(--sec));
+  --brand-accent: oklch(var(--color-darker) var(--theme-accent));
+  --brand-sec: oklch(var(--color-darker) var(--theme-sec));
 }
 /* Standard dark mode support for shadcn/ui compatibility */
 .dark,
@@ -246,10 +248,14 @@ Colours
 [data-theme="accent"] {
   --colour: var(--accent);
   --theme-primary: var(--accent);
+  --theme-accent: var(--sec);
+  --theme-sec: var(--primary);
 }
 [data-theme="sec"] {
   --colour: var(--sec);
   --theme-primary: var(--sec);
+  --theme-accent: var(--primary);
+  --theme-sec: var(--accent);
 }
 
 [data-theme="sec-light"],
@@ -282,10 +288,14 @@ Colours
 [data-theme="accent-light"] {
   --colour: var(--accent);
   --theme-primary: var(--accent);
+  --theme-accent: var(--sec);
+  --theme-sec: var(--primary);
 }
 [data-theme="sec-light"] {
   --colour: var(--sec);
   --theme-primary: var(--sec);
+  --theme-accent: var(--primary);
+  --theme-sec: var(--accent);
 }
 
 /* ≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠*/
