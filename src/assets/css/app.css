@@ -4,6 +4,8 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));
+
 /* Color System (KEEP ALL - this is your unique value) */
 @import "./colour.css";
 

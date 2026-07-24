@@ -45,6 +45,8 @@
   --accent: var(--brand-2);
   --sec: var(--brand-3);
 
+  --theme-primary: var(--primary);
+
   --color-white: white;
   --color-black: black;
 
@@ -114,11 +116,11 @@
 Colours
 +++++++++++++++++++++++++++++++++
 */
-  --brand-primary-lighter: oklch(var(--color-lighter) var(--primary));
-  --brand-primary-light: oklch(var(--color-light) var(--primary));
-  --brand-primary: oklch(var(--color-background) var(--primary));
-  --brand-primary-dark: oklch(var(--color-dark) var(--primary));
-  --brand-primary-darker: oklch(var(--color-darker) var(--primary));
+  --brand-primary-lighter: oklch(var(--color-lighter) var(--theme-primary));
+  --brand-primary-light: oklch(var(--color-light) var(--theme-primary));
+  --brand-primary: oklch(var(--color-background) var(--theme-primary));
+  --brand-primary-dark: oklch(var(--color-dark) var(--theme-primary));
+  --brand-primary-darker: oklch(var(--color-darker) var(--theme-primary));
   --brand-accent-lighter: oklch(var(--color-lighter) var(--accent));
   --brand-accent-light: oklch(var(--color-light) var(--accent));
   --brand-accent: oklch(var(--color-background) var(--accent));
@@ -205,7 +207,7 @@ Colours
 [data-theme="sec"]:hover,
 [data-theme="primary"]:hover,
 [data-theme="dark"]:hover {
-  --brand-primary: oklch(var(--color-darker) var(--primary));
+  --brand-primary: oklch(var(--color-darker) var(--theme-primary));
   --brand-accent: oklch(var(--color-darker) var(--accent));
   --brand-sec: oklch(var(--color-darker) var(--sec));
 }
@@ -239,13 +241,15 @@ Colours
   --colour: var(--gray);
 }
 [data-theme="primary"] {
-  --colour: var(--primary);
+  --colour: var(--theme-primary);
 }
 [data-theme="accent"] {
   --colour: var(--accent);
+  --theme-primary: var(--accent);
 }
 [data-theme="sec"] {
   --colour: var(--sec);
+  --theme-primary: var(--sec);
 }
 
 [data-theme="sec-light"],
@@ -273,13 +277,15 @@ Colours
   --color-contrast-higher: oklch(var(--950) var(--colour));
 }
 [data-theme="primary-light"] {
-  --colour: var(--primary);
+  --colour: var(--theme-primary);
 }
 [data-theme="accent-light"] {
   --colour: var(--accent);
+  --theme-primary: var(--accent);
 }
 [data-theme="sec-light"] {
   --colour: var(--sec);
+  --theme-primary: var(--sec);
 }
 
 /* ≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠*/
