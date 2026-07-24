@@ -22,7 +22,7 @@
 
 	setContext(
 		contenNavigationContext,
-		() => data.global?.headerNavigation ?? [],
+		() => data.headerNavigation ?? [],
 	);
 
 	const waitForNextPaint = () =>
@@ -105,8 +105,8 @@
 </svelte:head>
 
 <div use:cursix={{ speed: 0.6 }}>
-	<CmsMeta globals={data.global?.globals} />
-	<MenuMain globals={data.global?.globals} />
+	<CmsMeta globals={data.globals} />
+	<MenuMain globals={data.globals} />
 
 	<div
 		class="pointer-events-none fixed top-0 left-0 z-4000 h-05 w-[min(28vw,16rem)] bg-linear-to-r from-transparent via-primary to-transparent opacity-0 motion-safe:transition-opacity motion-safe:duration-200 motion-safe:ease-out motion-safe:animate-[route-progress-slide_0.9s_ease-in-out_infinite]"
@@ -118,9 +118,9 @@
 		<div id="smooth-content">
 			{@render children()}
 			<Footer
-				navigation={data.global?.footerNavigation ?? []}
-				copyrightNavigation={data.global?.copyrightNavigation ?? []}
-				globals={data.global?.globals}
+				navigation={data.footerNavigation ?? []}
+				copyrightNavigation={data.copyrightNavigation ?? []}
+				globals={data.globals}
 			/>
 		</div>
 	</div>

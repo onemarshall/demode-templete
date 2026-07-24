@@ -5,7 +5,8 @@ import { PUBLIC_ENABLE_VISUAL_EDITING } from "$app/env/public";
 export const load: LayoutServerLoad = async (event) => {
   const providerType = getProviderType();
   const provider = getContentProvider();
-  const global = await provider.getSiteData();
+  const { globals, headerNavigation, footerNavigation, copyrightNavigation } =
+    await provider.getSiteData();
 
   const visualEditingEnabled =
     providerType === "directus" &&
@@ -14,7 +15,10 @@ export const load: LayoutServerLoad = async (event) => {
 
   return {
     contentProvider: providerType,
-    global,
+    globals,
+    headerNavigation,
+    footerNavigation,
+    copyrightNavigation,
     visualEditingEnabled,
   };
 };
