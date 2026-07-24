@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { NavigationItem, NavigationTree, SiteGlobals } from '$lib/content/schema'
 	import { resolve } from '$app/paths'
-	import { CookiePreferencesButton } from '$lib/features/cookie-consent'
+	import { CookiePreferencesButton } from '$lib/services/cookie-consent'
 
 	interface Props {
 		globals?: SiteGlobals

@@ -14,7 +14,7 @@
  *
  * Usage:
  * ```typescript
- * import { submitDirectusForm } from '$lib/features/forms/remote/directus-helpers'
+ * import { submitDirectusForm } from '$lib/services/forms/remote/directus-helpers'
  *
  * // In a form action endpoint
  * export const actions = {
@@ -38,7 +38,7 @@
 import { getRequestEvent } from "$app/server";
 import { DIRECTUS_TOKEN } from "$app/env/private";
 import { PUBLIC_DIRECTUS_URL } from "$app/env/public";
-import { createDirectusClientServer } from "$lib/features/directus/client.server";
+import { createDirectusClientServer } from "$lib/services/directus/client.server";
 import { createItem } from "@directus/sdk";
 import { error } from "@sveltejs/kit";
 import type { FormSubmission, FormSubmissionValue } from "$lib/types/directus-schema";

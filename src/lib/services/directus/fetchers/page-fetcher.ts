@@ -71,7 +71,7 @@
  *
  * Usage:
  * ```typescript
- * import { fetchPageData } from '$lib/features/directus/fetchers/page-fetcher'
+ * import { fetchPageData } from '$lib/services/directus/fetchers/page-fetcher'
  *
  * // Basic page fetch
  * const page = await fetchPageData('/about', undefined, fetch)

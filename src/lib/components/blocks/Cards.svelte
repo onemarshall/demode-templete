@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from "$lib/utils";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import {
 		resolveDirectusLink,
 		type DirectusLinkValue,

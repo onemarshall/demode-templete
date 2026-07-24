@@ -1,5 +1,5 @@
 <script lang="ts">
-	import setAttr from "$lib/features/directus/visualEditing";
+	import setAttr from "$lib/services/directus/visualEditing";
 	import type { FormField } from "$lib/types/directus-schema";
 	import FormBuilder from "../forms/FormBuilder.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";

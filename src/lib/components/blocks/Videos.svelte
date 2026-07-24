@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { Dialog, DialogContent, DialogTitle, DialogDescription } from "$lib/components/ui/dialog";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 

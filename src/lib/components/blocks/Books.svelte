@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Dialog } from "bits-ui";
 	import { page } from "$app/state";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import { BookCard } from "$lib/components/books";
 	import { Sheet, SheetContent } from "$lib/components/ui/sheet";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+	import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 
 	interface Props {
 		video: { service?: string; id: string } | null;

@@ -10,7 +10,7 @@ import {
   fetchDirectusNavigationTree,
   fetchDirectusGlobals,
   fetchPageData,
-} from "$lib/features/directus/fetchers";
+} from "$lib/services/directus/fetchers";
 import {
   fetchPostBySlug,
   fetchPostsList,
@@ -21,7 +21,7 @@ import {
   fetchTagsBySlugs,
   fetchAvailableCategories,
   fetchAvailablePostTypes,
-} from "$lib/features/directus/fetchers/post-fetcher";
+} from "$lib/services/directus/fetchers/post-fetcher";
 import type { Post } from "$lib/types/directus-schema";
 import type { ContentProvider, PageLoadOptions, PostFilters } from "../provider";
 

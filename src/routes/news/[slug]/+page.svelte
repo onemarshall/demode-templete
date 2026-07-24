@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { page } from "$app/state";
 	import { resolve } from "$app/paths";
-	import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+	import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import { NewsPostSidebar } from "$lib/components/news";
 	import BaseText from "$lib/components/ui/Text.svelte";
-	import setAttr from "$lib/features/directus/visualEditing";
+	import setAttr from "$lib/services/directus/visualEditing";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from "$lib/utils";
-	import { setAttr } from "$lib/features/directus/visualEditing";
-	import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+	import { setAttr } from "$lib/services/directus/visualEditing";
+	import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 	import { goto } from "$app/navigation";
 	import { resolve } from "$app/paths";
 	import { fade } from "scripts/actions";

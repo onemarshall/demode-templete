@@ -1,6 +1,6 @@
-import { fetchAuthorById, fetchPostBySlug, fetchRelatedPosts } from '$lib/features/directus/fetchers'
+import { fetchAuthorById, fetchPostBySlug, fetchRelatedPosts } from '$lib/services/directus/fetchers'
 import { DRAFT_MODE_SECRET } from '$app/env/private'
-import { getDirectusAssetURL } from '$lib/features/directus/asset-utils'
+import { getDirectusAssetURL } from '$lib/services/directus/asset-utils'
 import type { PageServerLoad } from './$types'
 import { error } from '@sveltejs/kit'
 

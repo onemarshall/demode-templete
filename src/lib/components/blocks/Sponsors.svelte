@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import { fade, staggerFade } from "scripts/actions/fade";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
-	import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+	import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 	import { getImageUuid } from "$lib/utils/get-image-uuid";
 
 	interface SponsorItem {

@@ -4,7 +4,7 @@
 	import ButtonGroup from "./ButtonGroup.svelte";
 	import type { ButtonProps } from "./Button.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
-	import setAttr from "$lib/features/directus/visualEditing";
+	import setAttr from "$lib/services/directus/visualEditing";
 	import { fade } from "scripts/actions";
 
 	interface Props {

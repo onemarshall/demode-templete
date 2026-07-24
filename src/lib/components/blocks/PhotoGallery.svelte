@@ -6,11 +6,11 @@
 		DialogTitle,
 		DialogDescription,
 	} from "$lib/components/ui/dialog";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
-	import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+	import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 
 	interface ImageFile {
 		id: string;

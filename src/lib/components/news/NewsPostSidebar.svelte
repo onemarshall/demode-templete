@@ -1,8 +1,8 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+  import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
   import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
-  import setAttr from "$lib/features/directus/visualEditing";
+  import setAttr from "$lib/services/directus/visualEditing";
   import { formatDate } from "$lib/utils/date";
 
   interface Author {

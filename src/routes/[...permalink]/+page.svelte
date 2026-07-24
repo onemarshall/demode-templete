@@ -6,7 +6,7 @@
 	import type { PageBuilderModel } from '$lib/content/schema'
 	import { Button } from '$lib/components/ui/button'
 	import { Pencil } from '@lucide/svelte'
-	import { setAttr } from '$lib/features/directus/visualEditing'
+	import { setAttr } from '$lib/services/directus/visualEditing'
 	import type { Attachment } from 'svelte/attachments'
 
 	let { data }: { data: { page: PageBuilderModel } } = $props()

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+  import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
   import { formatDate } from "$lib/utils/date";
 
   interface PostCard {

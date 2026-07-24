@@ -1,6 +1,6 @@
 <script lang="ts">
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
-	import setAttr from "$lib/features/directus/visualEditing";
+	import setAttr from "$lib/services/directus/visualEditing";
 	import { fade } from "scripts/actions";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";

@@ -1,6 +1,6 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
-import { createDirectusClient } from "$lib/features/directus/fetchers/shared";
+import { createDirectusClient } from "$lib/services/directus/fetchers/shared";
 import { readItems } from "@directus/sdk";
 
 const MAX_QUERY_LENGTH = 100;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	/* eslint-disable svelte/no-navigation-without-resolve */
 	import { resolve } from "$app/paths";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import {
 		resolveDirectusLink,
 		type DirectusLinkValue,

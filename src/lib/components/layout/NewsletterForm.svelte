@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { submitGenericForm } from "$lib/features/forms/remote/generic.remote";
+	import { submitGenericForm } from "$lib/services/forms/remote/generic.remote";
 
 	interface Props {
 		heading?: string;

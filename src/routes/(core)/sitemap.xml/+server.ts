@@ -2,7 +2,7 @@ import {
   fetchSitemapPages,
   fetchSitemapPosts,
   getDefaultHomepageEntry,
-} from "$lib/features/directus/fetchers/sitemap-fetcher";
+} from "$lib/services/directus/fetchers/sitemap-fetcher";
 import type { RequestHandler } from "@sveltejs/kit";
 
 const formatSitemapDate = (dateString?: string | null): string => {

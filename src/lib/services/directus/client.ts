@@ -24,7 +24,7 @@
  *
  * Usage:
  * ```typescript
- * import { createDirectusClient } from '$lib/features/directus/client'
+ * import { createDirectusClient } from '$lib/services/directus/client'
  *
  * // Browser usage (with optional token)
  * const client = createDirectusClient(fetch, token)

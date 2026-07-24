@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from "$lib/utils";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import { resolve } from "$app/paths";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import { Button } from "$lib/components/ui/button";

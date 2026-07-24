@@ -1,7 +1,7 @@
 <!-- PreHeader.svelte -->
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { getCookie, setCookie } from '$lib/browser/cookies';
+	import { getCookie, setCookie } from '$lib/utils/cookies';
 	import { onMount } from 'svelte';
 	let showPreHeader = $state(true);
 	let {

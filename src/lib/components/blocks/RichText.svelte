@@ -1,5 +1,5 @@
 <script lang="ts">
-	import setAttr from '$lib/features/directus/visualEditing'
+	import setAttr from '$lib/services/directus/visualEditing'
 	import { cn } from '$lib/utils'
 	import Headline from '$lib/components/ui/Headline.svelte'
 	import Tagline from '$lib/components/ui/Tagline.svelte'

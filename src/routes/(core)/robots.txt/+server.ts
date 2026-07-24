@@ -1,4 +1,4 @@
-import { generateRobotsTxt } from '$lib/features/directus/fetchers/robots-fetcher';
+import { generateRobotsTxt } from '$lib/services/directus/fetchers/robots-fetcher';
 import type { RequestHandler } from '@sveltejs/kit';
 import { dev } from '$app/env';
 

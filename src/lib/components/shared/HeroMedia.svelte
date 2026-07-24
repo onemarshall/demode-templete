@@ -1,6 +1,6 @@
 <script lang="ts">
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
-	import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+	import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 
 	interface Props {
 		mediaType: "video" | "image" | null;

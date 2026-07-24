@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from "$lib/utils";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import { staggerFade } from "scripts/actions";
 	import Container from "$lib/components/ui/Container.svelte";
 	import { flipScroll } from "scripts/actions";

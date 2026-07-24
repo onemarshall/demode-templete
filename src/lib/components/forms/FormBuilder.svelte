@@ -4,7 +4,7 @@
 	import { CircleCheck } from "@lucide/svelte";
 	import { goto } from "$app/navigation";
 	import { resolve } from "$app/paths";
-	import { submitGenericForm } from "$lib/features/forms/remote/generic.remote";
+	import { submitGenericForm } from "$lib/services/forms/remote/generic.remote";
 	import DynamicForm from "./DynamicForm.svelte";
 
 	interface FormBuilderProps {

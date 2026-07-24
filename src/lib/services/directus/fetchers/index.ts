@@ -35,7 +35,7 @@
  *
  * Usage Examples:
  * ```typescript
- * import { fetchPageData, fetchPostBySlug } from '$lib/features/directus/fetchers'
+ * import { fetchPageData, fetchPostBySlug } from '$lib/services/directus/fetchers'
  *
  * // Fetch page with all blocks
  * const page = await fetchPageData('/about', postPages, fetch)

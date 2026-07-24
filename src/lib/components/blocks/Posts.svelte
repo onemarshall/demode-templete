@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
-	import setAttr from "$lib/features/directus/visualEditing";
+	import setAttr from "$lib/services/directus/visualEditing";
 	import type { BlockPost, Post } from "$lib/types/directus-schema";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";

@@ -2,7 +2,7 @@
 	import { CheckCircle } from "@lucide/svelte";
 	import { Badge } from "$lib/components/ui/badge";
 	import { Separator } from "$lib/components/ui/separator";
-	import setAttr from "$lib/features/directus/visualEditing";
+	import setAttr from "$lib/services/directus/visualEditing";
 	import Button from "./Button.svelte";
 	import type { ButtonVariant } from "$lib/components/ui/button";
 

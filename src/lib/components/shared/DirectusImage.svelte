@@ -7,7 +7,7 @@
 		type DirectusImageFormat,
 		type DirectusImageLayout,
 		type DirectusImageTransform,
-	} from "$lib/features/directus/asset-utils";
+	} from "$lib/services/directus/asset-utils";
 
 	export interface Props {
 		uuid: string | null | undefined;

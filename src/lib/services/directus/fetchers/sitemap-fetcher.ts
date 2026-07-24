@@ -25,7 +25,7 @@
  *
  * Usage:
  * ```typescript
- * import { fetchSitemapPages, fetchSitemapPosts, getDefaultHomepageEntry } from '$lib/features/directus/fetchers/sitemap-fetcher'
+ * import { fetchSitemapPages, fetchSitemapPosts, getDefaultHomepageEntry } from '$lib/services/directus/fetchers/sitemap-fetcher'
  *
  * // Fetch all published pages for sitemap
  * const pages = await fetchSitemapPages(fetch)

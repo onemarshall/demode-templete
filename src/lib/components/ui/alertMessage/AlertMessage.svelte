@@ -2,7 +2,7 @@
 	import './style.css';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import Icon from './Icon.svelte';
-	import { getCookie, setCookie } from '$lib/browser/cookies';
+	import { getCookie, setCookie } from '$lib/utils/cookies';
 
 	let {
 		alertID,

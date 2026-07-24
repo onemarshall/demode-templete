@@ -1,4 +1,4 @@
-import { fetchRSSFeedData } from '$lib/features/directus/fetchers/rss-fetcher';
+import { fetchRSSFeedData } from '$lib/services/directus/fetchers/rss-fetcher';
 import type { RequestHandler } from '@sveltejs/kit';
 
 const escapeXml = (str: string): string =>

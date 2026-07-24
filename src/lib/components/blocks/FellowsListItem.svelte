@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ChevronDown } from "@lucide/svelte";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 
 	interface FellowItem {
 		id: string | number;

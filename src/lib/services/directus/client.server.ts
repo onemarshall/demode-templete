@@ -10,7 +10,7 @@ import {
 	createBaseDirectusClient,
 	type DirectusClient,
 	withDirectusToken,
-} from '$lib/features/directus/client'
+} from '$lib/services/directus/client'
 
 type FetchFunction = Parameters<typeof createBaseDirectusClient>[0]
 

@@ -2,7 +2,7 @@ import { error } from "@sveltejs/kit";
 import { z } from "zod";
 import { getContentProvider } from "$lib/content";
 import { PageBuilderModelSchema } from "$lib/content/schema";
-import { getSeoData } from "$lib/features/directus/fetchers/seo-fetcher";
+import { getSeoData } from "$lib/services/directus/fetchers/seo-fetcher";
 import type { PageServerLoad } from "./$types";
 
 const PostPageSchema = z.coerce.number().int().min(1).max(9999);

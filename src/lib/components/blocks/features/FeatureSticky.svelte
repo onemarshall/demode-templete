@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
 	import { featureSticky } from "scripts/actions/featureSticky";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import {
 		resolveDirectusLink,
 		type DirectusLinkValue,

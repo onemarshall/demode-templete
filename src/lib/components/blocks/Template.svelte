@@ -31,7 +31,7 @@
 -->
 <script lang="ts">
 	import { cn } from "$lib/utils";
-	import { setAttr } from "$lib/features/directus/visualEditing";
+	import { setAttr } from "$lib/services/directus/visualEditing";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import Text from "$lib/components/ui/Text.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";

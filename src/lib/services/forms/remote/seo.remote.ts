@@ -1,6 +1,6 @@
 import * as z from 'zod'
 import { query } from '$app/server'
-import { getSeoData } from '$lib/features/directus/fetchers/seo-fetcher'
+import { getSeoData } from '$lib/services/directus/fetchers/seo-fetcher'
 import { getRequestEvent } from '$app/server'
 
 const seoQuerySchema = z.object({

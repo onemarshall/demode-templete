@@ -12,7 +12,7 @@ import { createDirectusClient } from "./shared";
 import type { ExtensionSeoMetadata } from "$lib/types/directus-schema";
 import { buildPermalinkCandidates } from "./page-fetcher";
 import { createScopedLogger } from "$lib/utils/logger";
-import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
+import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 
 const log = createScopedLogger(["Directus", "SEO"]);
 

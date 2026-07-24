@@ -3,7 +3,7 @@
 
 	onMount(async () => {
 		const { initCookieConsent } = await import(
-			"$lib/features/cookie-consent/client"
+			"$lib/services/cookie-consent/client"
 		);
 		void initCookieConsent();
 	});
