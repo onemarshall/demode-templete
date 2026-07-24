@@ -122,7 +122,7 @@
 	{#if mediaType}
 		<div
 			class="absolute inset-x-0 top-0 h-full md:inset-0 md:h-auto"
-			use:fade={{ x: -30, duration: 1 }}
+			use:fade={{ x: -30, duration: 0.8 }}
 			data-directus={setAttr({
 				collection: "block_hero",
 				item: id,
@@ -177,7 +177,7 @@
 					{#if eventBadge}
 						<span
 							class="inline-flex items-center rounded-full border border-white/40 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/90 backdrop-blur-sm"
-							use:fade={{ x: -20, delay: 0.2, duration: 0.8 }}
+							use:fade={{ x: -20, delay: 0.1, duration: 0.6 }}
 							data-directus={setAttr({
 								collection: "block_hero",
 								item: id,
@@ -195,7 +195,7 @@
 						<div
 							class=""
 							// use:splitText={{ preset: 'FxType9' }}
-							use:fade={{ x: -40, delay: 0.3, duration: 1 }}
+							use:fade={{ x: -40, delay: 0.2, duration: 0.7 }}
 							// use:splitText={{ type: 'chars', stagger: 0.01 }}
 							data-directus={setAttr({
 								collection: "block_hero",
@@ -215,7 +215,7 @@
 					{#if description}
 						<div
 							class="max-w-3xl"
-							use:fade={{ x: -30, delay: 0.5, duration: 0.8 }}
+							use:fade={{ x: -26, delay: 0.31, duration: 0.6 }}
 							data-directus={setAttr({
 								collection: "block_hero",
 								item: id,
@@ -233,7 +233,7 @@
 					{#if hasEventMeta}
 						<div
 							class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs uppercase tracking-[0.18em] text-white/75"
-							use:fade={{ x: -20, delay: 0.65, duration: 0.8 }}
+							use:fade={{ x: -20, delay: 0.45, duration: 0.6 }}
 							data-directus={setAttr({
 								collection: "block_hero",
 								item: id,
@@ -261,7 +261,7 @@
 								: alignment === "bottom"
 									? "mt-2 flex justify-end"
 									: "mt-2"}
-							use:fade={{ x: -40, duration: 0.5 }}
+							use:fade={{ x: -40, delay: 0.55, duration: 0.5 }}
 							data-directus={setAttr({
 								collection: "block_button_group",
 								item: button_group.id,
