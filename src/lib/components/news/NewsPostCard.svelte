@@ -1,7 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
-  import { formatDate } from "$lib/shared/utils/date";
+  import { formatDate } from "$lib/utils/date";
 
   interface PostCard {
     id: string | number;

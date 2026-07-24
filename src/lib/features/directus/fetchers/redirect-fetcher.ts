@@ -8,8 +8,8 @@
 import { CMS_PROVIDER, DIRECTUS_TOKEN } from '$app/env/private';
 import { PUBLIC_CMS_PROVIDER } from '$app/env/public';
 import { readItems } from '@directus/sdk';
-import { normalizePath } from '$lib/shared/utils/path';
-import { createScopedLogger } from '$lib/shared/logger';
+import { normalizePath } from '$lib/utils/path';
+import { createScopedLogger } from '$lib/utils/logger';
 import { createDirectusClient } from './shared';
 
 const log = createScopedLogger(['Directus', 'Redirects']);

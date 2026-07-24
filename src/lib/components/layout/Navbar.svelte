@@ -25,7 +25,7 @@
 		Antelope,
 		Panther,
 		Lion,
-	} from "$lib/icons";
+	} from "$lib/components/icons";
 	import { getContext } from "svelte";
 	import { slide } from "svelte/transition";
 	import type { Component } from "svelte";

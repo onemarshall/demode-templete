@@ -23,7 +23,7 @@
 		ApplyToBeAFellow,
 		PreviousMeetings,
 		TheAnimalThing,
-	} from "$lib/icons";
+	} from "$lib/components/icons";
 	import type { Component } from "svelte";
 
 	const iconMap: Record<string, Component> = {

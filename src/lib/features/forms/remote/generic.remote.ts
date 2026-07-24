@@ -1,7 +1,7 @@
 import * as z from 'zod'
 import { command } from '$app/server'
 import { submitDirectusForm } from './directus-helpers'
-import { createScopedLogger } from '$lib/shared/logger'
+import { createScopedLogger } from '$lib/utils/logger'
 
 const log = createScopedLogger(['Forms', 'Generic'])
 

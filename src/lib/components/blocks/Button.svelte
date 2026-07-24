@@ -10,7 +10,7 @@
 
 	import { Icon as Icontype, ArrowRight, Plus } from '@lucide/svelte'
 	import { cn } from '$lib/utils'
-	import { resolveDirectusLink } from '$lib/shared/utils/directus-links'
+	import { resolveDirectusLink } from '$lib/utils/directus-links'
 
 	export interface ButtonProps {
 		id?: string

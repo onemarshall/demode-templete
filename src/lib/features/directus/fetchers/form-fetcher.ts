@@ -5,7 +5,7 @@
  * via raw fetch to the REST API. Used for rendering dynamic forms on the client.
  */
 import type { FormField } from "$lib/types/directus-schema";
-import { createScopedLogger } from "$lib/shared/logger";
+import { createScopedLogger } from "$lib/utils/logger";
 import { PUBLIC_DIRECTUS_URL } from "$app/env/public";
 
 const log = createScopedLogger(["Directus", "Forms"]);

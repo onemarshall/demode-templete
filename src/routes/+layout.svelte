@@ -4,11 +4,11 @@
 	import "$lib/components/ui/cursix/styles.css";
 	import "css/app.css";
 	import { contenNavigationContext } from "$lib/content/context";
-	import { CookieConsent, Loader } from "$lib/shared";
+	import { CookieConsent, Loader } from "$lib/components/core";
 	import { ScrollToTop } from "$lib/components/ui";
 	import type { LayoutData } from "./$types";
 	import { smoothScroll, cursix } from "scripts/actions";
-	import CmsMeta from "$lib/shared/utils/core/CmsMeta.svelte";
+	import CmsMeta from "$lib/components/core/CmsMeta.svelte";
 	import MenuMain from "$lib/components/layout/morphing/index.svelte";
 	import Footer from "$lib/components/layout/Footer.svelte";
 

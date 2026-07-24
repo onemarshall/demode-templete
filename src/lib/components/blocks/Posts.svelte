@@ -9,7 +9,7 @@
 	import { scale } from "svelte/transition";
 	import Container from "$lib/components/ui/Container.svelte";
 	import { fade } from "scripts/actions";
-	import { formatDate } from "$lib/shared/utils/date";
+	import { formatDate } from "$lib/utils/date";
 	type BlockPostsPagination = {
 		currentPage: number;
 		perPage: number;

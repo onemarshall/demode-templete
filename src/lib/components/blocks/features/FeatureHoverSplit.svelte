@@ -4,9 +4,9 @@
 	import {
 		resolveDirectusLink,
 		type DirectusLinkValue,
-	} from "$lib/shared/utils/directus-links";
+	} from "$lib/utils/directus-links";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
-	import { getImageUuid } from "$lib/shared/utils/get-image-uuid";
+	import { getImageUuid } from "$lib/utils/get-image-uuid";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 	import { fade } from "scripts/actions";

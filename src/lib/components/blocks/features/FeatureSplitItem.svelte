@@ -5,7 +5,7 @@
 	import {
 		resolveDirectusLink,
 		type DirectusLinkValue,
-	} from "$lib/shared/utils/directus-links";
+	} from "$lib/utils/directus-links";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 

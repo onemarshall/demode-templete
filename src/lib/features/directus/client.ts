@@ -39,7 +39,7 @@ import type { RestClient } from "@directus/sdk";
 import Queue from "p-queue";
 import type { Schema } from "$lib/types/directus-schema";
 import { PUBLIC_DIRECTUS_URL } from "$app/env/public";
-import { createScopedLogger } from "$lib/shared/logger";
+import { createScopedLogger } from "$lib/utils/logger";
 
 const log = createScopedLogger(["Directus", "Client"]);
 

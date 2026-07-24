@@ -4,5 +4,5 @@ export type {
 	DirectusPostLink,
 	DirectusLinkValue,
 	ResolvedDirectusLink,
-} from '../shared/utils/directus-links';
-export { resolveDirectusLink } from '../shared/utils/directus-links';
+} from '../utils/directus-links';
+export { resolveDirectusLink } from '../utils/directus-links';

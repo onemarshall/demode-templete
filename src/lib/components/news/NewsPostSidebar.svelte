@@ -3,7 +3,7 @@
   import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
   import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
   import setAttr from "$lib/features/directus/visualEditing";
-  import { formatDate } from "$lib/shared/utils/date";
+  import { formatDate } from "$lib/utils/date";
 
   interface Author {
     avatar?: unknown;

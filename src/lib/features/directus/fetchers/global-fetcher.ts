@@ -9,7 +9,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { readItem, readSingleton } from '@directus/sdk';
 import type { NavigationType, GlobalsType } from '$lib/types/navigation';
 import { createDirectusClient, type DirectusClient } from './shared';
-import { createScopedLogger } from '$lib/shared/logger';
+import { createScopedLogger } from '$lib/utils/logger';
 
 const log = createScopedLogger(['Directus', 'Globals']);
 

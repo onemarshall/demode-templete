@@ -5,7 +5,7 @@
 	import Headline from "$lib/components/ui/Headline.svelte";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
-	import { getImageUuid } from "$lib/shared/utils/get-image-uuid";
+	import { getImageUuid } from "$lib/utils/get-image-uuid";
 
 	interface SponsorItem {
 		id: string | number;

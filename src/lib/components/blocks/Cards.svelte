@@ -4,7 +4,7 @@
 	import {
 		resolveDirectusLink,
 		type DirectusLinkValue,
-	} from "$lib/shared/utils/directus-links";
+	} from "$lib/utils/directus-links";
 	import CardItem from "./CardItem.svelte";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";

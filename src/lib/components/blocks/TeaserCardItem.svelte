@@ -7,7 +7,7 @@
 	import {
 		resolveDirectusLink,
 		type DirectusLinkValue,
-	} from "$lib/shared/utils/directus-links";
+	} from "$lib/utils/directus-links";
 
 	interface TeaserCardItem {
 		id: string | number;

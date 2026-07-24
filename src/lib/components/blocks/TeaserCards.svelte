@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setAttr } from "$lib/features/directus/visualEditing";
-	import type { DirectusLinkValue } from "$lib/shared/utils/directus-links";
+	import type { DirectusLinkValue } from "$lib/utils/directus-links";
 	import TeaserCardItem from "./TeaserCardItem.svelte";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";

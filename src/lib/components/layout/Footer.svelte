@@ -35,7 +35,7 @@
 		QQ,
 		VK,
 		RSS,
-	} from "$lib/icons";
+	} from "$lib/components/icons";
 	import Copyright from "$lib/components/layout/Copyright.svelte";
 	import Logo from "./SiteLogo.svelte";
 	import NewsletterForm from "./NewsletterForm.svelte";

@@ -9,7 +9,7 @@
 		Video,
 		Impact,
 		OurResearch,
-	} from "$lib/icons";
+	} from "$lib/components/icons";
 
 	import type { Component } from "svelte";
 	import Container from '$lib/components/ui/Container.svelte'

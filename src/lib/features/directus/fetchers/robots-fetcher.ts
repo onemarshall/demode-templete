@@ -5,7 +5,7 @@
  * with sitemap reference and default crawl rules.
  */
 import { fetchSiteData } from './global-fetcher';
-import { createScopedLogger } from '$lib/shared/logger';
+import { createScopedLogger } from '$lib/utils/logger';
 
 const log = createScopedLogger(['Directus', 'Robots']);
 

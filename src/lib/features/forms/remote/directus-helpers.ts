@@ -42,7 +42,7 @@ import { createDirectusClientServer } from "$lib/features/directus/client.server
 import { createItem } from "@directus/sdk";
 import { error } from "@sveltejs/kit";
 import type { FormSubmission, FormSubmissionValue } from "$lib/types/directus-schema";
-import { createScopedLogger } from "$lib/shared/logger";
+import { createScopedLogger } from "$lib/utils/logger";
 
 const log = createScopedLogger(["Forms", "Directus"]);
 

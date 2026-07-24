@@ -11,7 +11,7 @@ import { PUBLIC_CMS_PROVIDER } from "$app/env/public";
 import { createDirectusClient } from "./shared";
 import type { ExtensionSeoMetadata } from "$lib/types/directus-schema";
 import { buildPermalinkCandidates } from "./page-fetcher";
-import { createScopedLogger } from "$lib/shared/logger";
+import { createScopedLogger } from "$lib/utils/logger";
 import { getDirectusAssetURL } from "$lib/features/directus/asset-utils";
 
 const log = createScopedLogger(["Directus", "SEO"]);

@@ -5,7 +5,7 @@ import {
   fetchRedirects,
   type SvelteRedirect,
 } from "$lib/features/directus/fetchers/redirect-fetcher";
-import { normalizePath } from "$lib/shared/utils/path";
+import { normalizePath } from "$lib/utils/path";
 import { CMS_PROVIDER } from "$app/env/private";
 import { PUBLIC_CMS_PROVIDER, PUBLIC_SITE_URL } from "$app/env/public";
 

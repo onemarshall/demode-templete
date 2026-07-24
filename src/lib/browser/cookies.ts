@@ -1,1 +1,1 @@
-export { getCookie, setCookie } from '../shared/utils/js/cookies';
+export { getCookie, setCookie } from '../utils/cookies';

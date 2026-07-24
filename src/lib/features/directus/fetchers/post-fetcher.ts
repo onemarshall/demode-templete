@@ -11,7 +11,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { type Post, type Schema } from "$lib/types/directus-schema";
 import { type QueryFields, type QueryFilter, readItems, readUser } from "@directus/sdk";
 import { createDirectusClient, PUBLISHED_FILTER, POST_SORT } from "./shared";
-import { createScopedLogger } from "$lib/shared/logger";
+import { createScopedLogger } from "$lib/utils/logger";
 import { renderMarkdownInData } from "$lib/server/markdown";
 
 // Directus SDK's QueryFields/QueryFilter recursive generics cannot be inferred

@@ -6,7 +6,7 @@
 	import {
 		resolveDirectusLink,
 		type DirectusLinkValue,
-	} from "$lib/shared/utils/directus-links";
+	} from "$lib/utils/directus-links";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
@@ -14,7 +14,7 @@
 	import {
 		getImageUuid,
 		getImageObjectPosition,
-	} from "$lib/shared/utils/get-image-uuid";
+	} from "$lib/utils/get-image-uuid";
 	import { Button } from "$lib/components/ui/button/index.js";
 
 	interface FeatureBigImageLink {

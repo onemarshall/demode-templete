@@ -1,7 +1,7 @@
 import { appConfig } from '$lib/static/config';
 import { SiteDataSchema, type SiteData } from '$lib/content/schema';
 
-export { normalizePath } from '$lib/shared/utils/path';
+export { normalizePath } from '$lib/utils/path';
 
 const buildAddress = (): string =>
 	[

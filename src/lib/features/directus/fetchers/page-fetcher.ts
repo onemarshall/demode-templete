@@ -127,7 +127,7 @@ import {
   PAGE_FIELDS,
 } from "./page-fetcher.fields";
 import { fetchPostsCount, fetchPostsList } from "./post-fetcher";
-import { createScopedLogger } from "$lib/shared/logger";
+import { createScopedLogger } from "$lib/utils/logger";
 import { renderMarkdownInData } from "$lib/server/markdown";
 
 const log = createScopedLogger(["Directus", "Pages"]);
