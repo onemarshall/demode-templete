@@ -183,7 +183,7 @@
 
 {#snippet arrowIcon()}
 	<svg
-		class="icon inline-block text-inherit fill-current leading-none shrink-0 w-[12px] h-[12px]"
+		class="icon inline-block text-inherit fill-current leading-none shrink-0 w-12 h-12"
 		viewBox="0 0 12 12"
 	>
 		<g fill="currentColor">
@@ -219,7 +219,7 @@
 										onclick={closeMobileMenu}
 									>
 										<figure
-											class="shrink-0 flex items-center justify-center rounded-full h-[48px] w-[48px] mr-3 bg-primary-300/20"
+											class="shrink-0 flex items-center justify-center rounded-full h-48 w-48 mr-3 bg-primary-300/20"
 										>
 											{@render navIcon(ChildIcon)}
 										</figure>
@@ -238,7 +238,7 @@
 								{:else}
 									<span class="flex items-center">
 										<figure
-											class="shrink-0 flex items-center justify-center rounded-full h-[48px] w-[48px] mr-3 bg-primary-300/20"
+											class="shrink-0 flex items-center justify-center rounded-full h-48 w-48 mr-3 bg-primary-300/20"
 										>
 											{@render navIcon(ChildIcon)}
 										</figure>
@@ -265,7 +265,7 @@
 					>
 						{#if item.show_icon_mobile !== false}
 							<figure
-								class="shrink-0 flex items-center justify-center rounded-full h-[48px] w-[48px] mr-3 bg-primary-300/20"
+								class="shrink-0 flex items-center justify-center rounded-full h-48 w-48 mr-3 bg-primary-300/20"
 							>
 								{@render navIcon(getIcon(item))}
 							</figure>
@@ -287,9 +287,9 @@
 	</ul>
 {/snippet}
 
-<header class="relative z-50 h-[50px] lg:h-[70px] md:mt-10">
+<header class="relative z-50 h-50 lg:h-70 md:mt-10">
 	<!-- mobile -->
-	<div class="h-[96px] lg:hidden" aria-hidden="true"></div>
+	<div class="h-96 lg:hidden" aria-hidden="true"></div>
 	<div
 		class={[
 			"fixed left-0 right-0 top-0 z-10 px-4 pt-7 transition-transform duration-300 lg:hidden",
@@ -297,7 +297,7 @@
 		]}
 	>
 		<div
-			class="mx-auto flex h-[64px] max-w-7xl items-center justify-between rounded-full border border-white/10 bg-primary-900/95 px-3 shadow-[0_18px_50px_rgba(7,21,42,0.28)] backdrop-blur"
+			class="mx-auto flex h-64 max-w-7xl items-center justify-between rounded-full border border-white/10 bg-primary-900/95 px-3 shadow-[0_18px_50px_rgba(7,21,42,0.28)] backdrop-blur"
 		>
 			<div class="flex min-w-0 items-center">
 				<div class="flex h-12 items-center rounded-full px-3 shadow-sm">
@@ -420,7 +420,7 @@
 			{#if href}
 				<a {href} class="flex items-center">
 					<figure
-						class="shrink-0 flex items-center justify-center rounded-full h-[48px] w-[48px] mr-2 bg-primary-500/15"
+						class="shrink-0 flex items-center justify-center rounded-full h-48 w-48 mr-2 bg-primary-500/15"
 					>
 						{@render navIcon(icon, true)}
 					</figure>
@@ -439,7 +439,7 @@
 			{:else}
 				<span class="flex items-center">
 					<figure
-						class="shrink-0 flex items-center justify-center rounded-full h-[48px] w-[48px] mr-5 bg-primary-600/20"
+						class="shrink-0 flex items-center justify-center rounded-full h-48 w-48 mr-5 bg-primary-600/20"
 					>
 						{@render navIcon(icon)}
 					</figure>
@@ -487,11 +487,11 @@
 								>
 									<!-- arrow -->
 									<div
-										class="absolute -top-[6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-blue-100 rotate-45 rounded-[2px] shadow-[-1px_-1px_2px_0px_rgba(0,0,0,0.08)] z-10"
+										class="absolute -top-6 left-1/2 -translate-x-1/2 w-3 h-3 bg-blue-100 rotate-45 rounded-2 shadow-[-1px_-1px_2px_0px_rgba(0,0,0,0.08)] z-10"
 									></div>
 									{#if isMegaMenu}
 										<!-- Mega menu: L2 children are column headers, L3 are the links -->
-										<div class="flex w-[600px] gap-2 p-3">
+										<div class="flex w-600 gap-2 p-3">
 											{#each children as column (column.id)}
 												{@const columnChildren = (
 													column.children ?? []
