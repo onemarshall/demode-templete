@@ -1,6 +1,6 @@
 <script lang="ts">
 	/* eslint-disable svelte/no-navigation-without-resolve */
-	import { resolve } from "$app/paths";
+	import { resolvePathname } from "$lib/utils/path";
 	import { setAttr } from "$lib/services/directus/visualEditing";
 	import {
 		resolveDirectusLink,
@@ -121,7 +121,7 @@
 				<p class="mt-auto">
 					{#if !link.isExternal}
 						<a
-							href={resolve(link.href as "/")}
+							href={resolvePathname(link.href as string)}
 							class="group relative inline-block origin-bottom-left text-inherit no-underline transition-all duration-300 ease-out hover:scale-[1.3] after:absolute after:bottom-0 after:left-0 after:z-1 after:h-[2px] after:w-full after:bg-current after:opacity-[0.15] after:transition-all after:duration-300 after:ease-out after:content-[''] hover:after:h-full"
 						>
 							<span

@@ -132,9 +132,8 @@
             Category
           </p>
           <a
-            href={resolve(
-              `/news?category=${encodeURIComponent(post.category.slug ?? "")}`,
-            )}
+            href={resolve("/news") +
+              `?category=${encodeURIComponent(post.category.slug ?? "")}`}
             class="font-secondary text-sm font-semibold text-gray-900 transition-colors hover:text-primary"
           >
             {post.category.title}
@@ -178,9 +177,8 @@
         <div class="flex flex-wrap gap-2">
           {#each postTags as relation (relation.tag_id.id)}
             <a
-              href={resolve(
-                `/news?tag=${encodeURIComponent(relation.tag_id.slug ?? relation.tag_id.title)}`,
-              )}
+              href={resolve("/news") +
+                `?tag=${encodeURIComponent(relation.tag_id.slug ?? relation.tag_id.title)}`}
               class="rounded-sm border border-gray-200 px-2.5 py-1 text-xs text-gray-600 transition-colors hover:border-primary hover:text-primary"
             >
               {relation.tag_id.title}
@@ -201,7 +199,7 @@
         <div class="space-y-4">
           {#each visibleRelatedPosts as relatedPost (relatedPost.id)}
             <a
-              href={resolve(`/news/${relatedPost.slug}`)}
+              href={resolve("/news/[slug]", { slug: relatedPost.slug })}
               class="group flex gap-4"
             >
               <div class="relative size-20 shrink-0 overflow-hidden rounded-sm">

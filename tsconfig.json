@@ -1,25 +1,12 @@
 {
-  "extends": "./.svelte-kit/tsconfig.json",
+  "extends": "$app/tsconfig",
   "compilerOptions": {
-    "rewriteRelativeImportExtensions": true,
-    "allowJs": true,
-    "checkJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "strict": true,
-    "moduleResolution": "bundler"
+    "paths": {
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"],
+      "#scripts/actions": ["./src/assets/scripts/actions/index.ts"],
+      "#scripts/actions/*": ["./src/assets/scripts/actions/*.ts"]
+    }
   },
-  "exclude": [
-    "vite.config.ts",
-    "worker-configuration.d.ts",
-    "src/service-worker.js",
-    "src/service-worker/**/*.js",
-    "src/service-worker.ts",
-    "src/service-worker/**/*.ts",
-    "src/service-worker.d.ts",
-    "src/service-worker/**/*.d.ts"
-  ]
+  "include": ["src"]
 }

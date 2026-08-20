@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from "$lib/utils";
 	import { setAttr } from "$lib/services/directus/visualEditing";
-	import { resolve } from "$app/paths";
+	import { resolvePathname } from "$lib/utils/path";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import { Button } from "$lib/components/ui/button";
 	import {
@@ -39,7 +39,7 @@
 		resolvedLink.href
 			? resolvedLink.isExternal
 				? resolvedLink.href
-				: resolve(resolvedLink.href as "/")
+				: resolvePathname(resolvedLink.href)
 			: null,
 	);
 </script>

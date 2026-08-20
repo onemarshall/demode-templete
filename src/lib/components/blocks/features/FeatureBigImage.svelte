@@ -1,7 +1,7 @@
 <script lang="ts">
 	/* eslint-disable svelte/no-navigation-without-resolve */
-	import { resolve } from "$app/paths";
-	import { parallaxImage } from "scripts/actions";
+	import { resolvePathname } from "$lib/utils/path";
+	import { parallaxImage } from "#scripts/actions";
 	import { setAttr } from "$lib/services/directus/visualEditing";
 	import {
 		resolveDirectusLink,
@@ -10,7 +10,7 @@
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
-	import { fade } from "scripts/actions";
+	import { fade } from "#scripts/actions";
 	import {
 		getImageUuid,
 		getImageObjectPosition,
@@ -138,7 +138,7 @@
 								variant="outline"
 								class="rounded-full bg-white"
 								size="lg"
-								href={resolve(link.href as "/")}
+								href={resolvePathname(link.href as string)}
 							>
 								{ctaLabel}
 							</Button>

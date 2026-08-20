@@ -5,7 +5,7 @@
 	import type { ButtonProps } from "./Button.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 	import setAttr from "$lib/services/directus/visualEditing";
-	import { fade } from "scripts/actions";
+	import { fade } from "#scripts/actions";
 
 	interface Props {
 		data: {

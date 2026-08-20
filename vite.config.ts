@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, type ViteUserConfig } from "vitest/config";
 import { playwright } from "@vitest/browser-playwright";
 import tailwindcss from "@tailwindcss/vite";
 import adapter from "@sveltejs/adapter-cloudflare";
@@ -7,11 +7,56 @@ import { CSPDirectives } from "./csp.config.mjs";
 import { visualizer } from "rollup-plugin-visualizer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { Logger, Plugin } from "vite";
+
+const patchedConsoles = new WeakSet<typeof console>();
+const patchedLoggers = new WeakSet<Logger>();
+const originalLoggerInfos = new WeakMap<Logger, (...args: unknown[]) => void>();
+
+function suppressDataRequestLogs(): Plugin {
+  return {
+    name: "suppress-data-request-logs",
+    apply: "serve",
+    enforce: "pre",
+    configureServer(server) {
+      const { logger } = server.config;
+      if (!patchedLoggers.has(logger)) {
+        patchedLoggers.add(logger);
+        const originalInfo = (logger.info as (...args: unknown[]) => void).bind(logger);
+        originalLoggerInfos.set(logger, originalInfo);
+        const wrappedInfo: (...args: unknown[]) => void = (...args) => {
+          if (typeof args[0] === "string" && args[0].includes("__data.json")) return;
+          originalInfo(...args);
+        };
+        logger.info = wrappedInfo as unknown as Logger["info"];
+      }
+
+      if (patchedConsoles.has(console)) return;
+      patchedConsoles.add(console);
+      const originalLog = console.log.bind(console);
+      console.log = (...args: unknown[]) => {
+        if (typeof args[0] === "string" && args[0].includes("__data.json")) return;
+        originalLog(...args);
+      };
+      return () => {
+        console.log = originalLog;
+        patchedConsoles.delete(console);
+        const restoreInfo = originalLoggerInfos.get(logger);
+        if (restoreInfo) {
+          logger.info = restoreInfo as unknown as Logger["info"];
+          originalLoggerInfos.delete(logger);
+          patchedLoggers.delete(logger);
+        }
+      };
+    },
+  };
+}
 
 const cwd = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [
+    suppressDataRequestLogs(),
     tailwindcss(),
     sveltekit({
       compilerOptions: {
@@ -42,14 +87,6 @@ export default defineConfig({
         mode: "auto",
         directives: CSPDirectives(),
       },
-      alias: {
-        scripts: "./src/assets/scripts",
-        css: "./src/assets/css",
-        svg: "./src/assets/svg",
-        $lib: "./src/lib",
-        "$lib/*": "./src/lib/*",
-        "@/*": "./src/lib/*",
-      },
     }),
   ],
   build: {
@@ -68,6 +105,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      $lib: path.resolve(cwd, "./src/lib"),
+      css: path.resolve(cwd, "./src/assets/css"),
       "@vinejs/vine": path.resolve(cwd, "./src/lib/utils/stub-vine.ts"),
     },
   },
@@ -99,4 +138,4 @@ export default defineConfig({
       },
     ],
   },
-});
+} as ViteUserConfig);

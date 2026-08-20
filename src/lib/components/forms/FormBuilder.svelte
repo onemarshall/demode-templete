@@ -3,7 +3,7 @@
 	import { cn } from "$lib/utils";
 	import { CircleCheck } from "@lucide/svelte";
 	import { goto } from "$app/navigation";
-	import { resolve } from "$app/paths";
+	import { resolvePathname } from "$lib/utils/path";
 	import { submitGenericForm } from "$lib/services/forms/remote/generic.remote";
 	import DynamicForm from "./DynamicForm.svelte";
 
@@ -40,7 +40,7 @@
 
 			if (form.on_success === "redirect" && form.success_redirect_url) {
 				if (form.success_redirect_url.startsWith("/")) {
-					goto(resolve(form.success_redirect_url as "/"));
+					goto(resolvePathname(form.success_redirect_url));
 				} else {
 					window.location.href = form.success_redirect_url;
 				}

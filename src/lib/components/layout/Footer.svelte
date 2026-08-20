@@ -39,7 +39,7 @@
 	import Copyright from "$lib/components/layout/Copyright.svelte";
 	import Logo from "./SiteLogo.svelte";
 	import NewsletterForm from "./NewsletterForm.svelte";
-	import { resolve } from "$app/paths";
+	import { resolvePathname } from "$lib/utils/path";
 
 	const socialIconMap: Record<string, Component<{ class?: string }>> = {
 		linkedin: Linkedin,
@@ -133,7 +133,7 @@
 
 			{#if ctaHref}
 				<a
-					href={resolve(ctaHref as "/")}
+					href={resolvePathname(ctaHref as string)}
 					class="inline-flex items-center justify-center rounded-full border border-white/60 px-8 py-3 uppercase tracking-widest text-sm hover:bg-white/10 transition-colors shrink-0"
 				>
 					{ctaLabel}
@@ -199,7 +199,7 @@
 									{#each item.children.filter((c) => c.is_visible !== false) as child (child.id)}
 										<li>
 											<a
-												href={resolve(
+												href={resolvePathname(
 													itemHref(child) as "/",
 												)}
 												class="text-sm text-white/70 hover:text-white transition-colors"

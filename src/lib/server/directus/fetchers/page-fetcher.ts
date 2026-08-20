@@ -488,7 +488,7 @@ export const fetchPageData = async (
     );
 
     if (!Array.isArray(pageData) || pageData.length === 0) {
-      throw error(404, { message: "Not found" });
+      throw error(404, "Not found");
     }
 
     const page = pageData[0];

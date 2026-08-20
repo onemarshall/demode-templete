@@ -3,8 +3,8 @@
 	import { setAttr } from "$lib/services/directus/visualEditing";
 	import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 	import { goto } from "$app/navigation";
-	import { resolve } from "$app/paths";
-	import { fade } from "scripts/actions";
+	import { resolvePathname } from "$lib/utils/path";
+	import { fade } from "#scripts/actions";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 
@@ -78,8 +78,8 @@
 				<a
 					use:fade={{ x: -5, delay: 0.2, duration: 0.5 }}
 					class="video-feature__link leading-tight p-5 lg:p-8 font-bold"
-					href={resolve(`/${data.link.permalink}`)}
-					onclick={() => goto(resolve(`/${data.link.permalink}`))}
+					href={resolvePathname(data.link.permalink)}
+					onclick={() => goto(resolvePathname(data.link.permalink))}
 				>
 					<span>{data?.link_text || "About the Summer School"}</span>
 

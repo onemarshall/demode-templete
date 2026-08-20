@@ -33,7 +33,7 @@
     } else {
       next.searchParams.delete(key);
     }
-    return resolve(`/news${next.search}`);
+    return resolve("/news") + next.search;
   };
 
   const pageUrl = (targetPage: number) => {
@@ -43,7 +43,7 @@
     } else {
       next.searchParams.set("page", String(targetPage));
     }
-    return resolve(`/news${next.search}`);
+    return resolve("/news") + next.search;
   };
 
   const removeTagUrl = (slug: string) => {
@@ -52,7 +52,7 @@
     const remaining = data.filters.tags.filter((t) => t !== slug);
     next.searchParams.delete("tag");
     for (const t of remaining) next.searchParams.append("tag", t);
-    return resolve(`/news${next.search}`);
+    return resolve("/news") + next.search;
   };
 
   const hasFilters = $derived(
@@ -129,7 +129,7 @@
             <a
               href={resolve("/news")}
               class="mt-4 inline-block text-sm text-primary underline"
-              data-sveltekit-noscroll
+              data-sveltekit-reset={false}
             >
               Clear filters
             </a>
@@ -161,7 +161,7 @@
             <a
               class="rounded-sm border border-gray-200 px-4 py-2 text-sm text-gray-600 transition-colors hover:border-primary hover:text-primary"
               href={pageUrl(data.pagination.page - 1)}
-              data-sveltekit-noscroll
+              data-sveltekit-reset={false}
             >
               &larr; Previous
             </a>
@@ -178,7 +178,7 @@
               <a
                 href={pageUrl(p)}
                 class="rounded-sm border border-gray-200 px-3.5 py-2 text-sm text-gray-600 transition-colors hover:border-primary hover:text-primary"
-                data-sveltekit-noscroll
+                data-sveltekit-reset={false}
               >
                 {p}
               </a>
@@ -191,7 +191,7 @@
             <a
               class="rounded-sm border border-gray-200 px-4 py-2 text-sm text-gray-600 transition-colors hover:border-primary hover:text-primary"
               href={pageUrl(data.pagination.page + 1)}
-              data-sveltekit-noscroll
+              data-sveltekit-reset={false}
             >
               Next &rarr;
             </a>

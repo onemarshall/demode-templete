@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { numberCounter } from "scripts/actions/numberCounter";
-	import { fade } from "scripts/actions/fade";
+	import { numberCounter } from "#scripts/actions/numberCounter";
+	import { fade } from "#scripts/actions/fade";
 	import {
 		CentreBooks,
 		JournalOfAnimalEthics,

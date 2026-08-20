@@ -6,7 +6,7 @@
 	import { debounce } from "$lib/utils";
 	import Badge from "$lib/components/ui/badge/badge.svelte";
 	import { goto } from "$app/navigation";
-	import { resolve } from "$app/paths";
+	import { resolvePathname } from "$lib/utils/path";
 
 	let open = $state(false);
 	let search = $state("");
@@ -70,7 +70,7 @@
 	});
 
 	const handleSelect = (result: SearchResult) => {
-		void goto(resolve(result.link as `/${string}`));
+		void goto(resolvePathname(result.link));
 		open = false;
 	};
 </script>

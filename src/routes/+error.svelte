@@ -26,19 +26,18 @@
 		</h1>
 		{#if isNotFound}
 			<p class="mt-4 text-lg text-gray-600">
-				The page you are looking for could not be found.
-				Please check the URL and try again.
+				The page you are looking for could not be found. Please check
+				the URL and try again.
 			</p>
 		{/if}
 		{#if isServerError}
 			<p class="mt-4 text-lg text-gray-600">
-				Something went wrong on our end. Please try again
-				later.
+				Something went wrong on our end. Please try again later.
 			</p>
 		{/if}
 		<div class="mt-8">
 			<a
-				href={resolve("/")}
+				href={resolve("")}
 				class="inline-flex items-center rounded-md bg-primary-600 px-6 py-3 text-base font-medium text-white transition-colors duration-200 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
 			>
 				Return to homepage

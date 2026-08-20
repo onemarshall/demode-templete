@@ -24,12 +24,17 @@
 		};
 	};
 
-	const isPostTagRelation = (relation: unknown): relation is PostTagRelation => {
+	const isPostTagRelation = (
+		relation: unknown,
+	): relation is PostTagRelation => {
 		if (relation === null || typeof relation !== "object") return false;
 		const tag = (relation as { tag_id?: unknown }).tag_id;
 		if (tag === null || typeof tag !== "object") return false;
 		const candidate = tag as { id?: unknown; title?: unknown };
-		return typeof candidate.id === "string" && typeof candidate.title === "string";
+		return (
+			typeof candidate.id === "string" &&
+			typeof candidate.title === "string"
+		);
 	};
 
 	const normalizePostTags = (tags: unknown): PostTagRelation[] =>
@@ -122,9 +127,8 @@
 			{/if}
 			{#if post.category && typeof post.category === "object"}
 				<a
-					href={resolve(
-						`/news?category=${encodeURIComponent(post.category.slug ?? "")}`,
-					)}
+					href={resolve("/news") +
+						`?category=${encodeURIComponent(post.category.slug ?? "")}`}
 					class="text-white/50 transition-colors hover:text-white/80"
 				>
 					{post.category.title}
@@ -195,9 +199,8 @@
 				<div class="mb-8 flex flex-wrap gap-2">
 					{#each postTags as relation (relation.tag_id.id)}
 						<a
-							href={resolve(
-								`/news?tag=${encodeURIComponent(relation.tag_id.slug ?? relation.tag_id.title)}`,
-							)}
+							href={resolve("/news") +
+								`?tag=${encodeURIComponent(relation.tag_id.slug ?? relation.tag_id.title)}`}
 							class="rounded-sm border border-gray-200 px-2.5 py-1 text-xs text-gray-500 transition-colors hover:border-primary hover:text-primary"
 						>
 							{relation.tag_id.title}

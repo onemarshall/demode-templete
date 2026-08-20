@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from "$lib/utils";
 	import { setAttr } from "$lib/services/directus/visualEditing";
-	import { resolve } from "$app/paths";
+	import { resolvePathname } from "$lib/utils/path";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import TextUnstyles from "$lib/components/ui/TextUnstyles.svelte";
 
@@ -26,7 +26,7 @@
 		data: CardItem;
 	}>();
 
-	const href = $derived(data.link ? resolve(data.link) : null);
+	const href = $derived(data.link ? resolvePathname(data.link) : null);
 </script>
 
 <div

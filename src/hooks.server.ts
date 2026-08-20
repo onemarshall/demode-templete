@@ -1,6 +1,6 @@
 import { sequence } from "@sveltejs/kit/hooks";
 import { nanoid } from "nanoid";
-import type { Handle } from "@sveltejs/kit";
+import type { Handle } from "@sveltejs/kit/hooks";
 import {
   fetchRedirects,
   type SvelteRedirect,
@@ -35,11 +35,7 @@ let redirectCacheTimestamp = 0;
 
 const getRedirects = async (): Promise<SvelteRedirect[]> => {
   // Only fetch redirects in Directus mode
-  const provider = (
-    CMS_PROVIDER ??
-    PUBLIC_CMS_PROVIDER ??
-    "static"
-  ).toLowerCase();
+  const provider = (CMS_PROVIDER ?? PUBLIC_CMS_PROVIDER ?? "static").toLowerCase();
   if (provider !== "directus") return [];
 
   const now = Date.now();

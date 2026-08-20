@@ -63,7 +63,7 @@
 >
   <!-- Card image -->
   <a
-    href={resolve(`/news/${post.slug}`)}
+    href={resolve("/news/[slug]", { slug: post.slug })}
     class="relative block aspect-3/2 overflow-hidden"
   >
     {#if imageUrl(post.image)}
@@ -100,16 +100,18 @@
   <div class="flex flex-1 flex-col pt-5 pb-5 pr-5">
     {#if post.category && typeof post.category === "object" && post.category.slug}
       <a
-        href={resolve(
-          `/news?category=${encodeURIComponent(post.category.slug)}`,
-        )}
+        href={resolve("/news") +
+          `?category=${encodeURIComponent(post.category.slug)}`}
         class="mb-2 text-[11px] font-bold uppercase tracking-0.1em text-primary"
       >
         {post.category.title}
       </a>
     {/if}
 
-    <a href={resolve(`/news/${post.slug}`)} class="group/title block">
+    <a
+      href={resolve("/news/[slug]", { slug: post.slug })}
+      class="group/title block"
+    >
       <h2
         class="group-hover:underline underline-offset-4 font-serif text-2xl font-semibold leading-snug text-gray-900 transition-colors group-hover/title:text-primary text-balance"
       >
@@ -161,7 +163,7 @@
         {#each post.tags as tag, i (`${post.id}-${i}`)}
           {#if tag?.title && tag?.slug}
             <a
-              href={resolve(`/news?tag=${encodeURIComponent(tag.slug)}`)}
+              href={resolve("/news") + `?tag=${encodeURIComponent(tag.slug)}`}
               class="rounded-sm border border-gray-200 px-2 py-0.5 text-sm text-gray-500 transition-colors hover:border-primary hover:text-primary"
             >
               {tag.title}

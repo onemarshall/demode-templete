@@ -33,7 +33,13 @@
 	);
 	const logoClass = $derived(svgClass || className);
 	const currentVariant = $derived(variant);
-	const name = $derived(globals?.title ?? site?.title ?? globals?.company ?? site?.company ?? "Site");
+	const name = $derived(
+		globals?.title ??
+			site?.title ??
+			globals?.company ??
+			site?.company ??
+			"Site",
+	);
 	const initials = $derived(
 		name
 			.split(/\s+/)
@@ -70,7 +76,7 @@
 		{@render logo()}
 	</div>
 {:else}
-	<a href={resolve("/")} class={wrapperClass} title="Home">
+	<a href={resolve("")} class={wrapperClass} title="Home">
 		{@render logo()}
 	</a>
 {/if}

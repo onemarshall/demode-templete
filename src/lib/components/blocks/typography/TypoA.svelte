@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setAttr } from "$lib/services/directus/visualEditing";
-	import { fade } from "scripts/actions";
+	import { fade } from "#scripts/actions";
 	import Container from "$lib/components/ui/Container.svelte";
 	import {
 		CentreBooks,

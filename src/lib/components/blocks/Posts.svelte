@@ -8,7 +8,7 @@
 	import Tagline from "$lib/components/ui/Tagline.svelte";
 	import { scale } from "svelte/transition";
 	import Container from "$lib/components/ui/Container.svelte";
-	import { fade } from "scripts/actions";
+	import { fade } from "#scripts/actions";
 	import { formatDate } from "$lib/utils/date";
 	type BlockPostsPagination = {
 		currentPage: number;
@@ -198,7 +198,9 @@
 				{:else if featuredPost}
 					<!-- Featured post — narrower left column -->
 					<a
-						href={resolve(`/news/${featuredPost.slug}`)}
+						href={resolve("/news/[slug]", {
+							slug: featuredPost.slug as string,
+						})}
 						class="group block"
 					>
 						<div
@@ -267,7 +269,9 @@
 								use:fade={{ x: -20, duration: 0.9 }}
 							>
 								<a
-									href={resolve(`/news/${post.slug}`)}
+									href={resolve("/news/[slug]", {
+										slug: post.slug as string,
+									})}
 									class="group relative z-10 md:flex w-full cursor-pointer items-start gap-4"
 								>
 									<div
@@ -361,7 +365,9 @@
 				{#each posts as post (post.id)}
 					<a
 						in:scale={{ duration: 100 }}
-						href={resolve(`/news/${post.slug}`)}
+						href={resolve("/news/[slug]", {
+							slug: post.slug as string,
+						})}
 						class="group block overflow-hidden rounded-sm"
 					>
 						<div

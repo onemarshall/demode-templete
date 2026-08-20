@@ -5,7 +5,7 @@
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
-	import { fade } from "scripts/actions";
+	import { fade } from "#scripts/actions";
 	import type { ButtonProps } from "./Button.svelte";
 
 	interface BannerData {

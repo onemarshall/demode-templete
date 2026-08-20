@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolve } from "$app/paths";
+	import { resolvePathname } from "$lib/utils/path";
 	import { setAttr } from "$lib/services/directus/visualEditing";
 	import {
 		resolveDirectusLink,
@@ -9,7 +9,7 @@
 	import { getImageUuid } from "$lib/utils/get-image-uuid";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
-	import { fade } from "scripts/actions";
+	import { fade } from "#scripts/actions";
 	import Tagline from "$lib/components/ui/Tagline.svelte";
 	interface FeatureHoverSplitLink {
 		type?: "page" | "post" | "url" | null;
@@ -102,7 +102,7 @@
 	{#snippet linkBtn(href: string, label: string, isExternal: boolean)}
 		{#if !isExternal}
 			<a
-				href={resolve(href as "/")}
+				href={resolvePathname(href)}
 				class="inline-flex items-center bg-transparent px-5 py-2 text-sm font-medium text-white backdrop-blur-lg transition-all duration-200 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:px-8 lg:py-3 rounded-full border-2 border-white/50 hover:border-white cursor-grab"
 			>
 				{label}

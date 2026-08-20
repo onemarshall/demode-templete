@@ -59,7 +59,7 @@
               class="block py-1.5 text-sm transition-colors {!filters.category
                 ? 'font-semibold text-primary'
                 : 'text-gray-600 hover:text-gray-900'}"
-              data-sveltekit-noscroll
+              data-sveltekit-reset={false}
             >
               All categories
             </a>
@@ -72,7 +72,7 @@
                 cat.slug
                   ? 'font-semibold text-primary'
                   : 'text-gray-600 hover:text-gray-900'}"
-                data-sveltekit-noscroll
+                data-sveltekit-reset={false}
               >
                 {cat.title}
               </a>
@@ -97,7 +97,7 @@
               class="block py-1.5 text-sm transition-colors {!filters.post_type
                 ? 'font-semibold text-primary'
                 : 'text-gray-600 hover:text-gray-900'}"
-              data-sveltekit-noscroll
+              data-sveltekit-reset={false}
             >
               All types
             </a>
@@ -110,7 +110,7 @@
                 type
                   ? 'font-semibold text-primary'
                   : 'text-gray-600 hover:text-gray-900'}"
-                data-sveltekit-noscroll
+                data-sveltekit-reset={false}
               >
                 {type}
               </a>
@@ -132,7 +132,7 @@
         class="inline-flex items-center gap-2 py-1.5 text-sm transition-colors {filters.featured
           ? 'font-semibold text-primary'
           : 'text-gray-600 hover:text-gray-900'}"
-        data-sveltekit-noscroll
+        data-sveltekit-reset={false}
       >
         <span
           class="flex size-4 items-center justify-center rounded border {filters.featured
@@ -166,7 +166,7 @@
             <a
               href={removeTagUrl(tag)}
               class="group inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
-              data-sveltekit-noscroll
+              data-sveltekit-reset={false}
             >
               #{tag}
               <span
@@ -184,7 +184,7 @@
       <a
         href={resolve("/news")}
         class="inline-block border-b border-gray-400 pb-0.5 text-xs uppercase tracking-0.1em text-gray-500 transition-colors hover:border-gray-800 hover:text-gray-800"
-        data-sveltekit-noscroll
+        data-sveltekit-reset={false}
       >
         Clear all filters
       </a>

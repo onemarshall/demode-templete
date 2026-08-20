@@ -7,7 +7,7 @@
 	import { CookieConsent, Loader } from "$lib/components/core";
 	import { ScrollToTop } from "$lib/components/ui";
 	import type { LayoutData } from "./$types";
-	import { smoothScroll, cursix } from "scripts/actions";
+	import { smoothScroll, cursix } from "#scripts/actions";
 	import CmsMeta from "$lib/components/core/CmsMeta.svelte";
 	import MenuMain from "$lib/components/layout/morphing/index.svelte";
 	import Footer from "$lib/components/layout/Footer.svelte";

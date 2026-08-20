@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { setAttr } from "$lib/services/directus/visualEditing";
 	import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
-	import { fade, parallaxImage } from "scripts/actions";
+	import { fade, parallaxImage } from "#scripts/actions";
 	import Container from "$lib/components/ui/Container.svelte";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import Text from "$lib/components/ui/Text.svelte";

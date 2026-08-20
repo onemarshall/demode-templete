@@ -57,7 +57,10 @@
   };
 </script>
 
-<a href={resolve(`/news/${post.slug}`)} class="group mb-10 block">
+<a
+  href={resolve("/news/[slug]", { slug: post.slug })}
+  class="group mb-10 block"
+>
   <article class="relative overflow-hidden rounded-sm">
     <div class="aspect-21/9 w-full">
       {#if imageUrl(post.image)}

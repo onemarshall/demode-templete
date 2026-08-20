@@ -2,9 +2,9 @@
 	import { cn } from "$lib/utils";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import { setAttr } from "$lib/services/directus/visualEditing";
-	import { staggerFade } from "scripts/actions";
+	import { staggerFade } from "#scripts/actions";
 	import Container from "$lib/components/ui/Container.svelte";
-	import { flipScroll } from "scripts/actions";
+	import { flipScroll } from "#scripts/actions";
 	type GalleryImage = {
 		id: number;
 		directus_files_id: string;

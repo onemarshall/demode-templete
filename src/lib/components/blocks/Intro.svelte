@@ -1,7 +1,7 @@
 <script lang="ts">
 	/* eslint-disable svelte/no-navigation-without-resolve */
-	import { resolve } from "$app/paths";
-	import { parallaxImage } from "scripts/actions";
+	import { resolvePathname } from "$lib/utils/path";
+	import { parallaxImage } from "#scripts/actions";
 	import { setAttr } from "$lib/services/directus/visualEditing";
 	import {
 		resolveDirectusLink,
@@ -86,7 +86,7 @@
 						<div class="mt-3">
 							{#if !link.isExternal}
 								<a
-									href={resolve(link.href as "/")}
+									href={resolvePathname(link.href as string)}
 									class="inline-flex items-center text-lg leading-snug text-gray-600 underline decoration-transparent underline-offset-4 transition-colors duration-200 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700"
 								>
 									{ctaLabel}

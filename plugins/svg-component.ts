@@ -19,7 +19,7 @@ const svgCache = new Map<string, SvgTransformResult>();
  * Vite plugin that transforms SVG files imported with `?component`
  * into Svelte 5 components with prop spreading.
  *
- * Usage: `import Logo from 'svg/logo/logo.svg?component'`
+ * Usage: `import Logo from 'svg/custom/logos/logo.svg?component'`
  */
 export default function svgComponent(): Plugin {
   return {
