@@ -72,7 +72,7 @@
 
 {#snippet content()}
 	<span class="flex items-center space-x-2">
-		{#if icon && iconPosition === "left" && Icon}
+		{#if Icon && iconPosition === "left"}
 			<Icon class="size-4 shrink-0" />
 		{/if}
 
@@ -80,7 +80,7 @@
 			<span>{label}</span>
 		{/if}
 
-		{#if icon && iconPosition === "right" && Icon}
+		{#if Icon && iconPosition === "right"}
 			<Icon class="size-4 shrink-0" />
 		{/if}
 	</span>
