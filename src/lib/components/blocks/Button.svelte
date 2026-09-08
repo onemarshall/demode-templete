@@ -8,7 +8,8 @@
 		type ButtonVariant,
 	} from "$lib/components/ui/button";
 
-	import { Icon as Icontype, ArrowRight, Plus } from "@lucide/svelte";
+	import type { LucideIcon } from "@lucide/svelte";
+	import { ArrowRight, Plus } from "@lucide/svelte";
 	import { cn } from "$lib/utils";
 	import { resolveDirectusLink } from "$lib/utils/directus-links";
 
@@ -22,7 +23,7 @@
 		post?: { slug: string | null };
 		button_size?: ButtonSize;
 		icon?: "arrow" | "plus";
-		customIcon?: typeof Icontype;
+		customIcon?: LucideIcon;
 		iconPosition?: "left" | "right";
 		class?: string;
 		onClick?: () => void;
@@ -50,7 +51,7 @@
 
 	const size = $derived<ButtonSize>(button_size || "default");
 
-	const icons: Record<string, typeof Icontype> = {
+	const icons: Record<string, LucideIcon> = {
 		arrow: ArrowRight,
 		plus: Plus,
 	};
