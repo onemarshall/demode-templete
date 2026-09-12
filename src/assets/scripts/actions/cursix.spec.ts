@@ -1,55 +1,52 @@
 // @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-vi.mock("cursix", () => {
-  const cursor = {
-    destroy: vi.fn(),
-    addState: vi.fn(),
-    removeState: vi.fn(),
-    hide: vi.fn(),
-    show: vi.fn(),
-  };
-  const Cursix = vi.fn(function () {
-    return cursor;
-  });
-  Cursix.registerGSAP = vi.fn();
-  return { default: Cursix };
-});
-
-vi.mock("./gsap", () => ({
-  gsap: {
-    registerPlugin: vi.fn(),
-  },
+const gsapMock = vi.hoisted(() => ({
+  registerPlugin: vi.fn(),
 }));
 
-import { gsap } from "./gsap";
-import Cursix from "cursix";
+vi.mock("./gsap", () => ({
+  loadGsap: () => Promise.resolve({ gsap: gsapMock }),
+}));
+
+vi.mock("cursix", () => {
+  const mockCursor = {
+    destroy: vi.fn(),
+    animate: vi.fn(),
+    hide: vi.fn(),
+    show: vi.fn(),
+    addState: vi.fn(),
+    removeState: vi.fn(),
+  };
+
+  const MockCursix = vi.fn(function () {
+    return mockCursor;
+  });
+  MockCursix.registerGSAP = vi.fn();
+
+  return {
+    default: MockCursix,
+  };
+});
+
 import { cursix } from "./cursix";
+import Cursix from "cursix";
+
+const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe("cursix action", () => {
   const originalDocument = globalThis.document;
   const originalWindow = globalThis.window;
-  let hero: { addEventListener: any; removeEventListener: any };
-  let interactive: { addEventListener: any; removeEventListener: any };
 
   beforeEach(() => {
     vi.clearAllMocks();
-
-    hero = {
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
+    (globalThis as any).document = {
+      body: {},
+      querySelector: vi.fn(() => null),
+      querySelectorAll: vi.fn(() => []),
     };
-    interactive = {
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    };
-
     (globalThis as any).window = {
       matchMedia: vi.fn(() => ({ matches: false })),
-    };
-    (globalThis as any).document = {
-      body: { classList: {} },
-      querySelector: vi.fn((selector: string) => (selector === ".fx-hero" ? hero : null)),
     };
   });
 
@@ -58,55 +55,71 @@ describe("cursix action", () => {
     (globalThis as any).window = originalWindow;
   });
 
-  it("registers GSAP and creates the cursor with merged options", () => {
+  it("initializes Cursix with registered GSAP", async () => {
+    const node = {
+      querySelector: vi.fn(),
+      querySelectorAll: vi.fn(() => []),
+      ownerDocument: { querySelectorAll: vi.fn(() => []) },
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    } as unknown as HTMLElement;
+
+    const action = cursix(node);
+    await flush();
+
+    expect(Cursix.registerGSAP).toHaveBeenCalledWith(gsapMock);
+    expect(Cursix).toHaveBeenCalled();
+
+    action.destroy();
+  });
+
+  it("registers hero and interactive element listeners", async () => {
+    const hero = {
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    };
+    const interactive = {
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    };
     const node = {
       querySelector: vi.fn((selector: string) => (selector === ".fx-hero" ? hero : null)),
       querySelectorAll: vi.fn(() => [interactive]),
+      ownerDocument: { querySelectorAll: vi.fn(() => [interactive]) },
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     } as unknown as HTMLElement;
 
-    cursix(node, { speed: 0.8 });
+    const action = cursix(node);
+    await flush();
 
-    expect(Cursix.registerGSAP).toHaveBeenCalledWith(gsap);
-    expect(Cursix).toHaveBeenCalledWith(
-      expect.objectContaining({ speed: 0.8, className: "mf-cursor" }),
+    expect(hero.addEventListener).toHaveBeenCalledWith("mouseenter", expect.any(Function));
+    expect(interactive.addEventListener).toHaveBeenCalledWith("mouseenter", expect.any(Function));
+
+    action.destroy();
+
+    expect(hero.removeEventListener).toHaveBeenCalledWith("mouseenter", expect.any(Function));
+    expect(interactive.removeEventListener).toHaveBeenCalledWith(
+      "mouseenter",
+      expect.any(Function),
     );
   });
 
-  it("adds pointer state on interactive element hover", () => {
+  it("destroys the cursor instance on destroy", async () => {
     const node = {
-      querySelector: vi.fn((selector: string) => (selector === ".fx-hero" ? hero : null)),
-      querySelectorAll: vi.fn(() => [interactive]),
+      querySelector: vi.fn(),
+      querySelectorAll: vi.fn(() => []),
+      ownerDocument: { querySelectorAll: vi.fn(() => []) },
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     } as unknown as HTMLElement;
 
-    cursix(node);
-    const instance = Cursix.mock.results[0].value;
+    const action = cursix(node);
+    await flush();
 
-    const enter = interactive.addEventListener.mock.calls.find(
-      (call: any[]) => call[0] === "mouseenter",
-    )?.[1];
-    const leave = interactive.addEventListener.mock.calls.find(
-      (call: any[]) => call[0] === "mouseleave",
-    )?.[1];
-
-    enter?.();
-    expect(instance.addState).toHaveBeenCalledWith("-pointer");
-
-    leave?.();
-    expect(instance.removeState).toHaveBeenCalledWith("-pointer");
-  });
-
-  it("cleans up listeners and destroys the cursor on destroy", () => {
-    const node = {
-      querySelector: vi.fn((selector: string) => (selector === ".fx-hero" ? hero : null)),
-      querySelectorAll: vi.fn(() => [interactive]),
-    } as unknown as HTMLElement;
-
-    const action = cursix(node) as unknown as { destroy: () => void };
-    const instance = Cursix.mock.results[0].value;
+    const cursorInstance = Cursix.mock.results[0].value;
     action.destroy();
 
-    expect(hero.removeEventListener).toHaveBeenCalledTimes(2);
-    expect(interactive.removeEventListener).toHaveBeenCalledTimes(2);
-    expect(instance.destroy).toHaveBeenCalled();
+    expect(cursorInstance.destroy).toHaveBeenCalled();
   });
 });

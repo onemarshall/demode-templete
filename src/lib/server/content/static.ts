@@ -12,6 +12,7 @@ import {
   PostDetailSchema,
   SiteDataSchema,
   type NavigationItem,
+  type PageModel,
   type SiteData,
 } from "$lib/content/schema";
 import type { ContentProvider, PostFilters } from "$lib/content/provider";
@@ -186,29 +187,39 @@ const buildSiteData = (): SiteData => {
   });
 };
 
-export const createStaticContentProvider = (): ContentProvider => ({
-  type: "static",
-  getSiteData: async () => buildSiteData(),
-  getPageByPath: async (path: string) => {
-    const page = staticPagesByPath.get(normalizePath(path));
-    if (!page) return null;
-    const parsed = PageModelSchema.parse(page);
-    renderMarkdownInData(parsed);
-    return parsed;
-  },
-  getPostBySlug: async (slug: string) =>
-    PostDetailSchema.parse({
-      id: slug,
-      slug,
-      title: slug,
-      description: "",
-      content: "",
-    }),
-  getRelatedPosts: async () => [],
-  getPaginatedPosts: async (_page: number, _limit: number, _filters?: PostFilters) => [],
-  getTotalPostCount: async (_filters?: PostFilters) => 0,
-  getAvailableCategories: async () => [],
-  getAvailablePostTypes: async () => [],
-});
+export const createStaticContentProvider = (): ContentProvider => {
+  let siteData: SiteData | null = null;
+  const renderedPages = new Map<string, PageModel>();
+
+  return {
+    type: "static",
+    getSiteData: async () => (siteData ??= buildSiteData()),
+    getPageByPath: async (path: string) => {
+      const key = normalizePath(path);
+      let rendered = renderedPages.get(key);
+      if (!rendered) {
+        const page = staticPagesByPath.get(key);
+        if (!page) return null;
+        rendered = PageModelSchema.parse(page);
+        renderMarkdownInData(rendered);
+        renderedPages.set(key, rendered);
+      }
+      return rendered;
+    },
+    getPostBySlug: async (slug: string) =>
+      PostDetailSchema.parse({
+        id: slug,
+        slug,
+        title: slug,
+        description: "",
+        content: "",
+      }),
+    getRelatedPosts: async () => [],
+    getPaginatedPosts: async (_page: number, _limit: number, _filters?: PostFilters) => [],
+    getTotalPostCount: async (_filters?: PostFilters) => 0,
+    getAvailableCategories: async () => [],
+    getAvailablePostTypes: async () => [],
+  };
+};
 
 export const staticContentProvider = createStaticContentProvider();

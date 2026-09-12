@@ -4,6 +4,7 @@ import {
   PageBuilderModelSchema,
   PostDetailSchema,
   type PostSummary,
+  type SiteData,
 } from "$lib/content/schema";
 import { buildFallbackSiteData } from "./shared";
 import {
@@ -48,17 +49,17 @@ const withDirectusFallback = async <T>(
   }
 };
 
+const SITE_DATA_TTL_MS = 60 * 1000; // 1 minute
+
 export const createDirectusContentProvider = (): ContentProvider => {
+  let siteDataCache: SiteData | null = null;
+  let siteDataCachedAt = 0;
+  let siteDataInFlight: Promise<SiteData> | null = null;
+
   // Helper to resolve category and tag IDs from slugs
   const resolveFilterIds = async (filters: PostFilters) => {
     const categoryId = filters.categorySlug
-      ? (
-          await fetchCategoryBySlug(
-            filters.categorySlug,
-            globalThis.fetch,
-            DIRECTUS_TOKEN,
-          )
-        )?.id
+      ? (await fetchCategoryBySlug(filters.categorySlug, globalThis.fetch, DIRECTUS_TOKEN))?.id
       : undefined;
     const tagIds = filters.tagSlugs?.length
       ? await fetchTagsBySlugs(filters.tagSlugs, globalThis.fetch, DIRECTUS_TOKEN)
@@ -69,36 +70,53 @@ export const createDirectusContentProvider = (): ContentProvider => {
   return {
     type: "directus",
     getSiteData: async () => {
-      const [
-        { tree: headerTree, error: headerNavigationError },
-        { tree: footerTree, error: footerNavigationError },
-        { tree: copyrightTree, error: copyrightNavigationError },
-        directusGlobals,
-      ] = await Promise.all([
-        fetchDirectusNavigationTree(globalThis.fetch, "main", DIRECTUS_TOKEN),
-        fetchDirectusNavigationTree(globalThis.fetch, "footer", DIRECTUS_TOKEN),
-        fetchDirectusNavigationTree(globalThis.fetch, "copyright", DIRECTUS_TOKEN),
-        fetchDirectusGlobals(globalThis.fetch, DIRECTUS_TOKEN),
-      ]);
-
-      if (headerNavigationError || footerNavigationError) {
-        const reason = headerNavigationError ?? footerNavigationError;
-        console.warn(`[directus] Using fallback site data: ${reason}`);
-        return buildFallbackSiteData();
+      const now = Date.now();
+      if (siteDataCache && now - siteDataCachedAt < SITE_DATA_TTL_MS) {
+        return siteDataCache;
       }
 
-      const fallback = buildFallbackSiteData();
+      siteDataInFlight ??= (async () => {
+        const [
+          { tree: headerTree, error: headerNavigationError },
+          { tree: footerTree, error: footerNavigationError },
+          { tree: copyrightTree, error: copyrightNavigationError },
+          directusGlobals,
+        ] = await Promise.all([
+          fetchDirectusNavigationTree(globalThis.fetch, "main", DIRECTUS_TOKEN),
+          fetchDirectusNavigationTree(globalThis.fetch, "footer", DIRECTUS_TOKEN),
+          fetchDirectusNavigationTree(globalThis.fetch, "copyright", DIRECTUS_TOKEN),
+          fetchDirectusGlobals(globalThis.fetch, DIRECTUS_TOKEN),
+        ]);
 
-      return SiteDataSchema.parse({
-        ...fallback,
-        globals: {
-          ...fallback.globals,
-          ...directusGlobals,
-        },
-        headerNavigation: headerTree,
-        footerNavigation: footerTree,
-        copyrightNavigation: copyrightNavigationError ? [] : copyrightTree,
-      });
+        if (headerNavigationError || footerNavigationError) {
+          const reason = headerNavigationError ?? footerNavigationError;
+          console.warn(`[directus] Using fallback site data: ${reason}`);
+          return buildFallbackSiteData();
+        }
+
+        const fallback = buildFallbackSiteData();
+
+        return SiteDataSchema.parse({
+          ...fallback,
+          globals: {
+            ...fallback.globals,
+            ...directusGlobals,
+          },
+          headerNavigation: headerTree,
+          footerNavigation: footerTree,
+          copyrightNavigation: copyrightNavigationError ? [] : copyrightTree,
+        });
+      })()
+        .then((data) => {
+          siteDataCache = data;
+          siteDataCachedAt = Date.now();
+          return data;
+        })
+        .finally(() => {
+          siteDataInFlight = null;
+        });
+
+      return siteDataInFlight;
     },
     getPageByPath: async (path: string, options?: PageLoadOptions) => {
       try {
@@ -113,6 +131,7 @@ export const createDirectusContentProvider = (): ContentProvider => {
           path,
           title: pageData.title || path,
           blocks: pageData.blocks || [],
+          seo: pageData.seo ?? null,
         });
       } catch (err) {
         if (is404(err)) return null;
@@ -122,22 +141,13 @@ export const createDirectusContentProvider = (): ContentProvider => {
     },
     getPostBySlug: async (slug: string, options) =>
       withDirectusFallback(`getPostBySlug for ${slug}`, null, async () => {
-        const post = await fetchPostBySlug(
-          slug,
-          options,
-          globalThis.fetch,
-          DIRECTUS_TOKEN,
-        );
+        const post = await fetchPostBySlug(slug, options, globalThis.fetch, DIRECTUS_TOKEN);
         if (!post) return null;
         return PostDetailSchema.parse(post);
       }),
     getRelatedPosts: async (postId: string) =>
       withDirectusFallback(`getRelatedPosts for ${postId}`, [] as PostSummary[], async () => {
-        return (await fetchRelatedPosts(
-          postId,
-          globalThis.fetch,
-          DIRECTUS_TOKEN,
-        )) as PostSummary[];
+        return (await fetchRelatedPosts(postId, globalThis.fetch, DIRECTUS_TOKEN)) as PostSummary[];
       }),
     getPaginatedPosts: async (page: number, limit: number, filters?: PostFilters) =>
       withDirectusFallback("getPaginatedPosts", [] as PostSummary[], async () => {

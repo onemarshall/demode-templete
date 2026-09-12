@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-vi.mock("./gsap", () => ({
+const mocks = vi.hoisted(() => ({
   gsap: {
     set: vi.fn(),
     to: vi.fn(),
@@ -9,8 +9,13 @@ vi.mock("./gsap", () => ({
   },
 }));
 
-import { gsap } from "./gsap";
+vi.mock("./gsap", () => ({
+  loadGsap: () => Promise.resolve(mocks),
+}));
+
 import { links } from "./links";
+
+const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe("links action", () => {
   beforeEach(() => {
@@ -21,10 +26,10 @@ describe("links action", () => {
     vi.restoreAllMocks();
   });
 
-  it("animates main and bottom nav links on click", () => {
+  it("animates main and bottom nav links on click", async () => {
     const main = [{ id: "a" }, { id: "b" }];
     const bottom = [{ id: "c" }];
-    gsap.utils.toArray.mockImplementation(((selector: string) => {
+    mocks.gsap.utils.toArray.mockImplementation(((selector: string) => {
       if (selector === ".js-links") return main;
       if (selector === ".js-links-bottom") return bottom;
       return [];
@@ -46,14 +51,21 @@ describe("links action", () => {
     expect(clickHandler).toBeDefined();
 
     clickHandler!();
+    await flush();
 
-    expect(gsap.set).toHaveBeenCalledWith(main, expect.objectContaining({ autoAlpha: 0, x: 30 }));
-    expect(gsap.to).toHaveBeenCalledWith(
+    expect(mocks.gsap.set).toHaveBeenCalledWith(
+      main,
+      expect.objectContaining({ autoAlpha: 0, x: 30 }),
+    );
+    expect(mocks.gsap.to).toHaveBeenCalledWith(
       main,
       expect.objectContaining({ autoAlpha: 1, x: 0, duration: 0.6 }),
     );
-    expect(gsap.set).toHaveBeenCalledWith(bottom, expect.objectContaining({ autoAlpha: 0, y: 10 }));
-    expect(gsap.to).toHaveBeenCalledWith(
+    expect(mocks.gsap.set).toHaveBeenCalledWith(
+      bottom,
+      expect.objectContaining({ autoAlpha: 0, y: 10 }),
+    );
+    expect(mocks.gsap.to).toHaveBeenCalledWith(
       bottom,
       expect.objectContaining({ autoAlpha: 1, y: 0, duration: 0.6 }),
     );
@@ -62,10 +74,10 @@ describe("links action", () => {
     expect(node.removeEventListener).toHaveBeenCalledWith("click", clickHandler!);
   });
 
-  it("uses custom selectors when provided", () => {
+  it("uses custom selectors when provided", async () => {
     const nav = [{ id: "1" }];
     const footer = [{ id: "2" }];
-    gsap.utils.toArray.mockImplementation(((selector: string) => {
+    mocks.gsap.utils.toArray.mockImplementation(((selector: string) => {
       if (selector === ".nav-item") return nav;
       if (selector === ".nav-footer-item") return footer;
       return [];
@@ -82,15 +94,16 @@ describe("links action", () => {
     };
     const clickHandler = mockNode.addEventListener.mock.calls[0][1];
     clickHandler();
+    await flush();
 
-    expect(gsap.utils.toArray).toHaveBeenCalledWith(".nav-item");
-    expect(gsap.utils.toArray).toHaveBeenCalledWith(".nav-footer-item");
-    expect(gsap.to).toHaveBeenCalledWith(nav, expect.any(Object));
-    expect(gsap.to).toHaveBeenCalledWith(footer, expect.any(Object));
+    expect(mocks.gsap.utils.toArray).toHaveBeenCalledWith(".nav-item");
+    expect(mocks.gsap.utils.toArray).toHaveBeenCalledWith(".nav-footer-item");
+    expect(mocks.gsap.to).toHaveBeenCalledWith(nav, expect.any(Object));
+    expect(mocks.gsap.to).toHaveBeenCalledWith(footer, expect.any(Object));
   });
 
-  it("does nothing when no matching links are found", () => {
-    gsap.utils.toArray.mockReturnValue([]);
+  it("does nothing when no matching links are found", async () => {
+    mocks.gsap.utils.toArray.mockReturnValue([]);
 
     const node = {
       addEventListener: vi.fn(),
@@ -103,9 +116,10 @@ describe("links action", () => {
     };
     const clickHandler = mockNode.addEventListener.mock.calls[0][1];
     clickHandler();
+    await flush();
 
-    expect(gsap.set).not.toHaveBeenCalled();
-    expect(gsap.to).not.toHaveBeenCalled();
+    expect(mocks.gsap.set).not.toHaveBeenCalled();
+    expect(mocks.gsap.to).not.toHaveBeenCalled();
 
     action.destroy();
   });

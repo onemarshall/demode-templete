@@ -208,7 +208,7 @@
 								{headline}
 								as="h1"
 								size="xl"
-								class="font-serif font-medium text-balance font-heading leading-[1.01] tracking-[-0.02em] text-[#ffffff] "
+								class="font-serif font-medium text-balance font-heading leading-[1.01] tracking-[-0.02em] text-[#ffffff]"
 							/>
 						</div>
 					{/if}

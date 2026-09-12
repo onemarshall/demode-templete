@@ -1,5 +1,4 @@
 import { sequence } from "@sveltejs/kit/hooks";
-import { nanoid } from "nanoid";
 import type { Handle } from "@sveltejs/kit/hooks";
 import {
   fetchRedirects,
@@ -10,7 +9,7 @@ import { CMS_PROVIDER } from "$app/env/private";
 import { PUBLIC_CMS_PROVIDER, PUBLIC_SITE_URL } from "$app/env/public";
 
 /* -------------------------------------------------------------------------- */
-/*  Environment validation                                                     */
+/*  Environment validation                                                    */
 /* -------------------------------------------------------------------------- */
 
 if (
@@ -51,6 +50,9 @@ const getRedirects = async (): Promise<SvelteRedirect[]> => {
 /* -------------------------------------------------------------------------- */
 
 const directusRedirectHandle: Handle = async ({ event, resolve }) => {
+  // Redirects only apply to page paths — skip the lookup for API routes.
+  if (event.url.pathname.startsWith("/api/")) return resolve(event);
+
   const pathname = normalizePath(event.url.pathname);
   const redirects = await getRedirects();
   const match = redirects.find((redirect) => redirect.source === pathname);
@@ -70,7 +72,7 @@ const contentTypeFilterHandle: Handle = ({ event, resolve }) =>
   });
 
 const nonceHandle: Handle = ({ event, resolve }) => {
-  event.locals.nonce = nanoid();
+  event.locals.nonce = crypto.randomUUID();
   return resolve(event);
 };
 

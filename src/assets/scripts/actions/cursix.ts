@@ -1,6 +1,6 @@
-import { gsap } from "./gsap";
+import { loadGsap, type GsapModules } from "./gsap";
 import type { Action } from "svelte/action";
-import Cursix from "cursix";
+import type Cursix from "cursix";
 
 /** https://github.com/WaqasIshaque1/Cursix?tab=readme-ov-file */
 
@@ -129,10 +129,13 @@ export const cursix: Action<HTMLElement, CursixOptions | undefined> = (node, opt
   let heroElement: Element | null = null;
   const interactiveElements = new Set<Element>();
 
-  function initializeCursor() {
+  function initializeCursor(
+    gsap: GsapModules["gsap"],
+    CursixImpl: (typeof import("cursix"))["default"],
+  ) {
     try {
       // Ensure GSAP is registered
-      Cursix.registerGSAP(gsap);
+      CursixImpl.registerGSAP(gsap);
 
       // Determine container element
       let containerEl: HTMLElement;
@@ -148,7 +151,7 @@ export const cursix: Action<HTMLElement, CursixOptions | undefined> = (node, opt
       }
 
       // Create cursor instance
-      cursor = new Cursix({
+      cursor = new CursixImpl({
         el: null,
         container: containerEl,
         className,
@@ -286,11 +289,16 @@ export const cursix: Action<HTMLElement, CursixOptions | undefined> = (node, opt
     cursor = null;
   }
 
-  // Initialize cursor
-  initializeCursor();
+  // Initialize cursor once gsap and the cursix library have loaded
+  let cancelled = false;
+  void Promise.all([loadGsap(), import("cursix")]).then(([{ gsap }, { default: CursixImpl }]) => {
+    if (cancelled) return;
+    initializeCursor(gsap, CursixImpl);
+  });
 
   return {
     destroy() {
+      cancelled = true;
       cleanup();
     },
   };

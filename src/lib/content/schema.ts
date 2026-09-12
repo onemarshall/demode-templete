@@ -137,10 +137,24 @@ export const SiteDataSchema = z.object({
 
 export type SiteData = z.infer<typeof SiteDataSchema>;
 
+export const SeoMetadataSchema = z
+  .object({
+    title: z.string().nullable().optional(),
+    meta_description: z.string().nullable().optional(),
+    og_image: z.any().nullable().optional(),
+    no_index: z.boolean().nullable().optional(),
+    no_follow: z.boolean().nullable().optional(),
+  })
+  .nullable()
+  .optional();
+
+export type SeoMetadata = z.infer<typeof SeoMetadataSchema>;
+
 export const PageModelSchema = z.object({
   path: z.string(),
   title: z.string(),
   blocks: z.array(z.unknown()),
+  seo: SeoMetadataSchema,
 });
 
 export type PageModel = z.infer<typeof PageModelSchema>;
@@ -223,6 +237,7 @@ export const PageBuilderModelSchema = z.object({
   path: z.string(),
   title: z.string(),
   blocks: z.array(PageBuilderBlockSchema),
+  seo: SeoMetadataSchema,
 });
 
 export type PageBuilderModel = z.infer<typeof PageBuilderModelSchema>;

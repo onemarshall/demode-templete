@@ -1,5 +1,5 @@
 import { fetchAuthorById, fetchPostBySlug, fetchRelatedPosts } from "$lib/server/directus/fetchers";
-import { DRAFT_MODE_SECRET } from "$app/env/private";
+import { DRAFT_MODE_SECRET, DIRECTUS_TOKEN } from "$app/env/private";
 import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 import type { PageServerLoad } from "./$types";
 import { error } from "@sveltejs/kit";
@@ -9,7 +9,12 @@ export const load: PageServerLoad = async (event: Parameters<PageServerLoad>[0])
     event.url.searchParams.get("draft") === "true" &&
     event.url.searchParams.get("token") === DRAFT_MODE_SECRET;
   const slug = event.params.slug;
-  const post = await fetchPostBySlug(slug, { draft }, event.fetch);
+  const post = await fetchPostBySlug(
+    slug,
+    { draft },
+    event.fetch,
+    draft ? DIRECTUS_TOKEN : undefined,
+  );
 
   if (!post) {
     throw error(404, "Post Not found");

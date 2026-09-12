@@ -1,70 +1,74 @@
 // @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
+const mocks = vi.hoisted(() => ({
+  gsap: {
+    registerPlugin: vi.fn(),
+  },
+}));
+
 vi.mock("./gsap", () => ({
-	gsap: {
-		registerPlugin: vi.fn(),
-	},
+  loadGsap: () => Promise.resolve(mocks),
 }));
 
 vi.mock("gsap/dist/ScrollSmoother", () => ({
-	ScrollSmoother: {
-		create: vi.fn(() => ({ kill: vi.fn() })),
-	},
+  ScrollSmoother: {
+    create: vi.fn(() => ({ kill: vi.fn() })),
+  },
 }));
 
-import { gsap } from "./gsap";
 import { smoothScroll } from "./smoothScroll";
 
 describe("smoothScroll action", () => {
-	const originalWindow = globalThis.window;
+  const originalWindow = globalThis.window;
 
-	beforeEach(() => {
-		vi.clearAllMocks();
-		(globalThis as any).window = {
-			matchMedia: vi.fn((query: string) => ({
-				matches: false,
-				media: query,
-			})),
-		};
-	});
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (globalThis as any).window = {
+      matchMedia: vi.fn((query: string) => ({
+        matches: false,
+        media: query,
+      })),
+    };
+  });
 
-	afterEach(() => {
-		(globalThis as any).window = originalWindow;
-	});
+  afterEach(() => {
+    (globalThis as any).window = originalWindow;
+  });
 
-	it("creates the smoother with defaults when conditions are met", async () => {
-		const node = {} as unknown as HTMLElement;
-		const { ScrollSmoother } = await import("gsap/dist/ScrollSmoother");
-		smoothScroll(node);
+  it("creates the smoother with defaults when conditions are met", async () => {
+    const node = {} as unknown as HTMLElement;
+    const { ScrollSmoother } = await import("gsap/dist/ScrollSmoother");
+    smoothScroll(node);
 
-		await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
-		expect(gsap.registerPlugin).toHaveBeenCalledWith(ScrollSmoother);
-		expect(ScrollSmoother.create).toHaveBeenCalledWith({
-			wrapper: "#smooth-wrapper",
-			content: "#smooth-content",
-			smooth: 1.5,
-			effects: true,
-		});
-	});
+    expect(mocks.gsap.registerPlugin).toHaveBeenCalledWith(ScrollSmoother);
+    expect(ScrollSmoother.create).toHaveBeenCalledWith({
+      wrapper: "#smooth-wrapper",
+      content: "#smooth-content",
+      smooth: 1.5,
+      effects: true,
+    });
+  });
 
-	it("skips when reduced motion is preferred", () => {
-		(globalThis as any).window.matchMedia = vi.fn(() => ({ matches: true }));
-		const node = {} as unknown as HTMLElement;
-		const action = smoothScroll(node);
+  it("skips when reduced motion is preferred", () => {
+    (globalThis as any).window.matchMedia = vi.fn(() => ({ matches: true }));
+    const node = {} as unknown as HTMLElement;
+    const action = smoothScroll(node);
 
-		expect(action.destroy).toBeDefined();
-		expect(gsap.registerPlugin).not.toHaveBeenCalled();
-	});
+    expect(action.destroy).toBeDefined();
+    expect(mocks.gsap.registerPlugin).not.toHaveBeenCalled();
+  });
 
-	it("skips on touch/pointer coarse devices", () => {
-		(globalThis as any).window.matchMedia = vi.fn((query: string) => ({
-			matches: query === "(pointer: coarse)",
-		}));
-		const node = {} as unknown as HTMLElement;
-		smoothScroll(node);
+  it("skips on touch/pointer coarse devices", async () => {
+    (globalThis as any).window.matchMedia = vi.fn((query: string) => ({
+      matches: query === "(pointer: coarse)",
+    }));
+    const node = {} as unknown as HTMLElement;
+    smoothScroll(node);
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
-		expect(gsap.registerPlugin).not.toHaveBeenCalled();
-	});
+    expect(mocks.gsap.registerPlugin).not.toHaveBeenCalled();
+  });
 });

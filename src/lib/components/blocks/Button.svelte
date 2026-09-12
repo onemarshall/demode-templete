@@ -88,27 +88,27 @@
 
 {#if link.href}
 	<ShadcnButton
+		id={_id}
+		href={link.isExternal ? link.href : resolvePathname(link.href)}
+		target={link.isExternal ? "_blank" : undefined}
+		rel={link.isExternal ? "noopener noreferrer" : undefined}
 		variant={variant ?? "default"}
 		{size}
 		class={buttonClasses}
 		{disabled}
 		onclick={onClick}
 	>
-		{#if !link.isExternal}
-			<a href={resolvePathname(link.href)}>{@render content()}</a>
-		{:else}
-			<a href={link.href} target="_blank" rel="noopener noreferrer">
-				{@render content()}
-			</a>
-		{/if}
+		{@render content()}
 	</ShadcnButton>
 {:else}
 	<ShadcnButton
+		id={_id}
 		type="submit"
 		variant={variant ?? "default"}
 		{size}
 		class={buttonClasses}
 		{disabled}
+		onclick={onClick}
 	>
 		{@render content()}
 	</ShadcnButton>

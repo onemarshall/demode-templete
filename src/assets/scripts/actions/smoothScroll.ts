@@ -1,4 +1,4 @@
-import { gsap } from "./gsap";
+import { loadGsap } from "./gsap";
 import type { Action } from "svelte/action";
 
 interface SmoothScrollOptions {
@@ -30,23 +30,29 @@ export const smoothScroll: Action<HTMLElement, SmoothScrollOptions | undefined> 
   }
 
   let smoother: { kill(): void } | null = null;
+  let cancelled = false;
 
-  import("gsap/dist/ScrollSmoother").then(({ ScrollSmoother }) => {
-    gsap.registerPlugin(ScrollSmoother);
-    smoother = ScrollSmoother.create({
-      wrapper,
-      content,
-      smooth,
-      effects,
-    });
+  void Promise.all([loadGsap(), import("gsap/dist/ScrollSmoother")]).then(
+    ([{ gsap }, { ScrollSmoother }]) => {
+      if (cancelled) return;
 
-    if (import.meta.env.DEV) {
-      console.log("✅ Smooth scrolling action initialized");
-    }
-  });
+      gsap.registerPlugin(ScrollSmoother);
+      smoother = ScrollSmoother.create({
+        wrapper,
+        content,
+        smooth,
+        effects,
+      });
+
+      if (import.meta.env.DEV) {
+        console.log("✅ Smooth scrolling action initialized");
+      }
+    },
+  );
 
   return {
     destroy() {
+      cancelled = true;
       smoother?.kill();
       if (import.meta.env.DEV) {
         console.log("🔚 Smooth scrolling action destroyed");

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("./gsap", () => ({
+const mocks = vi.hoisted(() => ({
   gsap: {
     set: vi.fn(),
     timeline: vi.fn(() => ({
@@ -13,24 +13,30 @@ vi.mock("./gsap", () => ({
   },
 }));
 
-import { gsap } from "./gsap";
+vi.mock("./gsap", () => ({
+  loadGsap: () => Promise.resolve(mocks),
+}));
+
 import { reveal } from "./reveal";
+
+const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe("reveal action", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("sets initial visibility and builds the timeline from the left", () => {
+  it("sets initial visibility and builds the timeline from the left", async () => {
     const image = {};
     const node = {
       querySelector: vi.fn(() => image),
     } as unknown as HTMLElement;
 
     const action = reveal(node) as unknown as { destroy: () => void };
+    await flush();
 
-    expect(gsap.set).toHaveBeenCalledWith(node, { autoAlpha: 1 });
-    expect(gsap.timeline).toHaveBeenCalledWith(
+    expect(mocks.gsap.set).toHaveBeenCalledWith(node, { autoAlpha: 1 });
+    expect(mocks.gsap.timeline).toHaveBeenCalledWith(
       expect.objectContaining({
         scrollTrigger: expect.objectContaining({
           trigger: node,
@@ -40,7 +46,7 @@ describe("reveal action", () => {
       }),
     );
 
-    const tl = gsap.timeline.mock.results[0].value;
+    const tl = mocks.gsap.timeline.mock.results[0].value;
     expect(tl.from).toHaveBeenCalledWith(node, expect.objectContaining({ xPercent: -100 }));
     expect(tl.from).toHaveBeenCalledWith(
       image,
@@ -52,15 +58,16 @@ describe("reveal action", () => {
     expect(tl.kill).toHaveBeenCalled();
   });
 
-  it("uses a positive xPercent when direction is right", () => {
+  it("uses a positive xPercent when direction is right", async () => {
     const image = {};
     const node = {
       querySelector: vi.fn(() => image),
     } as unknown as HTMLElement;
 
     reveal(node, { direction: "right" });
+    await flush();
 
-    const tl = gsap.timeline.mock.results[0].value;
+    const tl = mocks.gsap.timeline.mock.results[0].value;
     expect(tl.from).toHaveBeenCalledWith(node, expect.objectContaining({ xPercent: 100 }));
     expect(tl.from).toHaveBeenCalledWith(
       image,
@@ -69,12 +76,13 @@ describe("reveal action", () => {
     );
   });
 
-  it("skips the image tween when no image is present", () => {
+  it("skips the image tween when no image is present", async () => {
     const node = { querySelector: vi.fn(() => null) } as unknown as HTMLElement;
 
     reveal(node);
+    await flush();
 
-    const tl = gsap.timeline.mock.results[0].value;
+    const tl = mocks.gsap.timeline.mock.results[0].value;
     expect(tl.from).toHaveBeenCalledOnce();
   });
 });

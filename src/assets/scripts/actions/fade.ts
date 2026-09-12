@@ -1,4 +1,4 @@
-import { gsap, ScrollTrigger } from "./gsap";
+import { loadGsap } from "./gsap";
 import type { Action } from "svelte/action";
 
 /**
@@ -61,38 +61,46 @@ export const fade: Action<HTMLElement, FadeOptions | undefined> = (node, options
   const dir = x !== 0 ? "x" : "y";
   const val = x !== 0 ? x : y;
 
-  const init = () => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      gsap.set(node, { autoAlpha: 1, [dir]: 0, clearProps: "opacity,visibility,transform" });
-      return () => {};
-    }
+  let cleanup = () => {};
+  let cancelled = false;
 
-    gsap.set(node, { autoAlpha: 0, [dir]: val, willChange: "opacity, transform" });
+  void loadGsap().then(({ gsap, ScrollTrigger }) => {
+    if (cancelled) return;
 
-    const trigger = ScrollTrigger.create({
-      trigger: node,
-      start,
-      once,
-      onEnter: () =>
-        gsap.to(node, {
-          autoAlpha: 1,
-          [dir]: 0,
-          duration,
-          delay,
-          ease,
-          onComplete() {
-            gsap.set(node, { clearProps: "opacity,visibility,x,y,willChange" });
-          },
-        }),
-    });
+    const init = () => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(node, { autoAlpha: 1, [dir]: 0, clearProps: "opacity,visibility,transform" });
+        return () => {};
+      }
 
-    return () => trigger.kill();
-  };
+      gsap.set(node, { autoAlpha: 0, [dir]: val, willChange: "opacity, transform" });
 
-  const cleanup = whenPageLoaded(init);
+      const trigger = ScrollTrigger.create({
+        trigger: node,
+        start,
+        once,
+        onEnter: () =>
+          gsap.to(node, {
+            autoAlpha: 1,
+            [dir]: 0,
+            duration,
+            delay,
+            ease,
+            onComplete() {
+              gsap.set(node, { clearProps: "opacity,visibility,x,y,willChange" });
+            },
+          }),
+      });
+
+      return () => trigger.kill();
+    };
+
+    cleanup = whenPageLoaded(init);
+  });
 
   return {
     destroy() {
+      cancelled = true;
       cleanup();
     },
   };
@@ -155,53 +163,61 @@ export const staggerFade: Action<HTMLElement, StaggerFadeOptions | undefined> = 
     willChange: "transform, opacity",
   };
 
-  const init = () => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      gsap.set(targets, { opacity: 1, x: 0, y: 0, clearProps: "all" });
-      return () => {};
-    }
+  let cleanup = () => {};
+  let cancelled = false;
 
-    // Set initial hidden state
-    gsap.set(targets, initialState);
+  void loadGsap().then(({ gsap, ScrollTrigger }) => {
+    if (cancelled) return;
 
-    // Re-apply initial state on ScrollTrigger refresh (e.g. resize)
-    const onRefresh = (): void => {
-      gsap.set(targets, initialState);
-    };
-
-    // Use ScrollTrigger.batch — groups elements entering the viewport
-    // together and fires them as one coordinated staggered animation
-    const triggers = ScrollTrigger.batch(targets, {
-      start,
-      once,
-      onEnter: (batch: Element[]) =>
-        gsap.to(batch, {
-          opacity: 1,
-          [dir]: 0,
-          duration,
-          ease: resolvedEase,
-          clearProps: true,
-          stagger: {
-            amount: stagger,
-            from: "start",
-          },
-        }),
-    });
-
-    ScrollTrigger.addEventListener("refreshInit", onRefresh);
-
-    return () => {
-      if (Array.isArray(triggers)) {
-        triggers.forEach((t: { kill: () => void }) => t.kill());
+    const init = () => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(targets, { opacity: 1, x: 0, y: 0, clearProps: "all" });
+        return () => {};
       }
-      ScrollTrigger.removeEventListener("refreshInit", onRefresh);
-    };
-  };
 
-  const cleanup = whenPageLoaded(init);
+      // Set initial hidden state
+      gsap.set(targets, initialState);
+
+      // Re-apply initial state on ScrollTrigger refresh (e.g. resize)
+      const onRefresh = (): void => {
+        gsap.set(targets, initialState);
+      };
+
+      // Use ScrollTrigger.batch — groups elements entering the viewport
+      // together and fires them as one coordinated staggered animation
+      const triggers = ScrollTrigger.batch(targets, {
+        start,
+        once,
+        onEnter: (batch: Element[]) =>
+          gsap.to(batch, {
+            opacity: 1,
+            [dir]: 0,
+            duration,
+            ease: resolvedEase,
+            clearProps: true,
+            stagger: {
+              amount: stagger,
+              from: "start",
+            },
+          }),
+      });
+
+      ScrollTrigger.addEventListener("refreshInit", onRefresh);
+
+      return () => {
+        if (Array.isArray(triggers)) {
+          triggers.forEach((t: { kill: () => void }) => t.kill());
+        }
+        ScrollTrigger.removeEventListener("refreshInit", onRefresh);
+      };
+    };
+
+    cleanup = whenPageLoaded(init);
+  });
 
   return {
     destroy() {
+      cancelled = true;
       cleanup();
     },
   };

@@ -1,8 +1,7 @@
 import { error } from "@sveltejs/kit";
 import { z } from "zod";
 import { getContentProvider } from "$lib/server/content/get-provider";
-import { PageBuilderModelSchema } from "$lib/content/schema";
-import { getSeoData } from "$lib/server/directus/fetchers/seo-fetcher";
+import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
 import type { PageServerLoad } from "./$types";
 
 const PostPageSchema = z.coerce.number().int().min(1).max(9999);
@@ -26,8 +25,9 @@ const parsePostPages = (url: URL): Record<string, number> => {
   return postPages;
 };
 
-export const load = (async ({ url, fetch }) => {
+export const load = (async ({ url }) => {
   const provider = getContentProvider();
+  // The provider already validates the page against PageModelSchema.
   const page = await provider.getPageByPath(url.pathname, {
     postPages: parsePostPages(url),
   });
@@ -36,22 +36,19 @@ export const load = (async ({ url, fetch }) => {
     throw error(404, "Page not found");
   }
 
-  const parsedPage = PageBuilderModelSchema.safeParse(page);
-  if (!parsedPage.success) {
-    throw error(500, "Page content is not compatible with PageBuilderModel");
-  }
-
-  const seo = await getSeoData(fetch, "page", url.pathname);
+  // `seo` is fetched inline with the page (PAGE_FIELDS) — no extra query needed.
+  const seo = page.seo;
+  const ogImage = seo?.og_image ? getDirectusAssetURL(seo.og_image) : undefined;
 
   return {
-    page: parsedPage.data,
+    page,
     seo: {
-      title: seo.title || parsedPage.data.title,
-      description: seo.description || "",
-      ogImage: seo.ogImage,
-      ogTemplateImage: seo.ogImage ? undefined : "/assets/img/og.jpg",
-      noIndex: seo.noIndex ?? false,
-      noFollow: seo.noFollow ?? false,
+      title: seo?.title || page.title,
+      description: seo?.meta_description || "",
+      ogImage,
+      ogTemplateImage: ogImage ? undefined : "/assets/img/og.jpg",
+      noIndex: seo?.no_index ?? false,
+      noFollow: seo?.no_follow ?? false,
     },
   };
 }) satisfies PageServerLoad;

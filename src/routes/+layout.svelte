@@ -7,7 +7,8 @@
 	import { CookieConsent, Loader } from "$lib/components/core";
 	import { ScrollToTop } from "$lib/components/ui";
 	import type { LayoutData } from "./$types";
-	import { smoothScroll, cursix } from "#scripts/actions";
+	import { smoothScroll } from "#scripts/actions/smoothScroll";
+	import { cursix } from "#scripts/actions/cursix";
 	import CmsMeta from "$lib/components/core/CmsMeta.svelte";
 	import MenuMain from "$lib/components/layout/morphing/index.svelte";
 	import Footer from "$lib/components/layout/Footer.svelte";
@@ -59,6 +60,13 @@
 	});
 
 	onMount(() => {
+		// Swap the preloaded Typekit CSS in via JS — an inline `onload`
+		// attribute would be blocked by `script-src-attr 'none'` in production CSP.
+		const typekit = document.createElement("link");
+		typekit.rel = "stylesheet";
+		typekit.href = "https://use.typekit.net/tck6tzf.css";
+		document.head.appendChild(typekit);
+
 		const media = window.matchMedia("(prefers-reduced-motion: reduce)");
 		prefersReducedMotion = media.matches;
 		const onChange = (e: MediaQueryListEvent) => {
@@ -88,14 +96,7 @@
 </script>
 
 <svelte:head>
-	<link
-		rel="preload"
-		href="https://use.typekit.net/tck6tzf.css"
-		as="style"
-		onload={(e) => {
-			(e.currentTarget as HTMLLinkElement).rel = "stylesheet";
-		}}
-	/>
+	<link rel="preload" href="https://use.typekit.net/tck6tzf.css" as="style" />
 	<noscript>
 		<link rel="stylesheet" href="https://use.typekit.net/tck6tzf.css" />
 	</noscript>

@@ -1,4 +1,4 @@
-import { gsap, ScrollTrigger } from "./gsap";
+import { loadGsap } from "./gsap";
 import type { Action } from "svelte/action";
 
 export interface FlipScrollOptions {
@@ -76,9 +76,14 @@ export const flipScroll: Action<HTMLElement, FlipScrollOptions | undefined> = (
   });
 
   let tl: { kill(): void } | null = null;
+  let cancelled = false;
 
   Promise.all(imagePromises).then(async () => {
-    const { Flip } = await import("gsap/dist/Flip");
+    const [{ gsap, ScrollTrigger }, { Flip }] = await Promise.all([
+      loadGsap(),
+      import("gsap/dist/Flip"),
+    ]);
+    if (cancelled) return;
     gsap.registerPlugin(Flip);
     // Temporarily apply end-state class to capture target positions
     node.classList.add(switchClass);
@@ -110,6 +115,7 @@ export const flipScroll: Action<HTMLElement, FlipScrollOptions | undefined> = (
 
   return {
     destroy() {
+      cancelled = true;
       tl?.kill();
     },
   };

@@ -1,8 +1,25 @@
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+/**
+ * Shared lazy loader for GSAP + ScrollTrigger.
+ *
+ * gsap and ScrollTrigger together are ~200KB of code. Loading them
+ * dynamically keeps them out of the initial bundle — they're fetched in
+ * parallel the first time a scroll/animation action mounts, and not at all
+ * for reduced-motion or touch users guarded upstream.
+ */
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+export interface GsapModules {
+  gsap: (typeof import("gsap"))["gsap"];
+  ScrollTrigger: (typeof import("gsap/dist/ScrollTrigger"))["ScrollTrigger"];
 }
-export { gsap };
-export { ScrollTrigger };
+
+let loading: Promise<GsapModules> | null = null;
+
+export function loadGsap(): Promise<GsapModules> {
+  loading ??= Promise.all([import("gsap"), import("gsap/dist/ScrollTrigger")]).then(
+    ([{ gsap }, { ScrollTrigger }]) => {
+      gsap.registerPlugin(ScrollTrigger);
+      return { gsap, ScrollTrigger };
+    },
+  );
+  return loading;
+}

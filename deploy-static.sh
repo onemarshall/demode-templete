@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Static deployment script for Cloudflare Pages
-echo "🚀 Building static version for Cloudflare Pages deployment..."
+# Static deployment script for Cloudflare Workers
+echo "🚀 Building static version for Cloudflare Workers deployment..."
 
 # Set environment variables for static mode
 export CMS_PROVIDER=static
@@ -15,10 +15,8 @@ if [ $? -eq 0 ]; then
     echo "✅ Build successful!"
     echo "📁 Build output is ready in .svelte-kit/cloudflare"
     echo ""
-    echo "🌐 To deploy to Cloudflare Pages:"
-    echo "   1. Run: wrangler pages deploy .svelte-kit/cloudflare"
-    echo "   2. Or use: bun run deploy:cloudflare"
-    echo "   3. Or manually upload the .svelte-kit/cloudflare directory to Cloudflare Pages"
+    echo "🌐 To deploy to Cloudflare Workers:"
+    echo "   Run: bunx wrangler deploy"
     echo ""
     echo "🔧 To test locally:"
     echo "   Run: bun run preview"

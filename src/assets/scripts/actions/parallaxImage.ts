@@ -1,4 +1,5 @@
-import { gsap, ScrollTrigger } from "./gsap";
+import { loadGsap, type GsapModules } from "./gsap";
+import type { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import type { Action } from "svelte/action";
 
 interface ParallaxImageOptions {
@@ -33,7 +34,9 @@ export const parallaxImage: Action<HTMLElement, ParallaxImageOptions | undefined
 
   let tween: gsap.core.Tween | null = null;
   let trigger: ScrollTrigger | null = null;
+  let gsapModules: GsapModules | null = null;
   let loadHandler: (() => void) | null = null;
+  let cancelled = false;
 
   const image = node.querySelector<HTMLImageElement>("img");
 
@@ -42,30 +45,36 @@ export const parallaxImage: Action<HTMLElement, ParallaxImageOptions | undefined
   }
 
   const init = () => {
-    if (trigger || tween) return;
+    if (cancelled || trigger || tween) return;
 
-    gsap.set(image, {
-      yPercent: fromYPercent,
-      scale,
-      transformOrigin: "center center",
-      willChange: "transform",
+    void loadGsap().then((modules) => {
+      if (cancelled || trigger || tween) return;
+      gsapModules = modules;
+      const { gsap, ScrollTrigger } = modules;
+
+      gsap.set(image, {
+        yPercent: fromYPercent,
+        scale,
+        transformOrigin: "center center",
+        willChange: "transform",
+      });
+
+      tween = gsap.to(image, {
+        yPercent: toYPercent,
+        scale,
+        ease: "none",
+        overwrite: "auto",
+        scrollTrigger: {
+          trigger: node,
+          start,
+          end,
+          scrub,
+        },
+      });
+
+      trigger = tween.scrollTrigger ?? null;
+      ScrollTrigger.refresh();
     });
-
-    tween = gsap.to(image, {
-      yPercent: toYPercent,
-      scale,
-      ease: "none",
-      overwrite: "auto",
-      scrollTrigger: {
-        trigger: node,
-        start,
-        end,
-        scrub,
-      },
-    });
-
-    trigger = tween.scrollTrigger ?? null;
-    ScrollTrigger.refresh();
   };
 
   if (image.complete) {
@@ -79,12 +88,13 @@ export const parallaxImage: Action<HTMLElement, ParallaxImageOptions | undefined
 
   return {
     destroy() {
+      cancelled = true;
       if (loadHandler) {
         image.removeEventListener("load", loadHandler);
       }
       trigger?.kill();
       tween?.kill();
-      gsap.set(image, { clearProps: "transform,transformOrigin,willChange" });
+      gsapModules?.gsap.set(image, { clearProps: "transform,transformOrigin,willChange" });
     },
   };
 };

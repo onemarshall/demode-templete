@@ -1,6 +1,5 @@
 <script>
 	import { page } from "$app/state";
-	import { resolve } from "$app/paths";
 
 	let isServerError = $derived(page.status === 500);
 	let isNotFound = $derived(page.status === 404);
@@ -37,7 +36,7 @@
 		{/if}
 		<div class="mt-8">
 			<a
-				href={resolve("")}
+				href="/"
 				class="inline-flex items-center rounded-md bg-primary-600 px-6 py-3 text-base font-medium text-white transition-colors duration-200 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
 			>
 				Return to homepage

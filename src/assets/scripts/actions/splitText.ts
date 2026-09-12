@@ -1,4 +1,5 @@
-import { gsap, ScrollTrigger } from "./gsap";
+import { loadGsap, type GsapModules } from "./gsap";
+import type { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import type { Action } from "svelte/action";
 
 type SplitSegment = "chars" | "words" | "lines";
@@ -30,7 +31,9 @@ interface PresetConfig {
   perspective?: number;
 }
 
-const presets: Record<SplitTextPreset, PresetConfig> = {
+// Presets are built lazily with the loaded gsap instance — several
+// initialStyle callbacks call gsap.utils.random.
+const buildPresets = (gsap: GsapModules["gsap"]): Record<SplitTextPreset, PresetConfig> => ({
   // Chars: slide in from left with skew. Fast-scroll safe.
   FxType0: {
     splitType: "chars",
@@ -195,7 +198,7 @@ const presets: Record<SplitTextPreset, PresetConfig> = {
     },
     scrollTrigger: { start: "top 80%", end: "bottom 20%" },
   },
-};
+});
 
 export interface SplitTextActionOptions {
   /**
@@ -246,71 +249,78 @@ export const splitText: Action<HTMLElement, SplitTextActionOptions | undefined> 
 
   let split: { chars: Element[]; words: Element[]; lines: Element[]; revert(): void } | null = null;
   let outerTrigger: ScrollTrigger | null = null;
+  let cancelled = false;
 
-  if (preset && presets[preset]) {
-    const config = presets[preset];
+  void loadGsap().then(({ gsap, ScrollTrigger }) => {
+    if (cancelled) return;
+    const presets = buildPresets(gsap);
 
-    outerTrigger = ScrollTrigger.create({
-      trigger: node,
-      start: "top 90%",
-      once: true,
-      onEnter: async () => {
-        const { SplitText } = await import("gsap/dist/SplitText");
-        gsap.registerPlugin(SplitText);
-        split = new SplitText(node, { type: config.splitType });
+    if (preset && presets[preset]) {
+      const config = presets[preset];
 
-        const targets =
-          config.splitType === "words"
-            ? split.words
-            : config.splitType === "lines"
-              ? split.lines
-              : split.chars;
+      outerTrigger = ScrollTrigger.create({
+        trigger: node,
+        start: "top 90%",
+        once: true,
+        onEnter: async () => {
+          const { SplitText } = await import("gsap/dist/SplitText");
+          gsap.registerPlugin(SplitText);
+          split = new SplitText(node, { type: config.splitType });
 
-        if (config.perspective) {
-          targets.forEach((el) => {
-            if (el.parentNode) {
-              gsap.set(el.parentNode as Element, { perspective: config.perspective });
-            }
+          const targets =
+            config.splitType === "words"
+              ? split.words
+              : config.splitType === "lines"
+                ? split.lines
+                : split.chars;
+
+          if (config.perspective) {
+            targets.forEach((el) => {
+              if (el.parentNode) {
+                gsap.set(el.parentNode as Element, { perspective: config.perspective });
+              }
+            });
+          }
+
+          gsap.set(targets, config.initialStyle);
+          gsap.to(targets, {
+            ...config.animation,
+            scrollTrigger: {
+              trigger: targets as gsap.DOMTarget,
+              ...config.scrollTrigger,
+            },
           });
-        }
+        },
+      });
+    } else {
+      // Simple mode — fade up from y with opacity
+      outerTrigger = ScrollTrigger.create({
+        trigger: node,
+        start,
+        once: true,
+        onEnter: async () => {
+          const { SplitText } = await import("gsap/dist/SplitText");
+          gsap.registerPlugin(SplitText);
+          split = new SplitText(node, { type });
+          const targets =
+            type === "words" ? split.words : type === "lines" ? split.lines : split.chars;
 
-        gsap.set(targets, config.initialStyle);
-        gsap.to(targets, {
-          ...config.animation,
-          scrollTrigger: {
-            trigger: targets as gsap.DOMTarget,
-            ...config.scrollTrigger,
-          },
-        });
-      },
-    });
-  } else {
-    // Simple mode — fade up from y with opacity
-    outerTrigger = ScrollTrigger.create({
-      trigger: node,
-      start,
-      once: true,
-      onEnter: async () => {
-        const { SplitText } = await import("gsap/dist/SplitText");
-        gsap.registerPlugin(SplitText);
-        split = new SplitText(node, { type });
-        const targets =
-          type === "words" ? split.words : type === "lines" ? split.lines : split.chars;
-
-        gsap.from(targets, {
-          y,
-          opacity: 0,
-          duration,
-          stagger,
-          ease,
-          onComplete: () => split?.revert(),
-        });
-      },
-    });
-  }
+          gsap.from(targets, {
+            y,
+            opacity: 0,
+            duration,
+            stagger,
+            ease,
+            onComplete: () => split?.revert(),
+          });
+        },
+      });
+    }
+  });
 
   return {
     destroy() {
+      cancelled = true;
       outerTrigger?.kill();
       split?.revert();
     },

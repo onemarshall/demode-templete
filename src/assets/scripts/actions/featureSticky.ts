@@ -1,4 +1,4 @@
-import { gsap, ScrollTrigger } from "./gsap";
+import { loadGsap } from "./gsap";
 import type { Action } from "svelte/action";
 
 interface FeatureStickyOptions {
@@ -26,63 +26,75 @@ export const featureSticky: Action<HTMLElement, FeatureStickyOptions | undefined
     onActiveChange?.(index);
   };
 
-  const itemTriggers = itemElements.map((itemElement, index) =>
-    ScrollTrigger.create({
-      trigger: itemElement,
-      start: "top center",
-      end: "bottom center",
-      onEnter: () => {
-        setActive(index);
-      },
-      onEnterBack: () => {
-        setActive(index);
-      },
-    }),
-  );
+  let cancelled = false;
+  let cleanup = () => {};
 
-  const pinTrigger =
-    contentList && mediaColumn
-      ? ScrollTrigger.create({
-          trigger: contentList,
-          start: "top top",
-          end: "bottom bottom",
-          pin: mediaColumn,
-          pinSpacing: false,
-        })
-      : null;
+  void loadGsap().then(({ gsap, ScrollTrigger }) => {
+    if (cancelled) return;
 
-  const clickHandlers = titleElements.map((titleElement, index) => {
-    const handleClick = async () => {
-      if (!mediaColumn || mediaColumn.offsetWidth < 1) return;
+    const itemTriggers = itemElements.map((itemElement, index) =>
+      ScrollTrigger.create({
+        trigger: itemElement,
+        start: "top center",
+        end: "bottom center",
+        onEnter: () => {
+          setActive(index);
+        },
+        onEnterBack: () => {
+          setActive(index);
+        },
+      }),
+    );
 
-      const itemElement = itemElements[index];
-      if (!itemElement) return;
+    const pinTrigger =
+      contentList && mediaColumn
+        ? ScrollTrigger.create({
+            trigger: contentList,
+            start: "top top",
+            end: "bottom bottom",
+            pin: mediaColumn,
+            pinSpacing: false,
+          })
+        : null;
 
-      const { ScrollSmoother } = await import("gsap/dist/ScrollSmoother");
-      gsap.registerPlugin(ScrollSmoother);
-      const smoother = ScrollSmoother.get();
-      if (smoother) {
-        smoother.scrollTo(itemElement, true, "center center");
-        return;
-      }
+    const clickHandlers = titleElements.map((titleElement, index) => {
+      const handleClick = async () => {
+        if (!mediaColumn || mediaColumn.offsetWidth < 1) return;
 
-      itemElement.scrollIntoView({ behavior: "smooth", block: "center" });
-    };
+        const itemElement = itemElements[index];
+        if (!itemElement) return;
 
-    titleElement.addEventListener("click", handleClick);
-    return { titleElement, handleClick };
-  });
+        const { ScrollSmoother } = await import("gsap/dist/ScrollSmoother");
+        gsap.registerPlugin(ScrollSmoother);
+        const smoother = ScrollSmoother.get();
+        if (smoother) {
+          smoother.scrollTo(itemElement, true, "center center");
+          return;
+        }
 
-  setActive(0);
-  ScrollTrigger.refresh();
+        itemElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      };
 
-  return {
-    destroy() {
+      titleElement.addEventListener("click", handleClick);
+      return { titleElement, handleClick };
+    });
+
+    setActive(0);
+    ScrollTrigger.refresh();
+
+    cleanup = () => {
       itemTriggers.forEach((trigger) => trigger.kill());
       pinTrigger?.kill();
       clickHandlers.forEach(({ titleElement, handleClick }) => {
         titleElement.removeEventListener("click", handleClick);
       });
+    };
+  });
+
+  return {
+    destroy() {
+      cancelled = true;
+      cleanup();
     },
   };
 };
