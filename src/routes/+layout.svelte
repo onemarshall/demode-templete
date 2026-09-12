@@ -116,6 +116,7 @@
 		<div id="smooth-content">
 			{@render children()}
 			<Footer
+				theme="accent"
 				navigation={data.footerNavigation ?? []}
 				copyrightNavigation={data.copyrightNavigation ?? []}
 				globals={data.globals}

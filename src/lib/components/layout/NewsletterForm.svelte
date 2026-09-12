@@ -155,30 +155,35 @@ Usage: codyhouse.co/license
 
 	.news-form__input {
 		background-color: transparent;
-		color: white;
+		color: var(--color-contrast-higher);
 		padding: 0 calc(var(--news-form-btn-padding-x) * 7) 0
 			var(--news-form-input-padding-x);
-		border: 1px solid rgb(255 255 255 / 0.3);
+		border: 1px solid
+			color-mix(in oklab, var(--color-contrast-higher) 30%, transparent);
 		border-radius: var(--news-form-input-radius);
 		width: 100%;
 		height: var(--news-form-input-height);
 		transition: 0.2s;
 	}
 	.news-form__input::placeholder {
-		color: rgb(255 255 255 / 0.55);
+		color: color-mix(
+			in oklab,
+			var(--color-contrast-higher) 55%,
+			transparent
+		);
 	}
 	.news-form__input:focus {
 		outline: none;
 		background-color: transparent;
-		border-color: white;
+		border-color: var(--color-contrast-higher);
 	}
 	/* Override the browser's blue/yellow autofill background so it matches the dark theme */
 	.news-form__input:-webkit-autofill,
 	.news-form__input:-webkit-autofill:hover,
 	.news-form__input:-webkit-autofill:focus,
 	.news-form__input:-webkit-autofill:active {
-		-webkit-text-fill-color: white;
-		caret-color: white;
+		-webkit-text-fill-color: var(--color-contrast-higher);
+		caret-color: var(--color-contrast-higher);
 		transition: background-color 5000s ease-in-out 0s;
 		box-shadow: 0 0 0 1000px transparent inset;
 	}
@@ -193,8 +198,8 @@ Usage: codyhouse.co/license
 			var(--news-form-input-height) - 2 * var(--news-form-btn-margin)
 		);
 		padding: 0 var(--news-form-btn-padding-x);
-		background-color: white;
-		color: rgb(17 24 39);
+		background-color: var(--color-contrast-higher);
+		color: var(--color-bg);
 		border-radius: calc(var(--news-form-input-radius) * 0.85);
 		font-size: 0.875rem;
 		line-height: 1.25rem;
@@ -205,7 +210,11 @@ Usage: codyhouse.co/license
 		transition: 0.2s;
 	}
 	.news-form__btn:hover:not(:disabled) {
-		background-color: rgb(255 255 255 / 0.85);
+		background-color: color-mix(
+			in oklab,
+			var(--color-contrast-higher) 85%,
+			transparent
+		);
 	}
 	.news-form__btn:disabled {
 		opacity: 0.6;
@@ -257,7 +266,7 @@ Usage: codyhouse.co/license
 	}
 
 	.news-form__msg {
-		background-color: rgb(45 212 191);
-		color: rgb(17 24 39);
+		background-color: var(--color-success);
+		color: var(--color-bg);
 	}
 </style>

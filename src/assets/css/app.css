@@ -82,7 +82,21 @@
   --color-gray-900: oklch(0.208 0.042 265.755);
   --color-gray-950: oklch(0.129 0.042 264.695);
 
-  /* shadcn-svelte semantic tokens — wired to the custom colour system */
+  /* Typography */
+  --font-primary: var(--font-sans);
+  --font-secondary: var(--font-serif);
+  --font-heading: var(--font-serif);
+
+  /* Font sizes */
+  --text-headline: clamp(4.5rem, 5vw + 1.5rem, 7rem);
+  --text-headline--line-height: 1.05;
+  --text-title: 1.5rem;
+  --text-tagline: 1.5rem;
+}
+
+/* Semantic tokens — inlined into utilities so they resolve per-element and
+   follow [data-theme] flips (a :root alias would freeze the default theme). */
+@theme inline {
   --color-background: var(--color-bg);
   --color-foreground: var(--color-contrast-higher);
   --color-card: var(--color-bg);
@@ -100,10 +114,6 @@
   --color-border: var(--color-contrast-lower);
   --color-input: var(--color-contrast-lower);
   --color-ring: var(--brand-primary);
-
-  /* Typography */
-  --font-primary: var(--font-sans);
-  --font-secondary: var(--font-serif);
 }
 
 /* Fonts */

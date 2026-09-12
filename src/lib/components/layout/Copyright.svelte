@@ -30,13 +30,13 @@
 	class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 {tagstyles ??
 		''}"
 >
-	<div class="space-y-1 text-xs text-white/50 {styles ?? ''}">
+	<div class="space-y-1 text-xs text-foreground/50 {styles ?? ''}">
 		<p>
-			<span class="font-medium text-white/70"
+			<span class="font-medium text-foreground/70"
 				>{globals?.footer_design_by_content}</span
 			>
 			<a
-				class="text-blue-300 hover:text-blue-200 transition-colors"
+				class="text-accent transition-colors hover:opacity-80"
 				target="_blank"
 				rel="external noopener noreferrer"
 				data-sveltekit-preload-data="off"
@@ -51,11 +51,13 @@
 
 	{#if copyrightNav.length}
 		<nav aria-label="Copyright navigation">
-			<ul class="flex gap-6 text-xs text-white/50 shrink-0 items-center">
+			<ul
+				class="flex gap-6 text-xs text-foreground/50 shrink-0 items-center"
+			>
 				{#each copyrightNav as item (item.id)}
 					<li>
 						<a
-							class="hover:text-white transition-colors"
+							class="hover:text-foreground transition-colors"
 							href={resolvePathname(url(item) as "/")}
 							>{item.title}</a
 						>
@@ -63,7 +65,7 @@
 				{/each}
 				<li>
 					<CookiePreferencesButton
-						className="hover:text-white transition-colors"
+						className="hover:text-foreground transition-colors"
 					/>
 				</li>
 			</ul>

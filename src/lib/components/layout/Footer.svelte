@@ -40,6 +40,7 @@
 	import Logo from "./SiteLogo.svelte";
 	import NewsletterForm from "./NewsletterForm.svelte";
 	import { resolvePathname } from "$lib/utils/path";
+	import { cn } from "$lib/utils";
 
 	const socialIconMap: Record<string, Component<{ class?: string }>> = {
 		linkedin: Linkedin,
@@ -74,14 +75,26 @@
 		rss: RSS,
 	};
 
+	type FooterTheme =
+		| "default"
+		| "gray"
+		| "primary"
+		| "accent"
+		| "sec"
+		| "dark"
+		| "primary-light"
+		| "accent-light"
+		| "sec-light";
+
 	interface Props {
 		navigation?: NavigationTree;
 		copyrightNavigation?: NavigationTree;
 		globals?: SiteGlobals;
 		ctaHref?: string;
 		ctaLabel?: string;
-		theme?: string;
+		theme?: FooterTheme;
 		style?: string;
+		class?: string;
 	}
 
 	let {
@@ -92,6 +105,7 @@
 		ctaLabel = "Contact us",
 		theme = "primary",
 		style = "f9",
+		class: className,
 	}: Props = $props();
 
 	const visibleNavItems = $derived(
@@ -103,7 +117,10 @@
 	}
 </script>
 
-<footer class="bg-primary-800 text-white footer-v9 {style}" data-theme={theme}>
+<footer
+	class={cn("bg-background text-foreground footer-v9", style, className)}
+	data-theme={theme}
+>
 	<div
 		class="w-[calc(100%-2.5rem)] lg:w-[calc(100%-4rem)] mx-auto max-w-8xl pt-10"
 	>
@@ -134,7 +151,7 @@
 			{#if ctaHref}
 				<a
 					href={resolvePathname(ctaHref as string)}
-					class="inline-flex items-center justify-center rounded-full border border-white/60 px-8 py-3 uppercase tracking-widest text-sm hover:bg-white/10 transition-colors shrink-0"
+					class="inline-flex items-center justify-center rounded-full border border-foreground/60 px-8 py-3 uppercase tracking-widest text-sm hover:bg-foreground/10 transition-colors shrink-0"
 				>
 					{ctaLabel}
 				</a>
@@ -142,10 +159,10 @@
 		</div>
 
 		<!-- Middle Section: Newsletter/Social | Navigation Columns -->
-		<div class="grid grid-cols-12 border-t border-white/20">
+		<div class="grid grid-cols-12 border-t border-foreground/20">
 			<!-- Left: Newsletter + Social Icons -->
 			<div
-				class="col-span-12 md:col-span-4 md:border-r md:border-white/20 md:pr-10 pb-8 md:pb-0 py-15"
+				class="col-span-12 md:col-span-4 md:border-r md:border-foreground/20 md:pr-10 pb-8 md:pb-0 py-15"
 			>
 				<div class="space-y-8">
 					<!-- Newsletter -->
@@ -163,7 +180,7 @@
 										href={social.url}
 										aria-label={social.label ||
 											social.service}
-										class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+										class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-foreground/10 hover:bg-foreground/20 transition-colors"
 										target="_blank"
 										rel="noopener noreferrer"
 									>
@@ -202,7 +219,7 @@
 												href={resolvePathname(
 													itemHref(child) as "/",
 												)}
-												class="text-sm text-white/70 hover:text-white transition-colors"
+												class="text-sm text-foreground/70 hover:text-foreground transition-colors"
 											>
 												{child.title}
 											</a>
@@ -217,7 +234,7 @@
 		</div>
 
 		<!-- Bottom Section: Copyright | Legal Links -->
-		<div class="border-t border-white/20 pt-6 pb-8">
+		<div class="border-t border-foreground/20 pt-6 pb-8">
 			<Copyright
 				{globals}
 				navigation={copyrightNavigation.filter(
