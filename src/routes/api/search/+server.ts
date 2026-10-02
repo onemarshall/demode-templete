@@ -1,4 +1,3 @@
-import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { createDirectusClient } from "$lib/server/directus/fetchers/shared";
 import { readItems } from "@directus/sdk";
@@ -11,7 +10,10 @@ export const GET: RequestHandler = async ({ request, fetch }) => {
   const search = searchParams.get("search")?.trim().slice(0, MAX_QUERY_LENGTH);
 
   if (!search || search.length < 3) {
-    return json({ error: "Query must be at least 3 characters." }, { status: 400 });
+    return Response.json(
+      { error: "Query must be at least 3 characters." },
+      { status: 400 },
+    );
   }
 
   const directus = createDirectusClient(fetch);
@@ -69,9 +71,12 @@ export const GET: RequestHandler = async ({ request, fetch }) => {
       })),
     ].slice(0, MAX_RESULTS);
 
-    return json(results);
+    return Response.json(results);
   } catch (error) {
     console.error("Error fetching search results:", error);
-    return json({ error: "Failed to fetch search results." }, { status: 500 });
+    return Response.json(
+      { error: "Failed to fetch search results." },
+      { status: 500 },
+    );
   }
 };

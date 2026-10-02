@@ -33,7 +33,7 @@
     } else {
       next.searchParams.delete(key);
     }
-    return resolve("/news") + next.search;
+    return resolve("news") + next.search;
   };
 
   const pageUrl = (targetPage: number) => {
@@ -43,7 +43,7 @@
     } else {
       next.searchParams.set("page", String(targetPage));
     }
-    return resolve("/news") + next.search;
+    return resolve("news") + next.search;
   };
 
   const removeTagUrl = (slug: string) => {
@@ -52,7 +52,7 @@
     const remaining = data.filters.tags.filter((t) => t !== slug);
     next.searchParams.delete("tag");
     for (const t of remaining) next.searchParams.append("tag", t);
-    return resolve("/news") + next.search;
+    return resolve("news") + next.search;
   };
 
   const hasFilters = $derived(
@@ -127,7 +127,7 @@
           </p>
           {#if hasFilters}
             <a
-              href={resolve("/news")}
+              href={resolve("news")}
               class="mt-4 inline-block text-sm text-primary underline"
               data-sveltekit-reset={false}
             >

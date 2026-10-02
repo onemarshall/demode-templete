@@ -70,7 +70,9 @@
 	});
 
 	const handleSelect = (result: SearchResult) => {
-		void goto(resolvePathname(result.link));
+		goto(resolvePathname(result.link)).catch(() => {
+			window.location.href = result.link;
+		});
 		open = false;
 	};
 </script>

@@ -1,5 +1,4 @@
 <script>
-  import Img from '@zerodevx/svelte-img';
   import Container from '$lib/components/ui/Container.svelte'
   import Headline from '$lib/components/ui/Headline.svelte'
   let { title, subTitleText, hasLink = false, link = '!#', linkText, image, alt } = $props();
@@ -30,7 +29,7 @@
   </div>
 
   <figure class="width-100% margin-left-auto max-width-md z-index-1">
-    <Img class="height-auto block width-100% shadow-lg landscape radius-lg" src={image} {alt} />
+    <img class="height-auto block width-100% shadow-lg landscape radius-lg" src={image} {alt} />
   </figure>
   </Container>
 </section>

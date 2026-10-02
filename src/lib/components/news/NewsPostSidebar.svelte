@@ -132,7 +132,7 @@
             Category
           </p>
           <a
-            href={resolve("/news") +
+            href={resolve("news") +
               `?category=${encodeURIComponent(post.category.slug ?? "")}`}
             class="font-secondary text-sm font-semibold text-gray-900 transition-colors hover:text-primary"
           >
@@ -177,7 +177,7 @@
         <div class="flex flex-wrap gap-2">
           {#each postTags as relation (relation.tag_id.id)}
             <a
-              href={resolve("/news") +
+              href={resolve("news") +
                 `?tag=${encodeURIComponent(relation.tag_id.slug ?? relation.tag_id.title)}`}
               class="rounded-sm border border-gray-200 px-2.5 py-1 text-xs text-gray-600 transition-colors hover:border-primary hover:text-primary"
             >

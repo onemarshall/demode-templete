@@ -127,7 +127,7 @@
 			{/if}
 			{#if post.category && typeof post.category === "object"}
 				<a
-					href={resolve("/news") +
+					href={resolve("news") +
 						`?category=${encodeURIComponent(post.category.slug ?? "")}`}
 					class="text-white/50 transition-colors hover:text-white/80"
 				>
@@ -199,7 +199,7 @@
 				<div class="mb-8 flex flex-wrap gap-2">
 					{#each postTags as relation (relation.tag_id.id)}
 						<a
-							href={resolve("/news") +
+							href={resolve("news") +
 								`?tag=${encodeURIComponent(relation.tag_id.slug ?? relation.tag_id.title)}`}
 							class="rounded-sm border border-gray-200 px-2.5 py-1 text-xs text-gray-500 transition-colors hover:border-primary hover:text-primary"
 						>
@@ -244,7 +244,7 @@
 				class="mt-12 flex items-center justify-between border-t border-gray-200 pt-8"
 			>
 				<a
-					href={resolve("/news")}
+					href={resolve("news")}
 					class="text-sm text-gray-500 transition-colors hover:text-primary"
 				>
 					&larr; Back to all articles

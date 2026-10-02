@@ -39,7 +39,7 @@
 				class="text-accent transition-colors hover:opacity-80"
 				target="_blank"
 				rel="external noopener noreferrer"
-				data-sveltekit-preload-data="off"
+				data-sveltekit-preload-data={false}
 				href={globals?.url}>{globals?.footer_design_by_name}</a
 			>
 		</p>

@@ -1,7 +1,5 @@
 import { resolve } from "$app/paths";
-import type { AppTypes } from "$app/types";
-
-type Path = ReturnType<AppTypes["Path"]>;
+import type { Path } from "$app/types";
 
 export const normalizePath = (path: string): string => {
   const trimmed = path.trim();

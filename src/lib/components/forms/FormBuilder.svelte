@@ -37,18 +37,26 @@
 				formId: form.id,
 				submissionData: data,
 			});
-
-			if (form.on_success === "redirect" && form.success_redirect_url) {
-				if (form.success_redirect_url.startsWith("/")) {
-					goto(resolvePathname(form.success_redirect_url));
-				} else {
-					window.location.href = form.success_redirect_url;
-				}
-			} else {
-				isSubmitted = true;
-			}
-		} catch (err) {
+		} catch {
 			error = "Failed to submit the form. Please try again later.";
+			return;
+		}
+
+		const redirectUrl =
+			form.on_success === "redirect" ? form.success_redirect_url : null;
+
+		if (!redirectUrl) {
+			isSubmitted = true;
+		} else if (redirectUrl.startsWith("/")) {
+			// goto() rejects if the URL doesn't resolve to an app route — fall
+			// back to a full navigation so CMS-managed redirects still work.
+			try {
+				await goto(resolvePathname(redirectUrl));
+			} catch {
+				window.location.href = redirectUrl;
+			}
+		} else {
+			window.location.href = redirectUrl;
 		}
 	};
 </script>

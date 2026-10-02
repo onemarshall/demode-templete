@@ -182,7 +182,7 @@
     <!-- Clear all -->
     {#if hasFilters}
       <a
-        href={resolve("/news")}
+        href={resolve("news")}
         class="inline-block border-b border-gray-400 pb-0.5 text-xs uppercase tracking-0.1em text-gray-500 transition-colors hover:border-gray-800 hover:text-gray-800"
         data-sveltekit-reset={false}
       >

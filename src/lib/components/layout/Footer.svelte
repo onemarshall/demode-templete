@@ -176,7 +176,7 @@
 								<li>
 									<!-- eslint-disable svelte/no-navigation-without-resolve -->
 									<a
-										data-sveltekit-preload-data="off"
+										data-sveltekit-preload-data={false}
 										href={social.url}
 										aria-label={social.label ||
 											social.service}

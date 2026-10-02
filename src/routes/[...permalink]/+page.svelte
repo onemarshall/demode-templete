@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from "$app/navigation";
+	import { refreshAll } from "$app/navigation";
 	import { page } from "$app/state";
 	import { PUBLIC_DIRECTUS_URL } from "$app/env/public";
 	import PageBuilder from "$lib/components/layout/PageBuilder.svelte";
@@ -22,7 +22,7 @@
 			apply({
 				directusUrl,
 				onSaved: async () => {
-					await invalidateAll();
+					await refreshAll();
 				},
 			});
 
@@ -34,7 +34,7 @@
 				elements: editButton,
 				customClass: "visual-editing-button-class",
 				onSaved: async () => {
-					await invalidateAll();
+					await refreshAll();
 				},
 			});
 		})();
