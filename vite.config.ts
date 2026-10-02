@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { defineConfig, type ViteUserConfig } from "vitest/config";
 import { playwright } from "@vitest/browser-playwright";
 import tailwindcss from "@tailwindcss/vite";
@@ -54,6 +55,11 @@ function suppressDataRequestLogs(): Plugin {
 
 const cwd = path.dirname(fileURLToPath(import.meta.url));
 
+// Public origin served through the Cloudflare Tunnel (e.g. https://oae.austinmarshall.co.uk)
+const siteUrl = process.env.PUBLIC_SITE_URL;
+const siteOrigin = siteUrl ? new URL(siteUrl).origin : undefined;
+const siteHost = siteOrigin ? new URL(siteOrigin).hostname : undefined;
+
 export default defineConfig({
   plugins: [
     suppressDataRequestLogs(),
@@ -87,8 +93,20 @@ export default defineConfig({
         mode: "auto",
         directives: CSPDirectives(),
       },
+      csrf: {
+        // Allow form/remote-function POSTs arriving via the tunnel's https origin
+        trustedOrigins: siteOrigin ? [siteOrigin] : [],
+      },
     }),
   ],
+  server: {
+    port: 7000,
+    // Bind all interfaces so Docker-based cloudflared can reach us via host.docker.internal
+    host: true,
+    // Allow the tunnel hostname through Vite's dev-server host check.
+    // ".trycloudflare.com" covers quick tunnels; siteHost covers named tunnels.
+    allowedHosts: siteHost ? [siteHost, ".trycloudflare.com"] : [".trycloudflare.com"],
+  },
   build: {
     rollupOptions: {
       plugins: [
