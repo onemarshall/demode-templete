@@ -86,12 +86,12 @@
 	>
 		{#if post?.image}
 			<DirectusImage
-				uuid={post.image as string}
+				uuid={post.image}
 				layout="fullWidth"
 				alt={post.title || "post header image"}
 				class="size-full object-cover"
 				fill
-				fetchpriority="high"
+				priority
 				sizes="100vw"
 				maxWidth={1600}
 			/>

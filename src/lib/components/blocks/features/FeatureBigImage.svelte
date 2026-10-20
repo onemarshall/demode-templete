@@ -11,10 +11,7 @@
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 	import { fade } from "#scripts/actions";
-	import {
-		getImageUuid,
-		getImageObjectPosition,
-	} from "$lib/utils/get-image-uuid";
+	import { getImageObjectPosition } from "$lib/utils/get-image-uuid";
 	import { Button } from "$lib/components/ui/button/index.js";
 
 	interface FeatureBigImageLink {
@@ -162,7 +159,7 @@
 					class="mx-auto w-full overflow-hidden rounded-sm lg:col-span-8 lg:col-start-6"
 				>
 					<DirectusImage
-						uuid={getImageUuid(data.image)}
+						uuid={data.image}
 						alt={data.image_alt || headline || "Feature image"}
 						layout="constrained"
 						class="block aspect-video w-full object-cover ring-1 ring-black/5 shadow-xl"
@@ -178,7 +175,7 @@
 					class="mt-7 mx-auto w-full overflow-hidden rounded-sm lg:col-span-12 lg:col-start-1 md:h-[60vh]"
 				>
 					<DirectusImage
-						uuid={getImageUuid(data.image)}
+						uuid={data.image}
 						alt={data.image_alt || headline || "Feature image"}
 						layout="constrained"
 						class="block aspect-video w-full object-cover ring-1 ring-black/5 shadow-xl"

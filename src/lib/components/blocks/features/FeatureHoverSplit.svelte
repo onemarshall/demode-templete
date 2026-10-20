@@ -6,7 +6,6 @@
 		type DirectusLinkValue,
 	} from "$lib/utils/directus-links";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
-	import { getImageUuid } from "$lib/utils/get-image-uuid";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
 	import { fade } from "#scripts/actions";
@@ -133,9 +132,9 @@
 						mode: "popover",
 					})}
 				>
-					{#if item.image}a
+					{#if item.image}
 						<DirectusImage
-							uuid={getImageUuid(item.image)}
+							uuid={item.image}
 							alt={item.title || "Feature image"}
 							class="absolute inset-0 block h-full min-h-full w-full min-w-full object-cover transition-transform duration-500 ease-out group-hover/panel:scale-105"
 							sizes="(max-width: 1024px) 100vw, 50vw"

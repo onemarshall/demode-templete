@@ -171,7 +171,13 @@
 					<!-- Social Icons -->
 					{#if globals?.social_links?.length}
 						<ul class="flex gap-3" aria-label="Social media links">
-							{#each globals.social_links.filter( (s) => ["linkedin", "instagram", "x", "twitter", "facebook", "youtube"].includes(s.service), ) as social (social.service)}
+							{#each globals.social_links.filter( (s) => 
+							["linkedin", 
+							"instagram", 
+							"x", 
+							"twitter", 
+							"facebook", 
+							"youtube"].includes(s.service), ) as social (social.service)}
 								{@const Icon = socialIconMap[social.service]}
 								<li>
 									<!-- eslint-disable svelte/no-navigation-without-resolve -->

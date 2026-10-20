@@ -208,10 +208,7 @@
 						>
 							{#if featuredPost.image}
 								<DirectusImage
-									uuid={typeof featuredPost.image ===
-										"object" && featuredPost.image !== null
-										? featuredPost.image.id
-										: featuredPost.image}
+									uuid={featuredPost.image}
 									alt={featuredPost.title}
 									layout="fullWidth"
 									fill
@@ -279,11 +276,7 @@
 									>
 										{#if post.image}
 											<DirectusImage
-												uuid={typeof post.image ===
-													"object" &&
-												post.image !== null
-													? post.image.id
-													: post.image}
+												uuid={post.image}
 												alt={post.title}
 												layout="constrained"
 												maxWidth={800}
@@ -375,10 +368,7 @@
 						>
 							{#if post.image}
 								<DirectusImage
-									uuid={typeof post.image === "object" &&
-									post.image !== null
-										? post.image.id
-										: post.image}
+									uuid={post.image}
 									alt={post.title}
 									layout="fullWidth"
 									fill

@@ -219,7 +219,7 @@
 						>
 							<div class="aspect-3/3">
 								<DirectusImage
-									uuid={imageId}
+									uuid={data.image}
 									alt={title}
 									class="absolute inset-0 h-full w-full object-cover"
 									fill
@@ -335,7 +335,7 @@
 					<div use:fade={{ x: 30, duration: 1.4 }}>
 						<div class="overflow-hidden rounded-sm">
 							<DirectusImage
-								uuid={imageId}
+								uuid={data.image}
 								alt={title}
 								class="h-full w-full object-cover"
 								sizes="(min-width: 1024px) 50vw, 100vw"
@@ -360,7 +360,7 @@
 									class="overflow-hidden rounded-sm grayscale"
 								>
 									<DirectusImage
-										uuid={imageId}
+										uuid={data.image}
 										alt={title}
 										class="aspect-3/5 h-full w-full object-cover"
 										fill
@@ -372,7 +372,7 @@
 							{#if image2Id}
 								<div class="overflow-hidden rounded-sm">
 									<DirectusImage
-										uuid={image2Id}
+										uuid={data.image_second}
 										alt={title}
 										class="aspect-3/4 h-full w-full object-cover"
 										fill
@@ -448,7 +448,7 @@
 						class="col-span-12 lg:col-span-8 lg:col-start-5 overflow-hidden rounded-sm"
 					>
 						<DirectusImage
-							uuid={imageId}
+							uuid={data.image}
 							alt={title}
 							class="aspect-3/2 h-full w-full object-cover"
 							fill
@@ -523,7 +523,7 @@
 						class="-mr-(--container-px,1.5rem)"
 					>
 						<DirectusImage
-							uuid={imageId}
+							uuid={data.image}
 							alt={title}
 							class="aspect-4/4 h-full w-full object-cover rounded-l-sm"
 							fill
@@ -584,7 +584,7 @@
 								class="overflow-hidden rounded-l-sm"
 							>
 								<DirectusImage
-									uuid={imageId}
+									uuid={data.image}
 									alt={title}
 									class="aspect-3/4 h-full w-full object-cover"
 									fill
@@ -596,7 +596,7 @@
 						{#if image2Id}
 							<div class="overflow-hidden grayscale">
 								<DirectusImage
-									uuid={image2Id}
+									uuid={data.image_second}
 									alt={title}
 									class="h-full w-full object-cover"
 									fill

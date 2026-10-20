@@ -25,6 +25,10 @@ export type DirectusImageFormat =
 
 export type DirectusImageTransform = [operation: string, ...(string | number | boolean)[]];
 
+export type DirectusImageSource =
+  | string
+  | ({ id?: string | null } & Partial<Omit<DirectusFile, "id">>);
+
 export interface DirectusAssetURLOptions {
   fit?: DirectusImageFit;
   format?: DirectusImageFormat;
@@ -139,4 +143,40 @@ export const getDirectusDefaultSrcWidth = ({
     responsiveWidths[responsiveWidths.length - 1] ??
     (width ? normalizeResponsiveWidth(width) : undefined)
   );
+};
+
+export const scaleDirectusHeight = (
+  height: number | undefined,
+  width: number | undefined,
+  targetWidth: number,
+): number | undefined =>
+  height && width ? Math.max(1, Math.round((height * targetWidth) / width)) : undefined;
+
+export const isDirectusTransformableImage = (type: string | null | undefined): boolean =>
+  !!type && type.startsWith("image/") && type !== "image/svg+xml" && type !== "image/gif";
+
+export const getDirectusSrcset = (
+  fileOrString: string | DirectusFile,
+  {
+    layout,
+    widths,
+    width,
+    height,
+    ...options
+  }: Omit<DirectusAssetURLOptions, "width"> & {
+    layout: DirectusImageLayout;
+    widths: number[];
+    width?: number;
+  },
+): string => {
+  const url = (candidateWidth: number) =>
+    getDirectusAssetURL(fileOrString, {
+      ...options,
+      width: candidateWidth,
+      height: scaleDirectusHeight(height, width, candidateWidth),
+    });
+
+  if (layout === "fixed" && width) return `${url(width)} 1x, ${url(width * 2)} 2x`;
+
+  return widths.map((candidateWidth) => `${url(candidateWidth)} ${candidateWidth}w`).join(", ");
 };

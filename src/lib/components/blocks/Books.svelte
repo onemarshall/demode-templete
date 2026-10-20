@@ -427,7 +427,7 @@
 						>
 							{#if getImageUuid(featuredBook.image)}
 								<DirectusImage
-									uuid={getImageUuid(featuredBook.image)}
+									uuid={featuredBook.image}
 									alt={featuredBook.title ?? ""}
 									class="size-full object-cover transition-transform duration-500 group-hover:scale-105"
 									fill
@@ -539,7 +539,7 @@
 			>
 				{#if getImageUuid(selectedBook.image)}
 					<DirectusImage
-						uuid={getImageUuid(selectedBook.image)}
+						uuid={selectedBook.image}
 						alt={selectedBook.title ?? ""}
 						class="h-full w-full object-cover"
 						fill

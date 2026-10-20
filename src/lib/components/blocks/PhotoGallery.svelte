@@ -11,14 +11,9 @@
 	import Headline from "$lib/components/ui/Headline.svelte";
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import { getDirectusAssetURL } from "$lib/services/directus/asset-utils";
+	import type { DirectusFile } from "$lib/types/directus-schema";
 
-	interface ImageFile {
-		id: string;
-		title?: string | null;
-		filename_download?: string | null;
-		width?: number | null;
-		height?: number | null;
-	}
+	type ImageFile = DirectusFile;
 
 	interface GalleryItem {
 		id: string | number;
@@ -177,7 +172,7 @@
 							aria-label={`Open image ${i + 1} of ${items.length}`}
 						>
 							<DirectusImage
-								uuid={img.id}
+								uuid={img}
 								alt={img.title ?? ""}
 								fill
 								layout="fullWidth"

@@ -61,12 +61,6 @@
 		data.Version === "v1" ? "bg-white" : "bg-white",
 	);
 
-	function getItemImageUuid(item: FeatureStickyItemData) {
-		return typeof item.image === "object" && item.image !== null
-			? item.image.id
-			: item.image;
-	}
-
 	function handleActiveChange(index: number) {
 		activeIndex = index;
 	}
@@ -150,7 +144,7 @@
 											class="mt-5 aspect-16/9 overflow-hidden rounded-sm shadow-md lg:sr-only"
 										>
 											<DirectusImage
-												uuid={getItemImageUuid(item)}
+												uuid={item.image}
 												alt={item.title ||
 													"Feature image"}
 												layout="constrained"
@@ -215,7 +209,7 @@
 											class="sticky-feature__media-figure h-[752px] w-full max-w-[1000px] overflow-hidden rounded-sm shadow-md opacity-0 transition-opacity duration-300"
 										>
 											<DirectusImage
-												uuid={getItemImageUuid(item)}
+												uuid={item.image}
 												alt={item.title ||
 													"Feature image"}
 												layout="constrained"

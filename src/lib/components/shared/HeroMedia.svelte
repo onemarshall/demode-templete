@@ -38,8 +38,7 @@
 	<DirectusImage
 		uuid={image}
 		layout="fullWidth"
-		loading="eager"
-		fetchpriority="high"
+		priority
 		alt={alt || "Hero Image"}
 		sizes="100vw"
 		class="h-full w-full object-cover object-top {className}"

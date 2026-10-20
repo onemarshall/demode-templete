@@ -47,9 +47,7 @@
 				aria-label={href ? data.title || "Card link" : undefined}
 			>
 				<DirectusImage
-					uuid={typeof data.image === "object" && data.image !== null
-						? data.image.id
-						: data.image}
+					uuid={data.image}
 					alt={data.title || "Card background image"}
 					layout="fullWidth"
 					fill

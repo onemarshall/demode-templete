@@ -169,7 +169,7 @@
 									class="size-20 shrink-0 overflow-hidden rounded-full"
 								>
 									<DirectusImage
-										uuid={getImageUuid(sponsor.logo)}
+										uuid={sponsor.logo}
 										alt={sponsor.name ?? "Sponsor photo"}
 										class="size-full object-cover"
 										layout="fixed"

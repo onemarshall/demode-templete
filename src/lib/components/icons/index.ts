@@ -6,12 +6,12 @@ import {
   FileText,
   GraduationCap,
   HandHeart,
-  History as HistoryIcon,
   Info,
   Library,
   Newspaper,
   PanelsTopLeft,
   PawPrint,
+  RotateCcwClock,
   ShieldCheck,
   Target,
   Users,
@@ -24,7 +24,7 @@ const OurResearch = Library;
 const OurNews = Newspaper;
 const Aims = Target;
 const About = Info;
-const History = HistoryIcon;
+const History = RotateCcwClock;
 const Impact = ChartNoAxesCombined;
 const AnimalEthics = PawPrint;
 const LatestNews = Newspaper;

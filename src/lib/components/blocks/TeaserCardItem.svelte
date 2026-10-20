@@ -64,9 +64,7 @@
 		<figure class="overflow-hidden">
 			<div class="relative aspect-4/3" style={duotoneBg}>
 				<DirectusImage
-					uuid={typeof data.image === "object" && data.image !== null
-						? data.image.id
-						: data.image}
+					uuid={data.image}
 					alt={data.title || "Teaser card image"}
 					layout="fullWidth"
 					fill

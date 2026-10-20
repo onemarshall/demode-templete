@@ -10,7 +10,6 @@
 	import DirectusImage from "$lib/components/shared/DirectusImage.svelte";
 	import Container from "$lib/components/ui/Container.svelte";
 	import Headline from "$lib/components/ui/Headline.svelte";
-	import { getImageUuid } from "$lib/utils/get-image-uuid";
 
 	interface FeatureBigImageLink {
 		type?: "page" | "post" | "url" | null;
@@ -111,7 +110,7 @@
 						class="mx-auto w-full lg:w-[calc(100%-3rem)] overflow-hidden rounded-sm lg:col-span-8 lg:col-start-6"
 					>
 						<DirectusImage
-							uuid={getImageUuid(data.image)}
+							uuid={data.image}
 							alt={data.image_alt || headline || "Feature image"}
 							layout="constrained"
 							class="block aspect-video w-full object-cover ring-1 ring-black/5 shadow-xl"
