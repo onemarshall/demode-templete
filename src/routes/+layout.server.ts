@@ -1,24 +1,8 @@
-import { getContentProvider, getProviderType } from "$lib/server/content/get-provider";
-import type { LayoutServerLoad } from "./$types";
-import { PUBLIC_ENABLE_VISUAL_EDITING } from "$app/env/public";
+import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async (event) => {
-  const providerType = getProviderType();
-  const provider = getContentProvider();
-  const { globals, headerNavigation, footerNavigation, copyrightNavigation } =
-    await provider.getSiteData();
-
-  const visualEditingEnabled =
-    providerType === "directus" &&
-    event.url.searchParams.get("visual-editing") === "true" &&
-    PUBLIC_ENABLE_VISUAL_EDITING === "true";
-
-  return {
-    contentProvider: providerType,
-    globals,
-    headerNavigation,
-    footerNavigation,
-    copyrightNavigation,
-    visualEditingEnabled,
-  };
+export const load: LayoutServerLoad = async ({ locals }) => {
+	return {
+		session: locals.auth?.session,
+		user: locals.auth?.user
+	};
 };

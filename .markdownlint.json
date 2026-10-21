@@ -1,0 +1,19 @@
+{
+	"default": true,
+	"MD010": {
+		"code_blocks": false,
+		"spaces_per_tab": 4
+	},
+	"MD013": {
+		"line_length": 120,
+		"code_blocks": false,
+		"tables": false,
+		"headings": false,
+		"strict": false,
+		"stern": false
+	},
+	"MD033": {
+		"allowed_elements": ["div", "span", "br", "sub", "sup", "kbd", "mark", "details", "summary"]
+	},
+	"MD041": false
+}

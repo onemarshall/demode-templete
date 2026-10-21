@@ -2,11 +2,15 @@
   "extends": "$app/tsconfig",
   "compilerOptions": {
     "paths": {
+      "$app/types": ["./.svelte-kit/types/index.d.ts"],
       "$lib": ["./src/lib"],
       "$lib/*": ["./src/lib/*"],
+      "$test": ["./src/test"],
+      "$test/*": ["./src/test/*"],
       "#scripts/actions": ["./src/assets/scripts/actions/index.ts"],
       "#scripts/actions/*": ["./src/assets/scripts/actions/*.ts"]
-    }
+    },
+    "types": ["$app/types", "bun", "vitest/globals"]
   },
   "include": ["src"]
 }

@@ -1,141 +1,79 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import { afterNavigate, beforeNavigate } from "$app/navigation";
-	import "$lib/components/ui/cursix/styles.css";
-	import "css/app.css";
-	import { setNavigationContext } from "$lib/content/context";
-	import { CookieConsent, Loader } from "$lib/components/core";
-	import { ScrollToTop } from "$lib/components/ui";
-	import type { LayoutData } from "./$types";
-	import { smoothScroll } from "#scripts/actions/smoothScroll";
-	import { cursix } from "#scripts/actions/cursix";
-	import CmsMeta from "$lib/components/core/CmsMeta.svelte";
-	import MenuMain from "$lib/components/layout/morphing/index.svelte";
-	import Footer from "$lib/components/layout/Footer.svelte";
+	import '../app.css';
+	import { dev } from '$app/env';
+	import { onMount, onDestroy } from 'svelte';
+	import { publicEnv, isDevelopment } from '$lib/auth/shared/env';
+	import AppNav from '$lib/components/navigation/AppNav.svelte';
+	import { Toaster } from 'svelte-sonner';
+	import type { LayoutData } from './$types';
+	import type { Snippet } from 'svelte';
 
-	let {
-		children,
-		data,
-	}: { children: import("svelte").Snippet; data: LayoutData } = $props();
-	let hasCompletedInitialLoad = false;
-	let isNavigating = $state(false);
-	let prefersReducedMotion = $state(false);
+	let { children, data }: { children: Snippet; data: LayoutData } = $props();
 
-	setNavigationContext(() => data.headerNavigation ?? []);
+	// ============================================
+	// Security Configuration
+	// ============================================
 
-	const waitForNextPaint = () =>
-		new Promise<void>((resolve) => {
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => resolve());
-			});
-		});
+	const isEnabled = (key: string): boolean => {
+		const value = publicEnv[key as keyof typeof publicEnv];
+		if (typeof value === 'boolean') return value;
+		if (typeof value === 'string') return value.toLowerCase() === 'true';
+		return false;
+	};
 
-	function setLoadingState(isLoading: boolean) {
-		document.body.classList.toggle("is-loading", isLoading);
-		document.body.classList.toggle("is-loaded", !isLoading);
-		document.body.classList.toggle("is-hide", isLoading);
-	}
+	const forceAllSecurity = isEnabled('PUBLIC_ALL_SECURITY');
+	const disableInDev = dev && !forceAllSecurity;
 
-	async function revealPage() {
-		if (!prefersReducedMotion) {
-			await waitForNextPaint();
+	const shouldEnable = (key: string, defaultValue = true): boolean => {
+		const explicit = isEnabled(key);
+		if (publicEnv[key as keyof typeof publicEnv] !== undefined) {
+			return explicit;
 		}
-		hasCompletedInitialLoad = true;
-		isNavigating = false;
-		setLoadingState(false);
-	}
+		if (forceAllSecurity) return true;
+		if (disableInDev) return false;
+		return defaultValue;
+	};
 
-	function handleInitialDOMContentLoaded() {
-		void revealPage();
-	}
+	const securityConfig = {
+		fraudDetection: shouldEnable('PUBLIC_AUTH_FRAUD_DETECTION_PLUGIN'),
+		abuseProtection: shouldEnable('PUBLIC_AUTH_ABUSE_PROTECTION_PLUGIN'),
+		geoProtection: shouldEnable('PUBLIC_AUTH_GEO_INTELLIGENCE_PLUGIN'),
+		rateLimit: shouldEnable('PUBLIC_AUTH_RATE_LIMIT_PLUGIN'),
+		securityAnalytics: shouldEnable('PUBLIC_AUTH_SECURITY_ANALYTICS_PLUGIN')
+	};
 
-	beforeNavigate((navigation) => {
-		if (!hasCompletedInitialLoad) return;
-		if (navigation.willUnload) return;
-		isNavigating = true;
-	});
+	// ============================================
+	// Initialization
+	// ============================================
 
-	afterNavigate(() => {
-		void revealPage();
-	});
+	let cleanup: (() => void) | null = null;
 
 	onMount(() => {
-		// Swap the preloaded Typekit CSS in via JS — an inline `onload`
-		// attribute would be blocked by `script-src-attr 'none'` in production CSP.
-		const typekit = document.createElement("link");
-		typekit.rel = "stylesheet";
-		typekit.href = "https://use.typekit.net/tck6tzf.css";
-		document.head.appendChild(typekit);
+		// Fire and forget the async init, store cleanup reference
+		import('$lib/auth-client').then(async ({ initializeAuth, cleanupAuth }) => {
+			await initializeAuth();
+			cleanup = cleanupAuth;
+		});
+	});
 
-		const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-		prefersReducedMotion = media.matches;
-		const onChange = (e: MediaQueryListEvent) => {
-			prefersReducedMotion = e.matches;
-		};
-		media.addEventListener("change", onChange);
-
-		if (document.readyState !== "loading") {
-			void revealPage();
-		} else {
-			document.addEventListener(
-				"DOMContentLoaded",
-				handleInitialDOMContentLoaded,
-				{ once: true },
-			);
-		}
-
-		return () => {
-			media.removeEventListener("change", onChange);
-			document.removeEventListener(
-				"DOMContentLoaded",
-				handleInitialDOMContentLoaded,
-			);
-			setLoadingState(false);
-		};
+	onDestroy(() => {
+		cleanup?.();
 	});
 </script>
 
-<svelte:head>
-	<link rel="preload" href="https://use.typekit.net/tck6tzf.css" as="style" />
-	<noscript>
-		<link rel="stylesheet" href="https://use.typekit.net/tck6tzf.css" />
-	</noscript>
-</svelte:head>
+<Toaster richColors position="top-right" />
+<div class="bg-muted flex min-h-svh flex-col">
+	<AppNav user={data.user} />
 
-<div use:cursix={{ speed: 0.6 }}>
-	<CmsMeta globals={data.globals} />
-	<MenuMain globals={data.globals} />
+	<main class="flex flex-1 flex-col px-6 py-12">
+		{@render children()}
+	</main>
 
-	<div
-		class="pointer-events-none fixed top-0 left-0 z-4000 h-05 w-[min(28vw,16rem)] bg-linear-to-r from-transparent via-primary to-transparent opacity-0 motion-safe:transition-opacity motion-safe:duration-200 motion-safe:ease-out motion-safe:animate-[route-progress-slide_0.9s_ease-in-out_infinite]"
-		class:opacity-100={isNavigating}
-		aria-hidden="true"
-	></div>
-
-	<div id="smooth-wrapper" use:smoothScroll={{ smooth: 2, effects: false }}>
-		<div id="smooth-content">
-			{@render children()}
-			<Footer
-				theme="accent"
-				navigation={data.footerNavigation ?? []}
-				copyrightNavigation={data.copyrightNavigation ?? []}
-				globals={data.globals}
-			/>
+	{#if isDevelopment()}
+		<div
+			class="fixed right-2 bottom-2 z-50 rounded border border-yellow-300 bg-yellow-100 px-2 py-1 text-xs text-yellow-800"
+		>
+			🚧 {publicEnv.PUBLIC_APP_NAME} - Development Mode
 		</div>
-	</div>
+	{/if}
 </div>
-<CookieConsent />
-<ScrollToTop />
-<Loader />
-
-<style>
-	@keyframes -global-route-progress-slide {
-		from {
-			transform: translateX(-120%);
-		}
-
-		to {
-			transform: translateX(calc(100vw + 120%));
-		}
-	}
-</style>

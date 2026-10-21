@@ -1,5 +1,6 @@
 <script>
 	import { page } from "$app/state";
+	import { resolve } from "$app/paths";
 
 	let isServerError = $derived(page.status === 500);
 	let isNotFound = $derived(page.status === 404);
@@ -12,35 +13,40 @@
 	<title>{page.status}: {page.error?.message}</title>
 </svelte:head>
 
-<section
-	class="flex min-h-screen items-center justify-center"
+<div
+	class="min-h-screen w-full flex items-center justify-center"
 	class:bg-red-50={isServerError}
 >
-	<div class="w-full max-w-2xl px-4 text-center">
-		<h1
-			class="text-4xl font-bold uppercase"
-			class:text-red-600={isServerError}
-		>
-			{page.status}: {errorMessage}
-		</h1>
-		{#if isNotFound}
-			<p class="mt-4 text-lg text-gray-600">
-				The page you are looking for could not be found. Please check
-				the URL and try again.
-			</p>
-		{/if}
-		{#if isServerError}
-			<p class="mt-4 text-lg text-gray-600">
-				Something went wrong on our end. Please try again later.
-			</p>
-		{/if}
-		<div class="mt-8">
-			<a
-				href="/"
-				class="inline-flex items-center rounded-md bg-primary-600 px-6 py-3 text-base font-medium text-white transition-colors duration-200 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+	<div class="w-full max-w-2xl">
+		<div class="text-center">
+			<h1
+				class="text-6xl font-bold text-center uppercase"
+				class:text-red-600={isServerError}
 			>
-				Return to homepage
-			</a>
+				{#if isServerError}
+					{page.status}: {errorMessage}
+				{:else}
+					{page.status}: {errorMessage}
+				{/if}
+			</h1>
+			{#if isNotFound}
+				<p class="text-lg text-center mt-4 text-gray-600">
+					The page you are looking for could not be found. Please
+					check the URL and try again.
+				</p>
+			{/if}
+			{#if isServerError}
+				<p class="text-lg text-center mt-4 text-gray-600">
+					Something went wrong on our end. Please try again later.
+				</p>
+			{/if}
+			<div class="flex justify-center mt-8">
+				<a
+					href={resolve("/")}
+					class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+					>Return to homepage</a
+				>
+			</div>
 		</div>
 	</div>
-</section>
+</div>

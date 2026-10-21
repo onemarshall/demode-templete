@@ -4,6 +4,7 @@ import { playwright } from "@vitest/browser-playwright";
 import tailwindcss from "@tailwindcss/vite";
 import adapter from "@sveltejs/adapter-cloudflare";
 import { sveltekit } from "@sveltejs/kit/vite";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { CSPDirectives } from "./csp.config.mjs";
 import { visualizer } from "rollup-plugin-visualizer";
 import path from "node:path";
@@ -65,6 +66,7 @@ export default defineConfig({
     suppressDataRequestLogs(),
     tailwindcss(),
     sveltekit({
+      preprocess: vitePreprocess(),
       compilerOptions: {
         // Force runes mode for the project, except for libraries. Can be removed in svelte 6.
         runes: ({ filename }) =>
@@ -100,7 +102,7 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: 7000,
+    port: 7101,
     // Bind all interfaces so Docker-based cloudflared can reach us via host.docker.internal
     host: true,
     // Allow the tunnel hostname through Vite's dev-server host check.
@@ -124,12 +126,14 @@ export default defineConfig({
   resolve: {
     alias: {
       $lib: path.resolve(cwd, "./src/lib"),
+      $test: path.resolve(cwd, "./src/test"),
       css: path.resolve(cwd, "./src/assets/css"),
       "@vinejs/vine": path.resolve(cwd, "./src/lib/utils/stub-vine.ts"),
     },
   },
   test: {
     expect: { requireAssertions: true },
+    globals: true,
     projects: [
       {
         extends: "./vite.config.ts",
@@ -150,6 +154,7 @@ export default defineConfig({
         test: {
           name: "server",
           environment: "node",
+          setupFiles: ["./src/test/setup.ts"],
           include: ["src/**/*.{test,spec}.{js,ts}"],
           exclude: ["src/**/*.svelte.{test,spec}.{js,ts}"],
         },

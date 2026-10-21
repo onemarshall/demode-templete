@@ -38,13 +38,12 @@ const domains = {
 };
 
 /**
- * @param {{ corsOrigin: string }} options
+ * @param {{ corsOrigin?: string }} options
  * @returns {Record<string, string>}
  */
-export function createSecurityHeaders({ corsOrigin }) {
-  return {
-    "Access-Control-Allow-Origin": corsOrigin,
-    "Access-Control-Allow-Credentials": "true",
+export function createSecurityHeaders({ corsOrigin } = {}) {
+  /** @type {Record<string, string>} */
+  const headers = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "X-XSS-Protection": "1; mode=block",
@@ -53,6 +52,14 @@ export function createSecurityHeaders({ corsOrigin }) {
     "Cross-Origin-Opener-Policy": "same-origin",
     "Cross-Origin-Resource-Policy": "same-site",
   };
+
+  // Only emit CORS headers when an explicit origin was resolved for this request.
+  if (corsOrigin) {
+    headers["Access-Control-Allow-Origin"] = corsOrigin;
+    headers["Access-Control-Allow-Credentials"] = "true";
+  }
+
+  return headers;
 }
 
 /**
@@ -63,7 +70,7 @@ export function createSecurityHeaders({ corsOrigin }) {
  * }} options - Options for CSP directives
  * @returns {Record<string, string[]>} CSP directives
  */
-export function CSPDirectives({ nonce = "", isDev: isDevOverride } = {}) {
+export function createCSPDirectives({ nonce = "", isDev: isDevOverride } = {}) {
   const isDevelopment = typeof isDevOverride === "boolean" ? isDevOverride : isDev;
   // Common sources that can be reused
   const self = ["'self'"];
@@ -173,3 +180,6 @@ export function CSPDirectives({ nonce = "", isDev: isDevOverride } = {}) {
     "manifest-src": self,
   };
 }
+
+/** @deprecated use createCSPDirectives */
+export const CSPDirectives = createCSPDirectives;
