@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-// import { runAllTests } from '$lib/_old/server/test/directus-plugin-test';
-import { logger } from '$lib/auth/shared/logger';
+// import { runAllTests } from '#lib/_old/server/test/directus-plugin-test';
+import { logger } from '#lib/auth/shared/logger.js';
 
 async function runAllTests(): Promise<void> {
 	return;

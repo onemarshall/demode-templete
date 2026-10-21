@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { authClient } from "$lib/auth-client";
-	import { publicEnv } from "$lib/auth/shared/env";
-	import { securityLogger } from "$lib/auth/shared/logger";
-	import { scheduleMessageClear } from "$lib/components/forms/auth-forms";
-	import { Button } from "$lib/components/ui/button";
-	import { Input } from "$lib/components/ui/input";
-	import { Label } from "$lib/components/ui/label";
-	import { Alert, AlertDescription } from "$lib/components/ui/alert";
+	import { authClient } from "#lib/auth-client.js";
+	import { publicEnv } from "#lib/auth/shared/env/index.js";
+	import { securityLogger } from "#lib/auth/shared/logger.js";
+	import { scheduleMessageClear } from "#lib/components/forms/auth-forms.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import { Input } from "#lib/components/ui/input/index.js";
+	import { Label } from "#lib/components/ui/label/index.js";
+	import { Alert, AlertDescription } from "#lib/components/ui/alert/index.js";
 	import { Mail, Loader, CircleCheck } from "@lucide/svelte";
 	import AuthFormCard from "./AuthFormCard.svelte";
 	import AuthFormAlert from "./AuthFormAlert.svelte";

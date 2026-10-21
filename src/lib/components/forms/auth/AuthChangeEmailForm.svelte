@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { authClient } from '$lib/auth-client';
-	import { logger, securityLogger } from '$lib/auth/shared/logger';
-	import { scheduleMessageClear } from '$lib/components/forms/auth-forms';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { authClient } from '#lib/auth-client.js';
+	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
+	import { scheduleMessageClear } from '#lib/components/forms/auth-forms.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
 	import { Loader, ArrowLeft } from '@lucide/svelte';
 	import AuthFormCard from './AuthFormCard.svelte';
 	import AuthFormAlert from './AuthFormAlert.svelte';
@@ -19,7 +19,7 @@
 		redirectTo?: string;
 		successRedirectDelayMs?: number;
 		successMessage?: string;
-		/** Back-link target. Default: /auth/profile. */
+		/** Back-link target. Default: /auth/security. */
 		backHref?: string;
 	};
 
@@ -30,7 +30,7 @@
 		redirectTo = '/auth/sign-in',
 		successRedirectDelayMs = 3000,
 		successMessage = 'Email change initiated! Please check your current email for a verification link to approve the change.',
-		backHref = '/auth/profile',
+		backHref = '/auth/security',
 	}: Props = $props();
 
 	const sessionStore = authClient.useSession();

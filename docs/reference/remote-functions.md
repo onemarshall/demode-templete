@@ -46,12 +46,12 @@ export default config;
 
 ## Auth Helpers
 
-`$lib/server/auth-helpers.ts` provides the canonical way to access session state inside a remote function. It uses `getRequestEvent()` so the real request headers (cookies included) are passed to Better Auth.
+`#lib/server/auth-helpers.ts` provides the canonical way to access session state inside a remote function. It uses `getRequestEvent()` so the real request headers (cookies included) are passed to Better Auth.
 
 ```typescript
 import { getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
-import { auth } from '$lib/auth';
+import { auth } from '#lib/auth.js';
 
 export function getRequestHeaders(): Headers {
 	const event = getRequestEvent();
@@ -109,7 +109,7 @@ export const getSecuritySessions = query(
 ### 2. Real request headers, not `new Headers()`
 
 ```typescript
-import { getRequestHeaders } from '$lib/server/auth-helpers';
+import { getRequestHeaders } from '#lib/server/auth-helpers';
 
 const session = await auth.api.getSession({
 	headers: getRequestHeaders()
@@ -179,7 +179,7 @@ z.object({
 
 ```svelte
 <script>
-	import { getDashboardMetrics } from '$lib/remote';
+	import { getDashboardMetrics } from '#lib/remote/index.js';
 </script>
 
 {#await getDashboardMetrics('24h')}
@@ -196,7 +196,7 @@ z.object({
 
 ```svelte
 <script>
-	import { getDashboardMetrics } from '$lib/remote';
+	import { getDashboardMetrics } from '#lib/remote/index.js';
 
 	const metrics = getDashboardMetrics('24h');
 </script>
@@ -216,7 +216,7 @@ z.object({
 
 ```svelte
 <script>
-	import { blockIp } from '$lib/remote';
+	import { blockIp } from '#lib/remote/index.js';
 
 	let ip = '';
 	let reason = '';
@@ -250,7 +250,7 @@ z.object({
 ### Client-driven invalidation
 
 ```typescript
-import { blockIp, getDashboardMetrics, getLiveThreats } from '$lib/remote';
+import { blockIp, getDashboardMetrics, getLiveThreats } from '#lib/remote/index.js';
 
 async function handleBlock(ip: string) {
 	await blockIp({ ip }).updates(getDashboardMetrics(), getLiveThreats());
@@ -268,7 +268,7 @@ async function handleBlockOptimistic(ip: string) {
 
 ```svelte
 <script>
-	import { getCompleteProfile } from '$lib/remote';
+	import { getCompleteProfile } from '#lib/remote/index.js';
 
 	let { userId } = $props();
 </script>
@@ -290,9 +290,9 @@ async function handleBlockOptimistic(ip: string) {
 
 ```typescript
 import { describe, it, expect, vi } from 'vitest';
-import { getDashboardMetrics } from '$lib/remote/security/analytics.remote';
+import { getDashboardMetrics } from '#lib/remote/security/analytics.remote.js';
 
-vi.mock('$lib/security/security-analytics/sdk/dashboard-sdk', () => ({
+vi.mock('#lib/security/security-analytics/sdk/dashboard-sdk', () => ({
 	SecurityDashboardSDK: vi.fn().mockImplementation(() => ({
 		authenticateRequest: vi.fn().mockResolvedValue({ userId: 'test' }),
 		loadDashboardData: vi.fn().mockResolvedValue({
@@ -337,7 +337,7 @@ Confirm `experimental.remoteFunctions: true` is set in `svelte.config.js`.
 Use the helpers — never `new Headers()`:
 
 ```typescript
-import { getSession, requireAuth } from '$lib/server/auth-helpers';
+import { getSession, requireAuth } from '#lib/server/auth-helpers';
 
 const session = await getSession();
 // or, to throw 401:

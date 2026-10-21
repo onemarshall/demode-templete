@@ -5,7 +5,7 @@
  */
 
 // Main auth client (canonical location: src/lib/auth-client.ts)
-export { authClient } from '$lib/auth-client';
+export { authClient } from '#lib/auth-client.js';
 
 // Client helpers
 export * from './helpers';

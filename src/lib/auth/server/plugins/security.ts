@@ -6,8 +6,8 @@
  */
 
 import type { BetterAuthPlugin } from 'better-auth';
-import { securityPlugin, type SecurityPluginOptions } from '$lib/auth/security';
-import { logger } from '$lib/auth/shared/logger';
+import { securityPlugin, type SecurityPluginOptions } from '#lib/auth/security/index.js';
+import { logger } from '#lib/auth/shared/logger.js';
 
 // Default configuration constants
 const DEFAULTS = {
@@ -171,4 +171,4 @@ function parseBool(value: unknown): boolean | undefined {
 }
 
 // Re-export unified plugin for direct usage
-export { securityPlugin, type SecurityPluginOptions } from '$lib/auth/security';
+export { securityPlugin, type SecurityPluginOptions } from '#lib/auth/security/index.js';

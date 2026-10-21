@@ -20,7 +20,7 @@ import { getDatabaseOptions } from './options/database';
 import { getUserOptions } from './options/user';
 import { getSocialProviders } from './options/socials';
 import { databaseHooks } from './options/databaseHooks';
-import { getServerEnv } from '$lib/auth/shared/env';
+import { getServerEnv } from '#lib/auth/shared/env/index.js';
 
 const env = await getServerEnv();
 

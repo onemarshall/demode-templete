@@ -7,7 +7,7 @@
 
 import { creem } from '@creem_io/better-auth';
 import type { BetterAuthPlugin } from 'better-auth';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 interface CreemEnv {
 	CREEM_API_KEY?: string;

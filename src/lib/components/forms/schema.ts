@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { config, validationMessages } from '$lib/components/forms/config';
+import { config, validationMessages } from '#lib/components/forms/config.js';
 
 const { password } = config;
 const messages = validationMessages;

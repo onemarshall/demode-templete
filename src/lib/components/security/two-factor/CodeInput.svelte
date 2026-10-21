@@ -1,7 +1,7 @@
 <!-- src/lib/components/auth/CodeInput.svelte -->
 <script lang="ts">
-	import { Input } from "$lib/components/ui/input";
-	import * as InputOTP from "$lib/components/ui/input-otp/index.js";
+	import { Input } from "#lib/components/ui/input/index.js";
+	import * as InputOTP from "#lib/components/ui/input-otp/index.js";
 	import { PinInput } from "bits-ui";
 
 	type VerificationMethod = "totp" | "otp" | "backup";

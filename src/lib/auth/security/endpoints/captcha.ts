@@ -6,7 +6,7 @@
 
 import { createAuthEndpoint, getSessionFromCtx } from 'better-auth/api';
 import { z } from 'zod';
-import { securityLogger } from '$lib/auth/shared/logger';
+import { securityLogger } from '#lib/auth/shared/logger.js';
 import { getClientIp, getIdentifier, generateToken } from '../core/helpers';
 import type { SecurityConfig, CaptchaFeatureConfig } from '../core/feature';
 import { createStorageAdapter, type StorageAdapter } from '../core/storage';

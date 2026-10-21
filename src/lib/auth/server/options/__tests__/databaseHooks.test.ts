@@ -1,21 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { databaseHooks } from '../databaseHooks';
-import { getServerEnv } from '$lib/auth/shared/env';
+import { getServerEnv } from '#lib/auth/shared/env/index.js';
 
 const mockGetDirectusCMSProvider = vi.fn();
 
 // Mock dependencies
-vi.mock('$lib/auth/shared/env', () => ({
+vi.mock('#lib/auth/shared/env/index.js', () => ({
 	getServerEnv: vi.fn()
 }));
 
-vi.mock('$lib/auth/server/plugins/cms', () => ({
+vi.mock('#lib/auth/server/plugins/cms.js', () => ({
 	getDirectusCMSProvider: () => mockGetDirectusCMSProvider()
 }));
 
 // Mock the dynamically imported service
 const mockSyncUser = vi.fn();
-vi.mock('$lib/server/directus/sync', () => ({
+vi.mock('#lib/server/directus/sync', () => ({
 	directusUserService: {
 		syncUser: (...args: unknown[]) => mockSyncUser(...args)
 	}

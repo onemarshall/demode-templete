@@ -2,12 +2,12 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import type { PageData, ActionData } from './$types';
 	import type { SubmitFunction } from '$app/forms';
-	import UserTable from '$lib/components/users/UserTable.svelte';
-	import UserModal from '$lib/components/users/UserModal.svelte';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { Button } from '$lib/components/ui/button';
-	import * as Select from '$lib/components/ui/select';
-	import type { UserListItem } from '$lib/components/users/types';
+	import UserTable from '#lib/components/users/UserTable.svelte';
+	import UserModal from '#lib/components/users/UserModal.svelte';
+	import * as Dialog from '#lib/components/ui/dialog/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import * as Select from '#lib/components/ui/select/index.js';
+	import type { UserListItem } from '#lib/components/users/types.js';
 
 	interface Props {
 		data: PageData;

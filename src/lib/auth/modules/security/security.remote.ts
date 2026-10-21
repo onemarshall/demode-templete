@@ -7,8 +7,8 @@
 import { command } from '$app/server';
 import { error } from '@sveltejs/kit';
 import * as z from 'zod';
-import { securityLogger } from '$lib/auth/shared/logger';
-import { requireAuth } from '$lib/auth/server/auth-helpers';
+import { securityLogger } from '#lib/auth/shared/logger.js';
+import { requireAuth } from '#lib/auth/server/auth-helpers.js';
 
 // ============================================
 // Security Remote Commands

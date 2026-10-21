@@ -10,7 +10,7 @@ import type { SecurityFeature, SecurityConfig, FeatureResult } from '../../core/
 import type { SecurityContext } from '../../core/context';
 import type { CaptchaFeatureConfig, CaptchaVerifyResult } from './types';
 import { FEATURE_PRIORITY } from '../../core/feature';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 import { hashUserAgent } from '../../core/helpers';
 import { positiveRiskFactors } from '../../core/risk-engine';
 import { validateBypassToken, issueBypassToken } from '../../endpoints/captcha';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { UserListItem, UserTableProps } from './types';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '#lib/components/ui/button/index.js';
 
 	let {
 		users = [],

@@ -8,9 +8,9 @@
  */
 
 import { z } from 'zod';
-import { securityLogger } from '$lib/auth/shared/logger';
+import { securityLogger } from '#lib/auth/shared/logger.js';
 import { getRiskLevel } from '../core/risk-engine';
-import { getSharedRedisClient, type ManagedRedisClient } from '$lib/auth/shared/redis';
+import { getSharedRedisClient, type ManagedRedisClient } from '#lib/auth/shared/redis/index.js';
 import { securityConfig } from '../config';
 import type { SecurityContext } from '../core/context';
 

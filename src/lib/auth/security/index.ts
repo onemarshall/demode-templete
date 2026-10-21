@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { betterAuth } from 'better-auth';
- * import { securityPlugin } from '$lib/auth/security';
+ * import { securityPlugin } from '#lib/auth/security/index.js';
  *
  * export const auth = betterAuth({
  *   plugins: [

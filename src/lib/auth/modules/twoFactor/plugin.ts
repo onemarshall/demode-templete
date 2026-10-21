@@ -5,8 +5,8 @@
 import { twoFactor } from 'better-auth/plugins/two-factor';
 import type { BetterAuthPlugin } from 'better-auth';
 import type { User } from 'better-auth';
-import { logger } from '$lib/auth/shared/logger';
-import { sendOTPEmail } from '$lib/auth/server/email';
+import { logger } from '#lib/auth/shared/logger.js';
+import { sendOTPEmail } from '#lib/auth/server/email/index.js';
 
 interface TwoFactorEnv {
 	AUTH_2FA_PLUGIN?: boolean;

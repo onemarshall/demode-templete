@@ -1,5 +1,5 @@
 // Deprecated: relocated to $lib/components/profile/utils/avatar
-export { getResizedAvatarUrl, getAvatarInitials } from '$lib/components/profile/utils/avatar';
+export { getResizedAvatarUrl, getAvatarInitials } from '#lib/components/profile/utils/avatar.js';
 
 /**
  * Checks if a URL is a Directus asset URL

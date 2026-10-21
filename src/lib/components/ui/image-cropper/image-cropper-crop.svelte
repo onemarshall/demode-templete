@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type ButtonElementProps, Button } from '$lib/components/ui/button';
+	import { type ButtonElementProps, Button } from '#lib/components/ui/button/index.js';
 	import { useImageCropperCrop } from './image-cropper.svelte.js';
 	import CropIcon from '@lucide/svelte/icons/crop';
 

@@ -117,7 +117,7 @@ REDIS_URL; // Redis connection URL (alternative)
 ### Validating Environment Variables
 
 ```typescript
-import { validateEnv, serverEnvSchema } from '$lib/shared/config/env-schema';
+import { validateEnv, serverEnvSchema } from '#lib/shared/config/env-schema';
 
 // Validate and get typed environment object
 const env = validateEnv(process.env, serverEnvSchema, 'Server');
@@ -150,7 +150,7 @@ import {
 	isRedisConfigured,
 	isDevelopmentMode,
 	isProductionMode
-} from '$lib/auth/shared/env';
+} from '#lib/auth/shared/env/index.js';
 
 // Check specific features
 if (isFeatureEnabled('GITHUB_CLIENT_ID')) {
@@ -188,7 +188,7 @@ if (isProductionMode()) {
 Redact sensitive values for logging:
 
 ```typescript
-import { getSafeEnvLog } from '$lib/shared/config/env-schema';
+import { getSafeEnvLog } from '#lib/shared/config/env-schema';
 
 const safeEnv = getSafeEnvLog(process.env);
 // Sensitive keys are redacted: [REDACTED:string:32chars]
@@ -288,7 +288,7 @@ CMS_PROVIDER="directus"
 To test environment validation:
 
 ```typescript
-import { validateEnv, serverEnvSchema } from '$lib/shared/config/env-schema';
+import { validateEnv, serverEnvSchema } from '#lib/shared/config/env-schema';
 
 // Test valid environment
 const validEnv = {
@@ -321,14 +321,14 @@ If you're updating from the old environment system:
 2. **New**: Use validated schemas
 
    ```typescript
-   import { validateEnv, serverEnvSchema } from '$lib/shared/config/env-schema';
+   import { validateEnv, serverEnvSchema } from '#lib/shared/config/env-schema';
    const env = validateEnv(process.env, serverEnvSchema, 'Server');
    const secret = env.BETTER_AUTH_SECRET; // typed string
    ```
 
 3. **Startup**: Add validation check
    ```typescript
-   import { validateServerEnvOnStartup } from '$lib/server/utils/env-startup-check';
+   import { validateServerEnvOnStartup } from '#lib/server/utils/env-startup-check';
    const env = validateServerEnvOnStartup();
    ```
 

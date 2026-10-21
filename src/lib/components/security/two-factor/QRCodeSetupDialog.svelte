@@ -1,13 +1,13 @@
 <!-- src/lib/components/profile/security/TwoFactorManager/components/QRCodeSetupDialog.svelte -->
 <script lang="ts">
-	import * as Dialog from "$lib/components/ui/dialog/index.js";
-	import * as Form from "$lib/components/ui/form";
-	import { Button } from "$lib/components/ui/button/index.js";
-	import * as InputOTP from "$lib/components/ui/input-otp";
+	import * as Dialog from "#lib/components/ui/dialog/index.js";
+	import * as Form from "#lib/components/ui/form/index.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import * as InputOTP from "#lib/components/ui/input-otp/index.js";
 	import { PinInput } from "bits-ui";
 	import { superForm } from "sveltekit-superforms";
 	import { zod4Client } from "sveltekit-superforms/adapters";
-	import { twoFactorVerificationSchema } from "$lib/components/forms/schema";
+	import { twoFactorVerificationSchema } from "#lib/components/forms/schema.js";
 	import { slide } from "svelte/transition";
 
 	interface Props {

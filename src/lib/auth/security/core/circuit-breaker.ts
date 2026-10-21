@@ -6,7 +6,7 @@
  * closed, open, and half-open states.
  */
 
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 // ============================================
 // Types

@@ -6,7 +6,7 @@
 
 import { lastLoginMethod } from 'better-auth/plugins';
 import type { BetterAuthPlugin } from 'better-auth';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 interface LastLoginMethodEnv {
 	AUTH_LAST_LOGIN_METHOD_ENABLED?: boolean;

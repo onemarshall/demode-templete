@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-vi.mock('$lib/auth/shared/env', () => ({
+vi.mock('#lib/auth/shared/env/index.js', () => ({
 	getServerEnvSync: () => ({
 		BETTER_AUTH_SECRET: 'test-secret',
 		PUBLIC_SITE_URL: 'http://localhost:3000'

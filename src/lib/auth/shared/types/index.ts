@@ -6,7 +6,7 @@
  */
 
 // Core auth types (from Better Auth inference)
-export type { User, Session } from '$lib/auth/server';
+export type { User, Session } from '#lib/auth/server/index.js';
 
 // Form data types
 export * from './forms';

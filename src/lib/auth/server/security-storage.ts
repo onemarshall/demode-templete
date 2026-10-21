@@ -1,5 +1,5 @@
-import { createStorageAdapter, type StorageAdapter } from '$lib/auth/security/core/storage';
-import { setSharedStorageAdapter } from '$lib/auth/security/services/redis';
+import { createStorageAdapter, type StorageAdapter } from '#lib/auth/security/core/storage.js';
+import { setSharedStorageAdapter } from '#lib/auth/security/services/redis.js';
 
 let _adapter: StorageAdapter | null = null;
 

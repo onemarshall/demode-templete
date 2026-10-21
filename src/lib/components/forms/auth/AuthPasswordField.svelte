@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Label } from "$lib/components/ui/label";
-	import { PasswordInput } from "$lib/components/ui/password-input";
+	import { Label } from "#lib/components/ui/label/index.js";
+	import { PasswordInput } from "#lib/components/ui/password-input/index.js";
 	type FieldIssue = {
 		message: string;
 	};

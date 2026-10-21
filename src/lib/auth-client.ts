@@ -2,7 +2,7 @@
  * Canonical auth client entry point.
  *
  * This is the single source of truth for the Better Auth client instance,
- * its plugins, and initialization lifecycle. Import from `$lib/auth-client`
+ * its plugins, and initialization lifecycle. Import from `#lib/auth-client.js`
  * throughout the app.
  */
 
@@ -18,15 +18,15 @@ import {
 } from 'better-auth/client/plugins';
 import { creemClient } from '@creem_io/better-auth/client';
 
-import { publicEnv } from '$lib/auth/shared/env';
-import type { auth } from '$lib/auth/server/config';
+import { publicEnv } from '#lib/auth/shared/env/index.js';
+import type { auth } from '#lib/auth/server/config.js';
 
 import {
 	createFetchWrapper,
 	initializeSessionManagement
-} from '$lib/auth/client/helpers';
+} from '#lib/auth/client/helpers.js';
 
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 // ============================================
 // Types
@@ -59,7 +59,7 @@ const SECURITY_PLUGINS: PluginConfig[] = [
 		envKey: 'PUBLIC_AUTH_SECURITY_PLUGIN',
 		name: 'security',
 		loader: async () => {
-			const m = await import('$lib/auth/security/client/standalone');
+			const m = await import('#lib/auth/security/client/standalone.js');
 			return m.security;
 		}
 	}
@@ -159,4 +159,4 @@ export function isAuthInitialized(): boolean {
 }
 
 // Unified security client (re-export for convenience)
-export { security, createSecurityClient, getSecurityClient } from '$lib/auth/security/client';
+export { security, createSecurityClient, getSecurityClient } from '#lib/auth/security/client/index.js';

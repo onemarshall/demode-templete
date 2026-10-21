@@ -12,7 +12,7 @@
 
 import type { BetterAuthPlugin } from 'better-auth';
 import { oneTimeToken } from 'better-auth/plugins/one-time-token';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 interface OneTimeTokenEnv {
 	AUTH_ONE_TIME_TOKEN_ENABLED?: boolean;

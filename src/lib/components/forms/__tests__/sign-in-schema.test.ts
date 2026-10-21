@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { signInSchema } from '$lib/components/forms/schema';
+import { signInSchema } from '#lib/components/forms/schema.js';
 
 /**
  * Sign-in schema unit tests to ensure baseline validation rules are enforced.

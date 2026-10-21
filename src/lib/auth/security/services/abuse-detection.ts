@@ -5,7 +5,7 @@
  * Consolidated from archived abuse-protection plugin.
  */
 
-import { logger, enhancedLogger } from '$lib/auth/shared/logger';
+import { logger, enhancedLogger } from '#lib/auth/shared/logger.js';
 import { securityConfig } from '../config';
 import { getRedis } from './redis';
 import { getClientIp as getSharedClientIp } from '../shared/client-ip';

@@ -9,7 +9,7 @@
 
 import { createAuthMiddleware } from 'better-auth/api';
 import type { HookEndpointContext } from 'better-auth';
-import { securityLogger } from '$lib/auth/shared/logger';
+import { securityLogger } from '#lib/auth/shared/logger.js';
 import { getSecurityContext, type SecurityContext } from '../core/context';
 import { getEnabledFeatures, type SecurityConfig, type SecurityFeature } from '../core/feature';
 

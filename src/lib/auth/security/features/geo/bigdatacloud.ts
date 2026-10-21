@@ -6,7 +6,7 @@
  */
 
 import type { GeoLocation, IPReputation, GeoFeatureConfig } from './types';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 import { CircuitBreaker } from '../../core/circuit-breaker';
 
 const API_TIMEOUT_MS = 5000;

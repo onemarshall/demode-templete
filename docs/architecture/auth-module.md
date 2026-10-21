@@ -52,7 +52,7 @@ Each module under `modules/` follows the same pattern: an `index.ts` barrel, a `
 `server/email/` provides a unified interface for transactional email across providers (Resend, Usesend, Mock). Initialize from env config and send via the shared `sendEmail` API:
 
 ```typescript
-import { createEmailProvider, initializeEmail } from '$lib/auth/server/email';
+import { createEmailProvider, initializeEmail } from '#lib/auth/server/email/index.js';
 
 const emailProvider = initializeEmail({
 	provider: 'resend',
@@ -75,7 +75,7 @@ Templates cover email verification, password reset, and OTP codes.
 `server/plugins/` assembles Better Auth plugins, with security features toggled by environment variables:
 
 ```typescript
-import { buildSecurityPlugins } from '$lib/auth/server/plugins';
+import { buildSecurityPlugins } from '#lib/auth/server/plugins/index.js';
 
 const securityPlugins = buildSecurityPlugins(env);
 ```
@@ -87,7 +87,7 @@ Features include CAPTCHA, rate limiting, temporary blocking, bot detection, beha
 `shared/env/` defines a Zod schema for all auth-related env vars:
 
 ```typescript
-import { fullEnvSchema } from '$lib/auth/shared/env';
+import { fullEnvSchema } from '#lib/auth/shared/env/index.js';
 
 const env = fullEnvSchema.parse(process.env);
 ```
@@ -107,7 +107,7 @@ Production validation is strict; development falls back to sensible defaults. Se
 `modules/siwe/` provides Ethereum wallet authentication: nonce generation, message signing/verification, ENS lookups, and multi-chain support (Ethereum, Polygon, Arbitrum, Base).
 
 ```typescript
-import { buildSIWEPlugin } from '$lib/auth/modules/siwe';
+import { buildSIWEPlugin } from '#lib/auth/modules/siwe/index.js';
 
 const siwePlugin = buildSIWEPlugin(env);
 ```
@@ -122,7 +122,7 @@ Relevant env vars:
 Server-side helpers:
 
 ```typescript
-import { generateNonceForWallet, verifySignature } from '$lib/auth/modules/siwe';
+import { generateNonceForWallet, verifySignature } from '#lib/auth/modules/siwe/index.js';
 
 const { nonce, expiresAt } = await generateNonceForWallet(walletAddress, chainId);
 const result = await verifySignature(message, signature, walletAddress, chainId);
@@ -131,7 +131,7 @@ const result = await verifySignature(message, signature, walletAddress, chainId)
 Client-side flow:
 
 ```typescript
-import { createSIWEClient } from '$lib/auth/modules/siwe';
+import { createSIWEClient } from '#lib/auth/modules/siwe/index.js';
 
 const siweClient = createSIWEClient();
 const result = await siweClient.authenticate(authClient, domain, statement);

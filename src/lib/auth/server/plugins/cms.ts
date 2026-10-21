@@ -4,11 +4,11 @@
  * Plugins for integrating with various CMS systems.
  */
 
-import type { FullEnv } from '$lib/auth/shared/env';
+import type { FullEnv } from '#lib/auth/shared/env/index.js';
 import type { BetterAuthPlugin } from 'better-auth';
-import type { CMSProvider, CMSProviderType, CMSConfig } from '$lib/auth/server/cms/types';
-import type { DirectusCMSProvider } from '$lib/auth/server/cms/providers/directus';
-import { logger } from '$lib/auth/shared/logger';
+import type { CMSProvider, CMSProviderType, CMSConfig } from '#lib/auth/server/cms/types.js';
+import type { DirectusCMSProvider } from '#lib/auth/server/cms/providers/directus/index.js';
+import { logger } from '#lib/auth/shared/logger.js';
 
 // Global CMS provider instance
 let cmsProvider: CMSProvider | null = null;
@@ -44,7 +44,7 @@ export async function buildCMSPlugin(
 		return null;
 	}
 
-	const { initializeCMS } = await import('$lib/auth/server/cms');
+	const { initializeCMS } = await import('#lib/auth/server/cms/index.js');
 
 	try {
 		const config = buildCMSConfig(env, cmsProviderType);
@@ -56,7 +56,7 @@ export async function buildCMSPlugin(
 
 		switch (cmsProviderType) {
 			case 'directus': {
-				const { directusSyncPlugin } = await import('$lib/auth/server/cms/providers/directus');
+				const { directusSyncPlugin } = await import('#lib/auth/server/cms/providers/directus/index.js');
 				const directusProvider = cmsProvider as DirectusCMSProvider;
 				plugin = directusSyncPlugin({ client: directusProvider.syncClient });
 				break;

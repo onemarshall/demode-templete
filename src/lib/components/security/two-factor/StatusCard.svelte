@@ -1,9 +1,9 @@
 <!-- src/lib/components/profile/security/TwoFactorManager/components/TwoFactorStatusCard.svelte -->
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Separator } from '$lib/components/ui/separator/index.js';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
+	import { Separator } from '#lib/components/ui/separator/index.js';
 	import { Shield, CheckCircle, XCircle, Key, Smartphone } from '@lucide/svelte';
 
 	interface TwoFactorState {

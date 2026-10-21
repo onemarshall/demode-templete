@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { authClient } from '$lib/auth-client';
-	import { Button } from '$lib/components/ui/button';
-	import { cn } from '$lib/utils.ts';
-	import { logger } from '$lib/auth/shared/logger';
+	import { authClient } from '#lib/auth-client.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { cn } from '#lib/utils.ts';
+	import { logger } from '#lib/auth/shared/logger.js';
 
 	type ButtonVariant = 'default' | 'link' | 'destructive' | 'outline' | 'secondary' | 'ghost';
 

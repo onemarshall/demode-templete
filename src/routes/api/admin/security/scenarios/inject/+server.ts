@@ -1,12 +1,12 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { auth } from '$lib/auth/server/config';
-import { isAdminUser, type SessionUser } from '$lib/auth/server/auth-helpers';
-import { isDevelopment } from '$lib/auth/shared/env';
-import { getDefaultCollector } from '$lib/auth/security/analytics';
-import { createSecurityContext } from '$lib/auth/security/core/context';
-import type { SecurityContext } from '$lib/auth/security/core/context';
-import type { RiskFactor, RiskLevel } from '$lib/auth/security/core/risk-engine';
+import { auth } from '#lib/auth/server/config.js';
+import { isAdminUser, type SessionUser } from '#lib/auth/server/auth-helpers.js';
+import { isDevelopment } from '#lib/auth/shared/env/index.js';
+import { getDefaultCollector } from '#lib/auth/security/analytics/index.js';
+import { createSecurityContext } from '#lib/auth/security/core/context.js';
+import type { SecurityContext } from '#lib/auth/security/core/context.js';
+import type { RiskFactor, RiskLevel } from '#lib/auth/security/core/risk-engine.js';
 
 export interface TestEvent {
 	type?: string;

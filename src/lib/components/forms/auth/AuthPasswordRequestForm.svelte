@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { authClient } from "$lib/auth-client";
-	import { logger, securityLogger } from "$lib/auth/shared/logger";
-	import { scheduleMessageClear } from "$lib/components/forms/auth-forms";
-	import { Button } from "$lib/components/ui/button";
-	import { Input } from "$lib/components/ui/input";
-	import { Label } from "$lib/components/ui/label";
+	import { authClient } from "#lib/auth-client.js";
+	import { logger, securityLogger } from "#lib/auth/shared/logger.js";
+	import { scheduleMessageClear } from "#lib/components/forms/auth-forms.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import { Input } from "#lib/components/ui/input/index.js";
+	import { Label } from "#lib/components/ui/label/index.js";
 	import { Loader, ArrowLeft, Mail } from "@lucide/svelte";
 	import AuthFormCard from "./AuthFormCard.svelte";
 	import AuthFormAlert from "./AuthFormAlert.svelte";

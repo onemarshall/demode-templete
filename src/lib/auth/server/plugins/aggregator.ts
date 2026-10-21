@@ -5,7 +5,7 @@
  */
 
 import type { BetterAuthPlugin } from 'better-auth';
-import type { FullEnv } from '$lib/auth/shared/env';
+import type { FullEnv } from '#lib/auth/shared/env/index.js';
 import { buildCorePlugins } from './core';
 import { buildSecurityPlugins } from './security';
 import { buildCMSPlugin } from './cms';

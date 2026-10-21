@@ -277,7 +277,7 @@ Boundaries:
 
 Forbidden imports (high-signal examples):
 
-- client-side code importing `'$lib/auth/server/*'`
+- client-side code importing `'#lib/auth/server/*'`
 - shared code importing DB drivers or server-only SvelteKit helpers unless explicitly server-scoped
 
 ## 6.4) Top Refactors (Ordered by Impact/Effort)

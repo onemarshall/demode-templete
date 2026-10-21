@@ -8,7 +8,7 @@ import { DirectusCMSProvider } from './providers/directus/index';
 import { StrapiCMSProvider } from './providers/strapi';
 import { PayloadCMSProvider } from './providers/payload';
 import { TempleCMSProvider } from './providers/temple';
-import { createProviderLogger } from '$lib/auth/shared/logger';
+import { createProviderLogger } from '#lib/auth/shared/logger.js';
 
 let cmsInstance: CMSProvider | null = null;
 

@@ -1,9 +1,9 @@
 //src/routes/api/auth/[...all]/+server.ts
-import { auth } from '$lib/auth';
+import { auth } from '#lib/auth.js';
 import { toSvelteKitHandler } from 'better-auth/svelte-kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import { isAuthDebugMode } from '$lib/auth/shared/env';
-import { logger } from '$lib/auth/shared/logger';
+import { isAuthDebugMode } from '#lib/auth/shared/env/index.js';
+import { logger } from '#lib/auth/shared/logger.js';
 
  function getSafeRequestLog(headers: Headers) {
 	return {

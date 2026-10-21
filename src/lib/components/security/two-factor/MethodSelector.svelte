@@ -1,6 +1,6 @@
 <!-- src/lib/components/auth/VerificationMethodSelector.svelte -->
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import { Smartphone, Mail, Key } from '@lucide/svelte';
 
 	type VerificationMethod = 'totp' | 'otp' | 'backup';

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { authClient } from '$lib/auth-client';
-	import { logger, securityLogger } from '$lib/auth/shared/logger';
-	import { scheduleMessageClear } from '$lib/components/forms/auth-forms';
-	import { Button } from '$lib/components/ui/button';
-	import { Label } from '$lib/components/ui/label';
-	import { PasswordInput } from '$lib/components/ui/password-input';
+	import { authClient } from '#lib/auth-client.js';
+	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
+	import { scheduleMessageClear } from '#lib/components/forms/auth-forms.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
+	import { PasswordInput } from '#lib/components/ui/password-input/index.js';
 	import { Loader, ArrowLeft, Lock } from '@lucide/svelte';
 	import AuthFormCard from './AuthFormCard.svelte';
 	import AuthFormAlert from './AuthFormAlert.svelte';
@@ -59,10 +59,10 @@
 			title: 'Change Password',
 			description: 'Enter your current password and choose a new secure password',
 			invalidTokenDescription: '',
-			redirectTo: '/auth/profile',
-			successMessage: 'Password changed successfully! Redirecting to profile...',
-			backHref: '/auth/profile',
-			backLabel: 'Back to Profile',
+			redirectTo: '/auth/security',
+			successMessage: 'Password changed successfully! Redirecting to security settings...',
+			backHref: '/auth/security',
+			backLabel: 'Back to Security',
 			submitLabel: 'Change Password',
 			submitLoadingLabel: 'Changing Password...',
 		},
@@ -70,10 +70,10 @@
 			title: 'Set Password',
 			description: 'Create a password to enable email + password sign-in',
 			invalidTokenDescription: '',
-			redirectTo: '/auth/profile',
-			successMessage: 'Password set successfully! Redirecting to profile...',
-			backHref: '/auth/profile',
-			backLabel: 'Back to Profile',
+			redirectTo: '/auth/security',
+			successMessage: 'Password set successfully! Redirecting to security settings...',
+			backHref: '/auth/security',
+			backLabel: 'Back to Security',
 			submitLabel: 'Set Password',
 			submitLoadingLabel: 'Setting Password...',
 		},

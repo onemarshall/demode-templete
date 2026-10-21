@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Button } from "$lib/components/ui/button";
-	import * as Alert from "$lib/components/ui/alert";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import * as Alert from "#lib/components/ui/alert/index.js";
 	import { Loader, Boxes, CircleAlert } from "@lucide/svelte";
-	import { logger, securityLogger } from "$lib/auth/shared/logger";
-	import { publicEnv } from "$lib/auth/shared/env";
+	import { logger, securityLogger } from "#lib/auth/shared/logger.js";
+	import { publicEnv } from "#lib/auth/shared/env/index.js";
 	import { onMount, onDestroy } from "svelte";
 
 	// Types

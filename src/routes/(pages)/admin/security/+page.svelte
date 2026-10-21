@@ -1,7 +1,7 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card'
-	import * as Alert from '$lib/components/ui/alert/index.js'
-	import { Button } from '$lib/components/ui/button'
+	import * as Card from '#lib/components/ui/card/index.js'
+	import * as Alert from '#lib/components/ui/alert/index.js'
+	import { Button } from '#lib/components/ui/button/index.js'
 	import { dev } from '$app/env'
 	import { invalidateAll } from '$app/navigation'
 	import { onMount } from 'svelte'
@@ -41,7 +41,7 @@
 		type RecommendedActionItem,
 		type ActionsFilterState,
 		type SummaryCard,
-	} from '$lib/components/admin-security'
+	} from '#lib/components/admin-security/index.js'
 
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 

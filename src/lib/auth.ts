@@ -1,1 +1,1 @@
-export { auth as default, auth } from '$lib/auth/server/config';
+export { auth as default, auth } from '#lib/auth/server/config.js';

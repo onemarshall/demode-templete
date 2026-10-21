@@ -4,8 +4,8 @@
  * Social authentication provider configuration.
  */
 
-import { getServerEnv, type FullEnv } from '$lib/auth/shared/env';
-import { logger } from '$lib/auth/shared/logger';
+import { getServerEnv, type FullEnv } from '#lib/auth/shared/env/index.js';
+import { logger } from '#lib/auth/shared/logger.js';
 
 // In src/lib/server/auth/options/socials.ts
 export async function getSocialProviders(envOverride?: FullEnv) {

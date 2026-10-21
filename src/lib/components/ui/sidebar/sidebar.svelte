@@ -33,7 +33,7 @@
 	>
 		{@render children?.()}
 	</div>
-{:else if sidebar.isMobile}
+{:else}
 	<Sheet.Root bind:open={() => sidebar.openMobile, (v) => sidebar.setOpenMobile(v)} {...restProps}>
 		<Sheet.Content
 			bind:ref
@@ -56,7 +56,6 @@
 			</div>
 		</Sheet.Content>
 	</Sheet.Root>
-{:else}
 	<div
 		bind:this={ref}
 		class="group peer hidden text-sidebar-foreground md:block"

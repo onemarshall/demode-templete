@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import * as Alert from '$lib/components/ui/alert';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Loader, CircleCheck, CircleAlert } from '@lucide/svelte';
-	import { logger, securityLogger } from '$lib/auth/shared/logger';
+	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 
 	// Types
 	interface EthereumProvider {

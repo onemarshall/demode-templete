@@ -1,7 +1,7 @@
 // src/lib/auth/server/database/db.ts
 import { Pool, type PoolClient } from 'pg';
-import { getServerEnv } from '$lib/auth/shared/env';
-import { logger } from '$lib/auth/shared/logger';
+import { getServerEnv } from '#lib/auth/shared/env/index.js';
+import { logger } from '#lib/auth/shared/logger.js';
 
 let pool: Pool | null = null;
 let poolPromise: Promise<Pool> | null = null;

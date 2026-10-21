@@ -14,8 +14,8 @@ import type {
 	EmailTemplateKind,
 	TemplateDataMap
 } from './types';
-import { createProviderLogger } from '$lib/auth/shared/logger';
-import { publicEnv, type FullEnv } from '$lib/auth/shared/env';
+import { createProviderLogger } from '#lib/auth/shared/logger.js';
+import { publicEnv, type FullEnv } from '#lib/auth/shared/env/index.js';
 
 // ============================================
 // Constants & Helpers

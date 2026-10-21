@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { Button } from "$lib/components/ui/button";
+	import { Button } from "#lib/components/ui/button/index.js";
 	import { KeyRound, Plus, Loader } from "@lucide/svelte";
-	import { authClient } from "$lib/auth-client";
+	import { authClient } from "#lib/auth-client.js";
 	import { goto, invalidateAll } from "$app/navigation";
 	import { page } from "$app/state";
 	import { dev } from "$app/env";
-	import { publicEnv } from "$lib/auth/shared/env";
+	import { publicEnv } from "#lib/auth/shared/env/index.js";
 	import { createConsola } from "consola/browser";
-	import { securityLogger } from "$lib/auth/shared/logger";
+	import { securityLogger } from "#lib/auth/shared/logger.js";
 	import { describePasskeyError } from "./passkey-errors";
 
 	const logger = createConsola({
@@ -22,7 +22,7 @@
 	const MAX_RETRIES = 2;
 	const RETRY_DELAY = 1000;
 	const DEFAULT_DEVICE_NAME = "My Device";
-	const DEFAULT_REDIRECT = "/auth/sessions";
+	const DEFAULT_REDIRECT = "/auth/dashboard";
 
 	// Types
 	interface WebAuthnCapabilities {

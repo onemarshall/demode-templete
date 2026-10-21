@@ -10,9 +10,9 @@
 import { createAuthEndpoint, sessionMiddleware } from 'better-auth/api';
 import { z } from 'zod';
 import { getAllFeatureCacheStats } from '../core/feature';
-import { isAdminUser } from '$lib/auth/shared/roles';
+import { isAdminUser } from '#lib/auth/shared/roles.js';
 import type { SecurityConfig } from '../core/feature';
-import { getSharedRedisClient, type ManagedRedisClient } from '$lib/auth/shared/redis';
+import { getSharedRedisClient, type ManagedRedisClient } from '#lib/auth/shared/redis/index.js';
 
 const REDIS_AVAILABLE = Boolean(process.env.REDIS_URL);
 

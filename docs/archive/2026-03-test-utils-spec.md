@@ -52,8 +52,8 @@ Note: `db` is exported so `setup.ts` can call `db.close()` in `afterAll`.
 
 | Alias | Current Target | New Target |
 |-------|---------------|------------|
-| `$lib/auth/server/config` | `src/test/mocks/server-config.ts` | `src/test/auth.ts` |
-| `$lib/auth` | `src/test/mocks/auth.ts` | `src/test/auth.ts` |
+| `#lib/auth/server/config` | `src/test/mocks/server-config.ts` | `src/test/auth.ts` |
+| `#lib/auth` | `src/test/mocks/auth.ts` | `src/test/auth.ts` |
 
 The existing `$test` alias (`path.resolve('src/test')`) means `$test/auth` resolves to `src/test/auth.ts` — no new alias needed for test imports.
 

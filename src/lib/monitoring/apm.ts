@@ -1,4 +1,4 @@
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 export interface SystemHealthPayload {
 	overallStatus: 'operational' | 'degraded' | 'critical';

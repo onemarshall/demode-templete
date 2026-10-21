@@ -4,8 +4,8 @@
 
 import { magicLink } from 'better-auth/plugins';
 import type { BetterAuthPlugin } from 'better-auth';
-import { logger } from '$lib/auth/shared/logger';
-import { sendMagicLinkEmail } from '$lib/auth/server/email';
+import { logger } from '#lib/auth/shared/logger.js';
+import { sendMagicLinkEmail } from '#lib/auth/server/email/index.js';
 
 interface MagicLinkEnv {
 	AUTH_MAGIC_LINK_PLUGIN?: boolean;

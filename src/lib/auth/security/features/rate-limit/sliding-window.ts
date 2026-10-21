@@ -7,12 +7,12 @@
 
 import type { RateLimitStatus } from './types';
 import { createStorageAdapter, type StorageAdapter } from '../../core/storage';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 let storageAdapter: StorageAdapter | null = null;
 
 // Redis-native client kept separately for Lua script path
-let nativeRedis: Awaited<ReturnType<typeof import('$lib/auth/shared/redis')['getSharedRedisClient']>> | null = null;
+let nativeRedis: Awaited<ReturnType<typeof import('#lib/auth/shared/redis')['getSharedRedisClient']>> | null = null;
 
 async function getStorage(): Promise<StorageAdapter> {
 	if (!storageAdapter) {
@@ -26,7 +26,7 @@ async function tryGetNativeRedis() {
 	const redisUrl = process.env.REDIS_URL;
 	if (!redisUrl) return null;
 	try {
-		const { getSharedRedisClient } = await import('$lib/auth/shared/redis');
+		const { getSharedRedisClient } = await import('#lib/auth/shared/redis/index.js');
 		nativeRedis = await getSharedRedisClient('RateLimitFeature');
 		return nativeRedis;
 	} catch {

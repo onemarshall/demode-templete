@@ -1,7 +1,7 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 import type { User as BetterAuthUser } from 'better-auth';
-import type { FraudAnalysis } from '$lib/auth/security/types';
-import type { SerializedSession, SerializedUser } from '$lib/auth/shared/types/serialized-auth';
+import type { FraudAnalysis } from '#lib/auth/security/types.js';
+import type { SerializedSession, SerializedUser } from '#lib/auth/shared/types/serialized-auth.js';
 
 // Global type declarations for the application
 declare global {

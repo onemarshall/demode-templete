@@ -12,7 +12,7 @@
  */
 
 import * as kitPublicEnv from '$app/env/public';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 import { publicEnvSchema, fullEnvSchema, validateEnv, getSafeEnvLog } from './env-schema';
 
 // Re-export types and utilities

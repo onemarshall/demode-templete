@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { logger, securityLogger } from '$lib/auth/shared/logger';
+import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 import { getRedis } from './redis';
 import { isValidIP, validatePagination, createSortComparator } from './helpers';
 

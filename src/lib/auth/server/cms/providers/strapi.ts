@@ -1,5 +1,5 @@
-import type { CMSProvider, CMSUser, CMSFile, CMSConfig } from '$lib/auth/server/cms/types';
-import { createProviderLogger } from '$lib/auth/shared/logger';
+import type { CMSProvider, CMSUser, CMSFile, CMSConfig } from '#lib/auth/server/cms/types.js';
+import { createProviderLogger } from '#lib/auth/shared/logger.js';
 import type { ConsolaInstance } from 'consola';
 
 interface StrapiUser {

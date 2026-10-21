@@ -28,7 +28,7 @@ yarn add redis
 Import from the shared utilities:
 
 ```typescript
-import { getSharedRedisClient } from '$lib/auth/shared/redis';
+import { getSharedRedisClient } from '#lib/auth/shared/redis/index.js';
 ```
 
 ### 3. Set Environment Variable
@@ -53,7 +53,7 @@ Each plugin has a `services/redis.ts` file that imports from the shared utils:
 ```typescript
 // src/lib/server/auth/security/plugins/abuse-protection/services/redis.ts
 
-import { getSharedRedisClient, type ManagedRedisClient } from '$lib/server/auth/security/utils';
+import { getSharedRedisClient, type ManagedRedisClient } from '#lib/server/auth/security/utils';
 
 let redisClient: ManagedRedisClient | null = null;
 
@@ -82,7 +82,7 @@ export function resetRedisClient(): void {
 
 import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 declare global {
 	var cleanupRegistered: boolean | undefined;
@@ -93,7 +93,7 @@ const cleanupHook: Handle = async ({ event, resolve }) => {
 		const cleanup = async () => {
 			logger.info('[Cleanup] Shutting down gracefully...');
 			try {
-				const { closeAllRedisClients } = await import('$lib/server/auth/security/utils');
+				const { closeAllRedisClients } = await import('#lib/server/auth/security/utils');
 				await closeAllRedisClients();
 				logger.info('[Cleanup] All Redis connections closed');
 			} catch (err) {
@@ -119,7 +119,7 @@ export const handle = sequence(cleanupHook /* other hooks */);
 // src/routes/api/health/+server.ts
 
 import { json } from '@sveltejs/kit';
-import { healthCheck, getActiveClientNames } from '$lib/server/auth/security/utils';
+import { healthCheck, getActiveClientNames } from '#lib/server/auth/security/utils';
 
 export async function GET() {
 	const redisHealth = await healthCheck();
@@ -214,7 +214,7 @@ For testing, you can reset individual plugin clients:
 
 ```typescript
 // In your test file
-import { resetRedisClient } from '$lib/server/auth/security/plugins/abuse-protection/services/redis';
+import { resetRedisClient } from '#lib/server/auth/security/plugins/abuse-protection/services/redis';
 
 beforeEach(() => {
 	resetRedisClient();
@@ -224,7 +224,7 @@ beforeEach(() => {
 Or close all clients between test suites:
 
 ```typescript
-import { closeAllRedisClients } from '$lib/server/auth/security/utils';
+import { closeAllRedisClients } from '#lib/server/auth/security/utils';
 
 afterAll(async () => {
 	await closeAllRedisClients();

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import { Shield, Wifi, WifiOff, RefreshCw, AlertTriangle, Ban, Activity } from '@lucide/svelte';
 	import { onMount, onDestroy } from 'svelte';
-	import { logger } from '$lib/auth/shared/logger';
+	import { logger } from '#lib/auth/shared/logger.js';
 
 	interface LiveThreat {
 		id: string;

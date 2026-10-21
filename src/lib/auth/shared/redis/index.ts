@@ -11,7 +11,7 @@
  *
  * Usage:
  * ```ts
- * import { getSharedRedisClient } from '$lib/auth/shared/redis';
+ * import { getSharedRedisClient } from '#lib/auth/shared/redis/index.js';
  *
  * const redis = await getSharedRedisClient('MyPlugin');
  * await redis.ensureConnected();
@@ -20,7 +20,7 @@
  */
 
 import { createClient, type RedisClientType } from 'redis';
-import { createScopedLogger, enhancedLogger } from '$lib/auth/shared/logger';
+import { createScopedLogger, enhancedLogger } from '#lib/auth/shared/logger.js';
 
 // ReturnType<typeof createClient> instantiates the generic signature with its
 // type-parameter *constraints*, which does not match the concrete client

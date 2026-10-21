@@ -1,7 +1,7 @@
 //lib/client/stores/two-factor.svelte.ts
-import { authClient } from '$lib/auth-client';
+import { authClient } from '#lib/auth-client.js';
 import { toast } from 'svelte-sonner';
-import { logger, securityLogger } from '$lib/auth/shared/logger';
+import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 import QRCode from 'qrcode';
 
 export function useTwoFactorState(user: typeof authClient.$Infer.Session.user) {

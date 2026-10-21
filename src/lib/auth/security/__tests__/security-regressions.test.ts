@@ -17,7 +17,7 @@ import { shouldProcessPath } from '../core/helpers';
 import { captchaFeature } from '../features/captcha';
 import { issueBypassToken } from '../endpoints/captcha';
 import { createSecurityContext, createTestSecurityContext } from '../core/context';
-import { isAdminUser } from '$lib/auth/shared/roles';
+import { isAdminUser } from '#lib/auth/shared/roles.js';
 import type { SecurityConfig } from '../core/feature';
 
 // ============================================

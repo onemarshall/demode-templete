@@ -6,7 +6,7 @@
  *
  * @example
  * ```ts
- * import { securityClient } from '$lib/auth/security/client';
+ * import { securityClient } from '#lib/auth/security/client/index.js';
  * ```
  */
 

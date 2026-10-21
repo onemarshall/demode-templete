@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { publicEnv } from '$lib/auth/shared/env';
+import { publicEnv } from '#lib/auth/shared/env/index.js';
 import type { SecurityDashboardConfig } from './dashboard-types';
 
 const configSchema = z.object({

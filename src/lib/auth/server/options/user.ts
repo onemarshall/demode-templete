@@ -5,7 +5,7 @@
  */
 
 import type { User as BetterAuthBaseUser } from 'better-auth';
-import { publicEnv } from '$lib/auth/shared/env';
+import { publicEnv } from '#lib/auth/shared/env/index.js';
 import { isAdminUser } from '../../shared/roles';
 const env = publicEnv;
 

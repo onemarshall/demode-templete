@@ -5,20 +5,20 @@
  */
 
 import type { BetterAuthPlugin } from 'better-auth';
-import type { FullEnv } from '$lib/auth/shared/env';
-import { logger } from '$lib/auth/shared/logger';
+import type { FullEnv } from '#lib/auth/shared/env/index.js';
+import { logger } from '#lib/auth/shared/logger.js';
 
 // Import module plugins
-import { AdminPlugin } from '$lib/auth/modules/admin';
-import { CreemPlugin } from '$lib/auth/modules/creem';
-import { EmailOTPPlugin } from '$lib/auth/modules/emailOTP';
-import { LastLoginMethodPlugin } from '$lib/auth/modules/lastLoginMethod';
-import { MagicLinkPlugin } from '$lib/auth/modules/magicLink';
-import { OAuthProxyPlugin } from '$lib/auth/modules/oauthProxy';
-import { OneTimeTokenPlugin } from '$lib/auth/modules/oneTimeToken';
-import { PasskeyPlugin } from '$lib/auth/modules/passkey';
-import { SIWEPlugin } from '$lib/auth/modules/siwe/plugin';
-import { TwoFactorPlugin } from '$lib/auth/modules/twoFactor';
+import { AdminPlugin } from '#lib/auth/modules/admin/index.js';
+import { CreemPlugin } from '#lib/auth/modules/creem/index.js';
+import { EmailOTPPlugin } from '#lib/auth/modules/emailOTP/index.js';
+import { LastLoginMethodPlugin } from '#lib/auth/modules/lastLoginMethod/index.js';
+import { MagicLinkPlugin } from '#lib/auth/modules/magicLink/index.js';
+import { OAuthProxyPlugin } from '#lib/auth/modules/oauthProxy/index.js';
+import { OneTimeTokenPlugin } from '#lib/auth/modules/oneTimeToken/index.js';
+import { PasskeyPlugin } from '#lib/auth/modules/passkey/index.js';
+import { SIWEPlugin } from '#lib/auth/modules/siwe/plugin.js';
+import { TwoFactorPlugin } from '#lib/auth/modules/twoFactor/index.js';
 
 // ============================================
 // Types
@@ -77,13 +77,13 @@ export function buildCorePlugins(env: FullEnv): BetterAuthPlugin[] {
 // Re-exports
 // ============================================
 
-export { AdminPlugin } from '$lib/auth/modules/admin';
-export { CreemPlugin } from '$lib/auth/modules/creem';
-export { EmailOTPPlugin } from '$lib/auth/modules/emailOTP';
-export { LastLoginMethodPlugin } from '$lib/auth/modules/lastLoginMethod';
-export { MagicLinkPlugin } from '$lib/auth/modules/magicLink';
-export { OAuthProxyPlugin } from '$lib/auth/modules/oauthProxy';
-export { OneTimeTokenPlugin } from '$lib/auth/modules/oneTimeToken';
-export { PasskeyPlugin } from '$lib/auth/modules/passkey';
-export { SIWEPlugin } from '$lib/auth/modules/siwe/plugin';
-export { TwoFactorPlugin } from '$lib/auth/modules/twoFactor';
+export { AdminPlugin } from '#lib/auth/modules/admin/index.js';
+export { CreemPlugin } from '#lib/auth/modules/creem/index.js';
+export { EmailOTPPlugin } from '#lib/auth/modules/emailOTP/index.js';
+export { LastLoginMethodPlugin } from '#lib/auth/modules/lastLoginMethod/index.js';
+export { MagicLinkPlugin } from '#lib/auth/modules/magicLink/index.js';
+export { OAuthProxyPlugin } from '#lib/auth/modules/oauthProxy/index.js';
+export { OneTimeTokenPlugin } from '#lib/auth/modules/oneTimeToken/index.js';
+export { PasskeyPlugin } from '#lib/auth/modules/passkey/index.js';
+export { SIWEPlugin } from '#lib/auth/modules/siwe/plugin.js';
+export { TwoFactorPlugin } from '#lib/auth/modules/twoFactor/index.js';

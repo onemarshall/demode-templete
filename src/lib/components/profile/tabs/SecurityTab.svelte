@@ -1,26 +1,25 @@
 <!-- src/lib/components/profile/SecurityTab.svelte -->
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Button } from '$lib/components/ui/button';
-	import { Badge } from '$lib/components/ui/badge';
-	import { Separator } from '$lib/components/ui/separator';
-	import * as Alert from '$lib/components/ui/alert/index.js';
-	import { Eye, Key, Loader, Mail, Shield, Smartphone } from '@lucide/svelte';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
+	import { Separator } from '#lib/components/ui/separator/index.js';
+	import * as Alert from '#lib/components/ui/alert/index.js';
+	import { Loader, Mail, MonitorSmartphone, Shield } from '@lucide/svelte';
 	import { goto } from '$app/navigation';
-	import TwoFactorManager from '$lib/components/security/two-factor/TwoFactorManager.svelte';
-	import PasskeyManager from '$lib/components/security/passkey/PasskeyManager.svelte';
-	import { authClient } from '$lib/auth-client';
-	import { logger, securityLogger } from '$lib/auth/shared/logger';
+	import TwoFactorManager from '#lib/components/security/two-factor/TwoFactorManager.svelte';
+	import PasskeyManager from '#lib/components/security/passkey/PasskeyManager.svelte';
+	import { authClient } from '#lib/auth-client.js';
+	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 	import type { User, Session } from 'better-auth';
-	import { publicEnv } from '$lib/auth/shared/env';
+	import { publicEnv } from '#lib/auth/shared/env/index.js';
 	interface Props {
 		user: User;
 		session: Session;
-		form: any;
 		isSiweLogin?: boolean;
 	}
 
-	let { user, session, form, isSiweLogin = false }: Props = $props();
+	let { user, session, isSiweLogin = false }: Props = $props();
 	let isVerificationLoading = $state(false);
 	let isPasskeyLoading = $state(false);
 	let error = $state('');
@@ -351,61 +350,35 @@
 		/>
 	{/if}
 
-	<!-- Login Activity -->
+	<!-- Sessions & Devices -->
 	<Card.Root>
 		<Card.Header>
 			<Card.Title class="flex items-center gap-2">
-				<Eye class="h-5 w-5" />
-				Login Activity
+				<MonitorSmartphone class="h-5 w-5" />
+				Sessions &amp; Devices
 			</Card.Title>
-			<Card.Description>Monitor your account's login activity and sessions.</Card.Description>
+			<Card.Description>
+				Monitor your login activity, active sessions, and trusted devices.
+			</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			<div class="flex items-center justify-between">
 				<div>
-					<h4 class="font-medium">Current Session</h4>
+					<h4 class="font-medium">Active Sessions</h4>
 					<p class="text-muted-foreground text-sm">
-						Started {new Date(session?.createdAt).toLocaleDateString()} at{' '}
-						{new Date(session?.createdAt).toLocaleTimeString()}
+						View and manage where you're signed in
 					</p>
-					{#if session?.ipAddress}
-						<p class="text-muted-foreground text-xs">
-							IP: {session.ipAddress}
-						</p>
-					{/if}
 				</div>
-				<Badge variant="success">Active</Badge>
+				<Button variant="outline" onclick={() => goto('/auth/sessions')}>Manage Sessions</Button>
 			</div>
 
 			<Separator />
 
 			<div class="flex items-center justify-between">
 				<div>
-					<h4 class="font-medium">All Sessions</h4>
+					<h4 class="font-medium">Trusted Devices</h4>
 					<p class="text-muted-foreground text-sm">
-						View and manage all your active sessions across devices
-					</p>
-				</div>
-				<Button variant="outline" onclick={() => goto('/auth/sessions')}>Manage Sessions</Button>
-			</div>
-		</Card.Content>
-	</Card.Root>
-
-	<!-- Trusted Devices -->
-	<Card.Root>
-		<Card.Header>
-			<Card.Title class="flex items-center gap-2">
-				<Smartphone class="h-5 w-5" />
-				Trusted Devices
-			</Card.Title>
-			<Card.Description>Manage devices you trust to skip 2FA verification.</Card.Description>
-		</Card.Header>
-		<Card.Content class="space-y-4">
-			<div class="flex items-center justify-between">
-				<div>
-					<h4 class="font-medium">Current Device</h4>
-					<p class="text-muted-foreground text-sm">
-						Mark this device as trusted to skip 2FA for 90 days
+						Manage devices that can skip 2FA verification
 					</p>
 				</div>
 				<Button variant="outline" onclick={() => goto('/auth/trusted-devices')}>

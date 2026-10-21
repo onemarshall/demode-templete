@@ -3,8 +3,8 @@
  */
 
 import type { SuperValidated } from 'sveltekit-superforms';
-import type { BetterAuthUser as BaseBetterAuthUser } from '$lib/auth/server/database/types';
-import type { ProfileSchema } from '$lib/components/forms/schema';
+import type { BetterAuthUser as BaseBetterAuthUser } from '#lib/auth/server/database/types.js';
+import type { ProfileSchema } from '#lib/components/forms/schema.js';
 
 /**
  * Extended BetterAuthUser with additional custom fields

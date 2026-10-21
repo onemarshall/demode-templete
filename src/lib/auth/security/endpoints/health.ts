@@ -7,7 +7,7 @@
 
 import { createAuthEndpoint, getSessionFromCtx } from 'better-auth/api';
 import { getAllFeatures, getAllFeatureCacheStats } from '../core/feature';
-import { isAdminUser } from '$lib/auth/shared/roles';
+import { isAdminUser } from '#lib/auth/shared/roles.js';
 import type { SecurityConfig } from '../core/feature';
 
 // ============================================

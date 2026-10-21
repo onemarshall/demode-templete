@@ -1,8 +1,8 @@
 <!-- src/lib/components/auth/AuthError.svelte -->
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Button } from '$lib/components/ui/button';
-	import * as Alert from '$lib/components/ui/alert';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { TriangleAlert, RefreshCw, House, LogIn } from '@lucide/svelte';
 
 	interface Props {

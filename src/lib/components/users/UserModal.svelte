@@ -9,18 +9,18 @@
 		revokeSession,
 		revokeAllSessions,
 		removeUser
-	} from '$lib/remote/admin.remote';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import * as Tabs from '$lib/components/ui/tabs';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { Switch } from '$lib/components/ui/switch';
+	} from '#lib/remote/admin.remote.js';
+	import * as Dialog from '#lib/components/ui/dialog/index.js';
+	import * as Tabs from '#lib/components/ui/tabs/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
+	import { Switch } from '#lib/components/ui/switch/index.js';
 	import type { UserDetail, SessionItem, DateLike } from './types';
-	import * as Alert from '$lib/components/ui/alert/index.js';
+	import * as Alert from '#lib/components/ui/alert/index.js';
 	import type { SubmitFunction } from '$app/forms';
 	import { formatDateTime, getInitials } from './utils';
-	import { logger } from '$lib/auth/shared/logger';
+	import { logger } from '#lib/auth/shared/logger.js';
 
 	interface Props {
 		open: boolean;

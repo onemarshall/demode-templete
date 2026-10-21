@@ -1,11 +1,11 @@
 <!-- src/lib/components/profile/security/TwoFactorManager/components/VerificationCodeForm.svelte -->
 <script lang="ts">
-	import * as Form from '$lib/components/ui/form';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
+	import * as Form from '#lib/components/ui/form/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
-	import { twoFactorVerificationSchema } from '$lib/components/forms/schema';
+	import { twoFactorVerificationSchema } from '#lib/components/forms/schema.js';
 	import { Loader } from '@lucide/svelte';
 
 	interface Props {

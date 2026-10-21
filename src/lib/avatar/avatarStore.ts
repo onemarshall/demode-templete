@@ -3,7 +3,7 @@
  * Centralizes all avatar-related UI state and operations
  */
 
-import { uploadAvatar, importAvatar, deleteAvatar } from '$lib/avatar/avatarService';
+import { uploadAvatar, importAvatar, deleteAvatar } from '#lib/avatar/avatarService.js';
 import { invalidateAll } from '$app/navigation';
 
 export interface AvatarState {

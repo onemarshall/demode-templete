@@ -1,11 +1,11 @@
 <!-- lib/components/forms/DeleteUserForm.svelte -->
 <script lang="ts">
-	import { authClient } from '$lib/auth-client';
+	import { authClient } from '#lib/auth-client.js';
 	import { goto } from '$app/navigation';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Alert from '$lib/components/ui/alert/index.js';
-	import { PasswordInput } from '$lib/components/ui/password-input';
-	import * as Dialog from '$lib/components/ui/alert-dialog/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import * as Alert from '#lib/components/ui/alert/index.js';
+	import { PasswordInput } from '#lib/components/ui/password-input/index.js';
+	import * as Dialog from '#lib/components/ui/alert-dialog/index.js';
 	import { Trash2, CircleAlertIcon, CircleCheckBig } from '@lucide/svelte';
 
 	type DeleteUserData = {

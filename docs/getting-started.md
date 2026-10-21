@@ -10,8 +10,8 @@
 ## Project Structure
 
 - `src/routes` — route files (`+page.svelte`, `+page.server.ts`, `+server.ts`)
-- `src/lib` — shared UI + utilities (import via `$lib`)
-- `src/lib/server` — server-only utilities (import via `$lib/server`)
+- `src/lib` — shared UI + utilities (import via `#lib`)
+- `src/lib/server` — server-only utilities (import via `#lib/server`)
 - `src/lib/auth` — auth, security, and Better Auth integration (see `docs/architecture/auth-module.md`)
 - `packages/` — workspace SDKs (e.g. `better-auth-directus`)
 

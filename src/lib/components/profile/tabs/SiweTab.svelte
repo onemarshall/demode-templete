@@ -1,13 +1,13 @@
 <!-- src/lib/components/profile/tabs/SiweTab.svelte -->
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Button } from '$lib/components/ui/button';
-	import { Badge } from '$lib/components/ui/badge';
-	import { Separator } from '$lib/components/ui/separator';
-	import * as Alert from '$lib/components/ui/alert/index.js';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
+	import { Separator } from '#lib/components/ui/separator/index.js';
+	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Copy, Check, Boxes, ExternalLink } from '@lucide/svelte';
-	import { authClient } from '$lib/auth-client';
-	import { logger, securityLogger } from '$lib/auth/shared/logger';
+	import { authClient } from '#lib/auth-client.js';
+	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 	import type { User } from 'better-auth';
 
 	interface Props {

@@ -7,7 +7,7 @@ _Generated: 2026-05-14_
 - **No LICENSE file**, `package.json` name is `better-auth-sveltekit5-example` and marked `private: true` — cannot publish or sell as-is.
 - **Auth pages are ~80% duplicated** across 6 files (2,272 lines total) — sign-in vs sign-up differ mainly by 3 strings and `signIn.email` → `signUp.email`. Easy 1,200+ line saving.
 - **`src/lib/auth/` is a kitchen sink** (1,400-line `security/services/sdk.ts`, 5 `.md` docs inside `security/`, 2 `.DS_Store` files committed, a `_template/` dir, an unimplemented S3 provider with TODOs).
-- **Two parallel auth-client import paths** coexist (`$lib/auth-client` ×36 vs `$lib/auth/client/config` ×5).
+- **Two parallel auth-client import paths** coexist (`#lib/auth-client` ×36 vs `$lib/auth/client/config` ×5).
 - **Creem guest-checkout endpoint creates real user accounts from unauthenticated POSTs with no rate-limit, captcha, or email-ownership proof.** `iamstudios.cc` is hardcoded in `csp.config.mjs` and `vite.config.ts`.
 
 ## Top 5 Prioritized Actions

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Radio, ShieldAlert, AlertTriangle, Ban, Info } from '@lucide/svelte';
-	import type { ThreatEvent } from '$lib/auth/security/services/sdk';
+	import type { ThreatEvent } from '#lib/auth/security/services/sdk.js';
 
 	let { threatFeed = [] }: { threatFeed: ThreatEvent[] } = $props();
 

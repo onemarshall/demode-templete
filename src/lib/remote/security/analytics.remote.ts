@@ -11,8 +11,8 @@
 import { query, command, getRequestEvent } from '$app/server'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
-import { SecurityDashboardSDK, SecurityDashboardError } from '$lib/auth/security/services'
-import { logger } from '$lib/auth/shared/logger'
+import { SecurityDashboardSDK, SecurityDashboardError } from '#lib/auth/security/services/index.js'
+import { logger } from '#lib/auth/shared/logger.js'
 
 // ============================================
 // Schemas

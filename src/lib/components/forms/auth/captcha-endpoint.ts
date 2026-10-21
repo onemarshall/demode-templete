@@ -1,4 +1,4 @@
-import { publicEnv } from '$lib/auth/shared/env';
+import { publicEnv } from '#lib/auth/shared/env/index.js';
 
 /**
  * Resolve the cap.js widget endpoint URL.

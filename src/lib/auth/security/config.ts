@@ -10,7 +10,7 @@
  * - Memoized temp block delay calculations
  */
 
-import { getServerEnvSync } from '$lib/auth/shared/env';
+import { getServerEnvSync } from '#lib/auth/shared/env/index.js';
 import {
 	getRiskLevel as coreGetRiskLevel,
 	shouldBlock as coreShouldBlock,

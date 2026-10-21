@@ -4,7 +4,7 @@
 
 **Goal:** Replace mocked auth with a real Better Auth instance backed by SQLite in-memory, using the `testUtils` plugin for test helpers.
 
-**Architecture:** A single test auth instance (`src/test/auth.ts`) using `better-sqlite3` with `:memory:` DB, `testUtils({ captureOTP: true })` plugin, and `cookiePrefix: 'iam-studio'`. Vitest aliases redirect `$lib/auth` and `$lib/auth/server/config` to this instance. Existing mock files for pg/redis/env stay to prevent real service imports.
+**Architecture:** A single test auth instance (`src/test/auth.ts`) using `better-sqlite3` with `:memory:` DB, `testUtils({ captureOTP: true })` plugin, and `cookiePrefix: 'iam-studio'`. Vitest aliases redirect `#lib/auth` and `$lib/auth/server/config` to this instance. Existing mock files for pg/redis/env stay to prevent real service imports.
 
 **Tech Stack:** Better Auth, better-sqlite3, Vitest, SvelteKit, TypeScript
 
@@ -152,12 +152,12 @@ Change these two aliases in `vitest.config.ts` resolve.alias:
 
 ```ts
 // BEFORE:
-'$lib/auth/server/config': path.resolve('src/test/mocks/server-config.ts'),
-'$lib/auth': path.resolve('src/test/mocks/auth.ts'),
+'#lib/auth/server/config': path.resolve('src/test/mocks/server-config.ts'),
+'#lib/auth': path.resolve('src/test/mocks/auth.ts'),
 
 // AFTER:
-'$lib/auth/server/config': path.resolve('src/test/auth.ts'),
-'$lib/auth': path.resolve('src/test/auth.ts'),
+'#lib/auth/server/config': path.resolve('src/test/auth.ts'),
+'#lib/auth': path.resolve('src/test/auth.ts'),
 ```
 
 - [ ] **Step 2: Add `pool: 'forks'` for test isolation**
@@ -204,7 +204,7 @@ process.env.REDIS_URL ??= 'redis://localhost:6379';
 process.env.REDIS_PASSWORD ??= 'test-redis-password';
 
 // Mock the analytics.remote module globally to avoid SSR evaluation issues
-vi.mock('$lib/auth/remote/security/analytics.remote', () => ({
+vi.mock('#lib/auth/remote/security/analytics.remote', () => ({
 	getDashboardMetrics: vi.fn(),
 	getSecuritySessions: vi.fn(),
 	getTrustedDevices: vi.fn(),
@@ -296,7 +296,7 @@ git commit -m "refactor: auth-system tests use testUtils plugin"
 **Files:**
 - Modify: `src/test/integration/auth-api.test.ts`
 
-This file imports `auth` from `$lib/auth` and helpers from `$test/helpers/test-utils`. It tests session management, password reset, 2FA endpoints with mocked auth API.
+This file imports `auth` from `#lib/auth` and helpers from `$test/helpers/test-utils`. It tests session management, password reset, 2FA endpoints with mocked auth API.
 
 - [ ] **Step 1: Read the current file**
 
@@ -306,7 +306,7 @@ Read `src/test/integration/auth-api.test.ts` in full.
 
 Replace:
 ```ts
-import { auth } from '$lib/auth';
+import { auth } from '#lib/auth.js';
 import { TestDatabaseHelper, createAuthHeaders, createTestUser } from '$test/helpers/test-utils';
 ```
 With:
@@ -338,7 +338,7 @@ git commit -m "refactor: auth-api integration tests use testUtils plugin"
 **Files:**
 - Modify: `src/test/security/auth-security.test.ts`
 
-Same pattern as Task 7. Imports `auth` from `$lib/auth` and helpers from `$test/helpers/test-utils`.
+Same pattern as Task 7. Imports `auth` from `#lib/auth` and helpers from `$test/helpers/test-utils`.
 
 - [ ] **Step 1: Read the current file**
 
@@ -370,7 +370,7 @@ git commit -m "refactor: auth-security tests use testUtils plugin"
 **Files:**
 - Modify: `src/test/plugins/auth-plugins.test.ts`
 
-Imports `auth` from `$lib/auth/server/config` and helpers from `$test/helpers/test-utils`.
+Imports `auth` from `#lib/auth/server/config` and helpers from `$test/helpers/test-utils`.
 
 - [ ] **Step 1: Read the current file**
 
@@ -378,7 +378,7 @@ Read `src/test/plugins/auth-plugins.test.ts` in full.
 
 - [ ] **Step 2: Replace imports and usage**
 
-Replace `$lib/auth/server/config` import with `$test/auth`. Replace helper usage with testUtils equivalents.
+Replace `#lib/auth/server/config` import with `$test/auth`. Replace helper usage with testUtils equivalents.
 
 - [ ] **Step 3: Run this test file**
 
@@ -434,7 +434,7 @@ git commit -m "refactor: auth-plugins-simple tests use testUtils plugin"
 **Files:**
 - Modify: `src/test/performance/auth-performance.test.ts`
 
-Imports `auth` from `$lib/auth` and helpers from `$test/helpers/test-utils`. Tests performance benchmarks.
+Imports `auth` from `#lib/auth` and helpers from `$test/helpers/test-utils`. Tests performance benchmarks.
 
 - [ ] **Step 1: Read the current file**
 
@@ -466,7 +466,7 @@ git commit -m "refactor: auth-performance tests use testUtils plugin with real S
 **Files:**
 - Modify: `src/test/+server.test.ts`
 
-This file tests the system health endpoint and mocks `$lib/auth/shared/env`, `$lib/auth/server/database/db`, etc. It does NOT import from `$test/helpers/test-utils`, but the `$lib/auth` alias change may affect it.
+This file tests the system health endpoint and mocks `#lib/auth/shared/env`, `$lib/auth/server/database/db`, etc. It does NOT import from `$test/helpers/test-utils`, but the `$lib/auth` alias change may affect it.
 
 - [ ] **Step 1: Read the current file**
 

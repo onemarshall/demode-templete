@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { BlockStatus, BlockingFeatureConfig } from './types';
 import { createStorageAdapter, type StorageAdapter } from '../../core/storage';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 import { CacheManager } from '../../core/cache';
 
 const tempBlockDataSchema = z.object({

@@ -1,5 +1,5 @@
 import { form, query, getRequestEvent } from '$app/server';
-import { getAdminApi } from '$lib/auth/server/admin-helpers';
+import { getAdminApi } from '#lib/auth/server/admin-helpers.js';
 import { z } from 'zod';
 import {
 	banUserSchema,
@@ -7,8 +7,8 @@ import {
 	setRoleSchema,
 	setPasswordSchema,
 	revokeSessionSchema
-} from '$lib/auth/shared/types/admin';
-import type { UserListItem, UserDetail, SessionItem } from '$lib/components/users/types';
+} from '#lib/auth/shared/types/admin.js';
+import type { UserListItem, UserDetail, SessionItem } from '#lib/components/users/types.js';
 
 interface AdminApi {
 	listUsers(input: {

@@ -2,19 +2,19 @@
 
 import { redirect, error } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { auth } from '$lib/auth/server/config';
-import { isAdminUser, type SessionUser } from '$lib/auth/server/auth-helpers';
-import { logger, enhancedLogger } from '$lib/auth/shared/logger';
+import { auth } from '#lib/auth/server/config.js';
+import { isAdminUser, type SessionUser } from '#lib/auth/server/auth-helpers.js';
+import { logger, enhancedLogger } from '#lib/auth/shared/logger.js';
 import {
 	getSecurityDashboard,
 	blockIp as blockIpCommand,
 	unblockIp as unblockIpCommand,
 	clearMetricsCache as clearRemoteMetricsCache
-} from '$lib/remote';
+} from '#lib/remote/index.js';
 import {
 	getDefaultCollector,
 	clearMetricsCache as clearLocalMetricsCache
-} from '$lib/auth/security/analytics';
+} from '#lib/auth/security/analytics/index.js';
 
 async function requireAdmin(request: Request): Promise<SessionUser> {
 	const session = await auth.api.getSession({ headers: request.headers });

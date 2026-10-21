@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { authClient } from "$lib/auth-client";
-	import { publicEnv } from "$lib/auth/shared/env";
-	import { logger, securityLogger } from "$lib/auth/shared/logger";
-	import { scheduleMessageClear } from "$lib/components/forms/auth-forms";
-	import { Button } from "$lib/components/ui/button";
-	import { Input } from "$lib/components/ui/input";
-	import { Label } from "$lib/components/ui/label";
-	import { Alert, AlertDescription } from "$lib/components/ui/alert";
-	import * as InputOTP from "$lib/components/ui/input-otp/index.js";
+	import { authClient } from "#lib/auth-client.js";
+	import { publicEnv } from "#lib/auth/shared/env/index.js";
+	import { logger, securityLogger } from "#lib/auth/shared/logger.js";
+	import { scheduleMessageClear } from "#lib/components/forms/auth-forms.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import { Input } from "#lib/components/ui/input/index.js";
+	import { Label } from "#lib/components/ui/label/index.js";
+	import { Alert, AlertDescription } from "#lib/components/ui/alert/index.js";
+	import * as InputOTP from "#lib/components/ui/input-otp/index.js";
 	import { PinInput } from "bits-ui";
 	import { Mail, Loader, CircleCheck, RefreshCw } from "@lucide/svelte";
 	import AuthFormCard from "./AuthFormCard.svelte";
@@ -19,7 +19,7 @@
 	type Props = {
 		title?: string;
 		description?: string;
-		/** Where to redirect after a successful code verification. Default: /auth/profile. */
+		/** Where to redirect after a successful code verification. Default: /auth/dashboard. */
 		redirectTo?: string;
 		/** Footer link below the card body. */
 		altLink?: { label: string; href: string; linkText: string };
@@ -33,7 +33,7 @@
 	let {
 		title = "Sign in with email code",
 		description = "We'll email you a 6-digit code to verify and sign you in.",
-		redirectTo = "/auth/profile",
+		redirectTo = "/auth/dashboard",
 		altLink = {
 			label: "Don't have an account?",
 			href: "/auth/sign-up",

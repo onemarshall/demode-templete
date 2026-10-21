@@ -8,19 +8,19 @@
 		Avatar,
 		AvatarImage,
 		AvatarFallback,
-	} from "$lib/components/ui/avatar";
-	import { Button } from "$lib/components/ui/button";
-	import { Badge } from "$lib/components/ui/badge";
+	} from "#lib/components/ui/avatar/index.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import { Badge } from "#lib/components/ui/badge/index.js";
 	import { Camera } from "@lucide/svelte";
 	import {
 		getResizedAvatarUrl,
 		getAvatarInitials,
-	} from "$lib/components/profile/utils/avatar";
-	import { createAvatarState } from "$lib/avatar/avatarStore";
+	} from "#lib/components/profile/utils/avatar.js";
+	import { createAvatarState } from "#lib/avatar/avatarStore.js";
 	import AvatarSourceDialog, {
 		type Props as AvatarSourceDialogProps,
-	} from "$lib/components/profile/AvatarSourceDialog.svelte";
-	import type { BetterAuthUser } from "$lib/components/profile/tabs/types";
+	} from "#lib/components/profile/AvatarSourceDialog.svelte";
+	import type { BetterAuthUser } from "#lib/components/profile/tabs/types.js";
 
 	interface Props {
 		user: BetterAuthUser;

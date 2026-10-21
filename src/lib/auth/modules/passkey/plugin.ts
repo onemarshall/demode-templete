@@ -4,7 +4,7 @@
 
 import { passkey } from '@better-auth/passkey';
 import type { BetterAuthPlugin } from 'better-auth';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 import { resolvePasskeyConfig } from './config';
 
 interface PasskeyEnv {

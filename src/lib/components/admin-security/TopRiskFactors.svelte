@@ -1,6 +1,6 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
 	import {
 		TrendingUp,
 		TriangleAlert,
@@ -10,7 +10,7 @@
 		Shield,
 		Activity
 	} from '@lucide/svelte';
-	import type { DashboardMetrics } from '$lib/auth/security/types';
+	import type { DashboardMetrics } from '#lib/auth/security/types.js';
 
 	let { metrics }: { metrics: DashboardMetrics } = $props();
 

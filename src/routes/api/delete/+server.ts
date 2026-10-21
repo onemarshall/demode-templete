@@ -1,7 +1,7 @@
 // src/routes/auth/delete/+server.ts
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { auth } from '$lib/auth';
-import { logger } from '$lib/auth/shared/logger';
+import { auth } from '#lib/auth.js';
+import { logger } from '#lib/auth/shared/logger.js';
 import type { User as BetterAuthUser } from 'better-auth';
 
 // Type guard to check if the response is a success

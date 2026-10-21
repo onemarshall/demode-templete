@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { ShieldOff, AlertTriangle, Clock } from '@lucide/svelte';
-	import type { RateLimitStats } from '$lib/auth/security/services/sdk';
+	import type { RateLimitStats } from '#lib/auth/security/services/sdk.js';
 
 	let { rateLimitStats = null }: { rateLimitStats: RateLimitStats | null } = $props();
 

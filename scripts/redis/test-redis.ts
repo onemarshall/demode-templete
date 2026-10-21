@@ -1,5 +1,5 @@
-import { createManagedRedisClient } from '$lib/server/auth/security/utils';
-import { logger } from '$lib/shared/logger';
+import { createManagedRedisClient } from '#lib/server/auth/security/utils';
+import { logger } from '#lib/shared/logger';
 
 async function testRedisConnection() {
 	const redis = createManagedRedisClient('test-client');

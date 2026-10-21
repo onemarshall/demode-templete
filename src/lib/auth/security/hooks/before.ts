@@ -9,7 +9,7 @@
 
 import { createAuthMiddleware, getSessionFromCtx } from 'better-auth/api';
 import type { HookEndpointContext } from 'better-auth';
-import { securityLogger } from '$lib/auth/shared/logger';
+import { securityLogger } from '#lib/auth/shared/logger.js';
 import {
 	createSecurityContext,
 	attachSecurityContext,
@@ -29,7 +29,7 @@ import {
 	type FeatureResult
 } from '../core/feature';
 import { shouldProcessPath, isDevelopment } from '../core/helpers';
-import { securityLogger as beforeHookLogger } from '$lib/auth/shared/logger';
+import { securityLogger as beforeHookLogger } from '#lib/auth/shared/logger.js';
 
 // ============================================
 // Types

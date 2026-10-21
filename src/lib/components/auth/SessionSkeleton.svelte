@@ -1,7 +1,7 @@
 <!-- src/lib/components/auth/SessionSkeleton.svelte -->
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Skeleton } from '$lib/components/ui/skeleton';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Skeleton } from '#lib/components/ui/skeleton/index.js';
 </script>
 
 <div class="container mx-auto max-w-6xl space-y-6 p-6">

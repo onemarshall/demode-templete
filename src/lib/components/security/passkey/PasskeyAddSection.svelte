@@ -1,18 +1,18 @@
 <!-- src/lib/components/profile/security/PasskeyManager/components/PasskeyAddSection.svelte -->
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import * as Form from '$lib/components/ui/form';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import * as Form from '#lib/components/ui/form/index.js';
 	import { Plus, KeyRound, Loader } from '@lucide/svelte';
-	import { authClient } from '$lib/auth-client';
+	import { authClient } from '#lib/auth-client.js';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
-	import { logger, securityLogger } from '$lib/auth/shared/logger';
-	import { passkeySchema } from '$lib/components/forms/schema';
+	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
+	import { passkeySchema } from '#lib/components/forms/schema.js';
 	import { PasskeyWebAuthnCheck } from './index';
 	import type { User } from 'better-auth';
-	import { createWebAuthnStore } from '$lib/auth/client/stores/webauthn.svelte.ts';
+	import { createWebAuthnStore } from '#lib/auth/client/stores/webauthn.svelte.ts';
 
 	interface Props {
 		user: User;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import { RefreshCcw, ShieldCheck, ShieldAlert, ShieldX } from '@lucide/svelte';
 	import type { SecurityStatus } from './derive-status';
 

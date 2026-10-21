@@ -1,9 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
-import { auth } from '$lib/auth';
-import { logger, securityLogger } from '$lib/auth/shared/logger';
+import { auth } from '#lib/auth.js';
+import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 import { Pool } from 'pg';
-import { getServerEnv } from '$lib/auth/shared/env';
+import { getServerEnv } from '#lib/auth/shared/env/index.js';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {

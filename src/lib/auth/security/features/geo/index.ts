@@ -12,7 +12,7 @@ import { FEATURE_PRIORITY } from '../../core/feature';
 import { fetchFromBigDataCloud, getDefaultReputation } from './bigdatacloud';
 import { assessGeoRisk } from './reputation';
 import { isPrivateIp } from '../../core/helpers';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 import { CacheManager, PendingRequests } from '../../core/cache';
 import { geoRiskFactors } from '../../core/risk-engine';
 

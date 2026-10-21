@@ -5,7 +5,7 @@
 import { siwe } from 'better-auth/plugins';
 import type { BetterAuthPlugin } from 'better-auth';
 import { getSIWEConfig, validateSIWEConfig } from './utils';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 interface SIWEEnv {
 	AUTH_SIWE_ENABLED?: boolean;

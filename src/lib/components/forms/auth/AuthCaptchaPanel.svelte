@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CapWidgetAdapter from '$lib/components/forms/shared/CapWidgetAdapter.svelte';
+	import CapWidgetAdapter from '#lib/components/forms/shared/CapWidgetAdapter.svelte';
 	import { computeCapEndpoint } from './captcha-endpoint';
 
 	type Props = {

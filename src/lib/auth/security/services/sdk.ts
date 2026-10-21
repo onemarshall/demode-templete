@@ -14,9 +14,9 @@
  * importers see no breaking change.
  */
 
-import { auth } from '$lib/auth';
-import { securityLogger as logger, enhancedLogger } from '$lib/auth/shared/logger';
-import { getDB } from '$lib/auth/server/database';
+import { auth } from '#lib/auth.js';
+import { securityLogger as logger, enhancedLogger } from '#lib/auth/shared/logger.js';
+import { getDB } from '#lib/auth/server/database/index.js';
 import type { FlaggedSession, TrustedDevice } from '../types';
 import {
 	getDefaultCollector,

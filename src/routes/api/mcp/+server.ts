@@ -13,8 +13,8 @@
 import { z } from 'zod';
 import { McpServer, createMcpHandler } from '@modelcontextprotocol/server';
 import { requireMcpAuth } from '@better-auth/mcp';
-import { auth } from '$lib/auth/server';
-import { getServerEnv } from '$lib/auth/shared/env';
+import { auth } from '#lib/auth/server/index.js';
+import { getServerEnv } from '#lib/auth/shared/env/index.js';
 
 const env = await getServerEnv();
 // Must match `mcp({ resource })` in server/plugins/mcp.ts

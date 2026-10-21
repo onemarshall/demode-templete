@@ -1,12 +1,12 @@
 <script lang="ts">
-	import * as Card from "$lib/components/ui/card";
-	import { Badge } from "$lib/components/ui/badge";
-	import { Separator } from "$lib/components/ui/separator";
+	import * as Card from "#lib/components/ui/card/index.js";
+	import { Badge } from "#lib/components/ui/badge/index.js";
+	import { Separator } from "#lib/components/ui/separator/index.js";
 	import { CircleCheck, TriangleAlert, Activity } from "@lucide/svelte";
 	import type {
 		SystemHealthStatus,
 		HealthStatus,
-	} from "$lib/auth/security/types";
+	} from "#lib/auth/security/types.js";
 
 	let {
 		systemHealth = undefined,

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
-	import { authClient } from '$lib/auth-client';
-	import { Button } from '$lib/components/ui/button';
-	import { publicEnv } from '$lib/auth/shared/env';
-	import { logger } from '$lib/auth/shared/logger';
+	import { authClient } from '#lib/auth-client.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { publicEnv } from '#lib/auth/shared/env/index.js';
+	import { logger } from '#lib/auth/shared/logger.js';
 	import { GalleryVerticalEnd as GalleryVerticalEndIcon, LogOut, Copy } from '@lucide/svelte';
 	import type { User } from 'better-auth';
-	import type { SerializedUser } from '$lib/auth/shared/types/serialized-auth';
+	import type { SerializedUser } from '#lib/auth/shared/types/serialized-auth.js';
 
 	// Define a type that's compatible with both User and SerializedUser
 	type NavUser = {

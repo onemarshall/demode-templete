@@ -1,6 +1,6 @@
 <!-- src/lib/components/auth/EmailCodeRequest.svelte -->
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import { Loader, Mail } from '@lucide/svelte';
 
 	let {

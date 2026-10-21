@@ -1,10 +1,10 @@
 // src/routes/api/test-email/+server.ts
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { auth } from '$lib/auth';
-import { isAdminUser, type UserWithRoles } from '$lib/auth/shared/roles';
-import { sendTemplateEmail } from '$lib/auth/server/email';
-import { securityLogger } from '$lib/auth/shared/logger';
+import { auth } from '#lib/auth.js';
+import { isAdminUser, type UserWithRoles } from '#lib/auth/shared/roles.js';
+import { sendTemplateEmail } from '#lib/auth/server/email/index.js';
+import { securityLogger } from '#lib/auth/shared/logger.js';
 
 const bodySchema = z.object({
 	type: z.enum(['verification', 'delete', 'resetPassword', 'welcome', 'notification']),

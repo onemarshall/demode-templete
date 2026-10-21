@@ -1,7 +1,7 @@
 // src/routes/auth/confirm-delete/+server.ts
 import { redirect, error, type RequestHandler } from '@sveltejs/kit';
-import { auth } from '$lib/auth';
-import { logger } from '$lib/auth/shared/logger';
+import { auth } from '#lib/auth.js';
+import { logger } from '#lib/auth/shared/logger.js';
 
 export const GET: RequestHandler = async ({ url, request }) => {
 	const token = url.searchParams.get('token');

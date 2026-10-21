@@ -12,7 +12,7 @@
  * @example
  * ```ts
  * import { betterAuth } from 'better-auth';
- * import { securityPlugin } from '$lib/auth/security';
+ * import { securityPlugin } from '#lib/auth/security/index.js';
  *
  * export const auth = betterAuth({
  *   plugins: [
@@ -34,7 +34,7 @@ import type { SecurityConfig } from './core/feature';
 import { createBeforeHook, createAfterHook } from './hooks';
 import { createEndpoints } from './endpoints';
 import { getEnabledFeatures } from './features';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 import { setTrustProxy } from './core/helpers';
 
 // Import features to ensure they're registered

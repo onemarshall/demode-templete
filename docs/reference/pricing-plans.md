@@ -138,7 +138,7 @@ Large enterprises and scale-ups requiring maximum reliability, compliance, and s
 
 ```svelte
 <script>
-  import SubscribeButton from '$lib/components/SubscribeButton.svelte';
+  import SubscribeButton from '#lib/components/SubscribeButton.svelte';
 </script>
 
 <!-- Free tier - no checkout needed -->

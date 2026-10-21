@@ -1,4 +1,4 @@
-import type { SerializedSession, SerializedUser } from '$lib/auth/shared/types/serialized-auth';
+import type { SerializedSession, SerializedUser } from '#lib/auth/shared/types/serialized-auth.js';
 
 interface AuthSessionUser {
 	id: string;

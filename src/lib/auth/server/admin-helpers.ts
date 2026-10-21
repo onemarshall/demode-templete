@@ -5,7 +5,7 @@
  */
 
 import { auth } from './config';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 /**
  * Get the Better Auth admin API.

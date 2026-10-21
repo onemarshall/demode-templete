@@ -2,13 +2,12 @@
 	import '../app.css';
 	import { dev } from '$app/env';
 	import { onMount, onDestroy } from 'svelte';
-	import { publicEnv, isDevelopment } from '$lib/auth/shared/env';
-	import AppNav from '$lib/components/navigation/AppNav.svelte';
+	import { publicEnv, isDevelopment } from '#lib/auth/shared/env/index.js';
 	import { Toaster } from 'svelte-sonner';
 	import type { LayoutData } from './$types';
 	import type { Snippet } from 'svelte';
 
-	let { children, data }: { children: Snippet; data: LayoutData } = $props();
+	let { children }: { children: Snippet; data: LayoutData } = $props();
 
 	// ============================================
 	// Security Configuration
@@ -50,7 +49,7 @@
 
 	onMount(() => {
 		// Fire and forget the async init, store cleanup reference
-		import('$lib/auth-client').then(async ({ initializeAuth, cleanupAuth }) => {
+		import('#lib/auth-client.js').then(async ({ initializeAuth, cleanupAuth }) => {
 			await initializeAuth();
 			cleanup = cleanupAuth;
 		});
@@ -62,18 +61,12 @@
 </script>
 
 <Toaster richColors position="top-right" />
-<div class="bg-muted flex min-h-svh flex-col">
-	<AppNav user={data.user} />
+{@render children()}
 
-	<main class="flex flex-1 flex-col px-6 py-12">
-		{@render children()}
-	</main>
-
-	{#if isDevelopment()}
-		<div
-			class="fixed right-2 bottom-2 z-50 rounded border border-yellow-300 bg-yellow-100 px-2 py-1 text-xs text-yellow-800"
-		>
-			🚧 {publicEnv.PUBLIC_APP_NAME} - Development Mode
-		</div>
-	{/if}
-</div>
+{#if isDevelopment()}
+	<div
+		class="fixed right-2 bottom-2 z-50 rounded border border-yellow-300 bg-yellow-100 px-2 py-1 text-xs text-yellow-800"
+	>
+		🚧 {publicEnv.PUBLIC_APP_NAME} - Development Mode
+	</div>
+{/if}

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as Card from "$lib/components/ui/card";
-	import { Badge } from "$lib/components/ui/badge";
-	import { Button } from "$lib/components/ui/button";
-	import { Separator } from "$lib/components/ui/separator";
+	import * as Card from "#lib/components/ui/card/index.js";
+	import { Badge } from "#lib/components/ui/badge/index.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import { Separator } from "#lib/components/ui/separator/index.js";
 	import {
 		Eye,
 		ChevronDown,
@@ -14,7 +14,7 @@
 		Shield,
 	} from "@lucide/svelte";
 	import { enhance } from "$app/forms";
-	import type { FlaggedSession } from "$lib/auth/security/types";
+	import type { FlaggedSession } from "#lib/auth/security/types.js";
 
 	let { sessions }: { sessions: FlaggedSession[] } = $props();
 

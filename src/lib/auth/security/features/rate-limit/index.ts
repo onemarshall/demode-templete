@@ -16,7 +16,7 @@ import type { RateLimitStatus } from './types';
 import { FEATURE_PRIORITY } from '../../core/feature';
 import { slidingWindowCheck } from './sliding-window';
 import { getMatchingRules, getClientIdentifier, shouldSkipPath, buildRateLimitKey } from './rules';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 export const rateLimitFeature: SecurityFeature = {
 	id: 'rate-limit',

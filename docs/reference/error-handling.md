@@ -57,7 +57,7 @@ class AppError extends Error {
 ### Basic Error Handling
 
 ```typescript
-import { handleError } from '$lib/server/utils/error-handler';
+import { handleError } from '#lib/server/utils/error-handler';
 
 try {
 	// some operation
@@ -75,7 +75,7 @@ import {
 	createAuthError,
 	createNotFoundError,
 	createConflictError
-} from '$lib/server/utils/error-handler';
+} from '#lib/server/utils/error-handler';
 
 // Validation error
 throw createValidationError('Email is required', { field: 'email' });
@@ -93,7 +93,7 @@ throw createConflictError('Email already exists', { email });
 ### Wrapping Async Functions
 
 ```typescript
-import { withErrorHandling } from '$lib/server/utils/error-handler';
+import { withErrorHandling } from '#lib/server/utils/error-handler';
 
 const safeSync = withErrorHandling(async () => await directusService.syncUser(user), {
 	operation: 'user_sync',
@@ -110,7 +110,7 @@ try {
 ### Environment Validation
 
 ```typescript
-import { validateRequiredEnv } from '$lib/server/utils/error-handler';
+import { validateRequiredEnv } from '#lib/server/utils/error-handler';
 
 // Throws AppError if any variable is missing
 validateRequiredEnv(['DIRECTUS_ADMIN_TOKEN', 'BETTER_AUTH_SECRET'], 'DirectusUserService');
@@ -208,7 +208,7 @@ All errors include context:
 
 ```typescript
 import { fail } from '@sveltejs/kit';
-import { handleError, createValidationError } from '$lib/server/utils/error-handler';
+import { handleError, createValidationError } from '#lib/server/utils/error-handler';
 
 export const actions = {
 	updateUser: async ({ request }) => {
@@ -235,7 +235,7 @@ export const actions = {
 
 ```typescript
 import { json } from '@sveltejs/kit';
-import { handleError, createNotFoundError } from '$lib/server/utils/error-handler';
+import { handleError, createNotFoundError } from '#lib/server/utils/error-handler';
 
 export async function GET({ params }) {
 	try {
@@ -256,7 +256,7 @@ export async function GET({ params }) {
 ## Service Layer Example
 
 ```typescript
-import { createExternalServiceError, createDatabaseError } from '$lib/server/utils/error-handler';
+import { createExternalServiceError, createDatabaseError } from '#lib/server/utils/error-handler';
 
 export class DirectusUserService {
 	async syncUser(user: BetterAuthUser) {
@@ -418,7 +418,7 @@ try {
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { createValidationError, handleError } from '$lib/server/utils/error-handler';
+import { createValidationError, handleError } from '#lib/server/utils/error-handler';
 
 describe('Error Handling', () => {
 	it('creates validation error with correct properties', () => {

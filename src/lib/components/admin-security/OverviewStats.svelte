@@ -1,7 +1,7 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
-	import type { DashboardMetrics, TrustedDevicesResponse } from '$lib/auth/security/types';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
+	import type { DashboardMetrics, TrustedDevicesResponse } from '#lib/auth/security/types.js';
 
 	let { metrics, devices }: { metrics: DashboardMetrics; devices: TrustedDevicesResponse | null } =
 		$props();

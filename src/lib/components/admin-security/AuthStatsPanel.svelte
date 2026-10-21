@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { CheckCircle, XCircle, TrendingUp, Clock } from '@lucide/svelte';
-	import type { AuthStats } from '$lib/auth/security/services/sdk';
+	import type { AuthStats } from '#lib/auth/security/services/sdk.js';
 
 	let { authStats = null }: { authStats: AuthStats | null } = $props();
 

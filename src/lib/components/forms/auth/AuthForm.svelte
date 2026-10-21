@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { publicEnv } from "$lib/auth/shared/env";
-	import { scheduleMessageClear } from "$lib/components/forms/auth-forms";
-	import { Button } from "$lib/components/ui/button";
-	import { Input } from "$lib/components/ui/input";
-	import { Label } from "$lib/components/ui/label";
+	import { publicEnv } from "#lib/auth/shared/env/index.js";
+	import { scheduleMessageClear } from "#lib/components/forms/auth-forms.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import { Input } from "#lib/components/ui/input/index.js";
+	import { Label } from "#lib/components/ui/label/index.js";
 	import { Loader } from "@lucide/svelte";
 	import AuthFormCard from "./AuthFormCard.svelte";
 	import AuthFormAlert from "./AuthFormAlert.svelte";
@@ -31,7 +31,7 @@
 		/**
 		 * SvelteKit remote `form()` action that owns server-side submission,
 		 * cookie setting, and (for sign-in) the 303 redirect. Pages import
-		 * either `login` or `signup` from `$lib/remote/auth.remote` and pass it
+		 * either `login` or `signup` from `#lib/remote/auth.remote.js` and pass it
 		 * here.
 		 */
 		formAction: RemoteFormAction;
@@ -43,7 +43,7 @@
 		showPasskey?: boolean;
 		showSocial?: boolean;
 		showForgotPassword?: boolean;
-		/** Where social/passkey buttons should land. Default: /auth/profile. */
+		/** Where social/passkey buttons should land. Default: /auth/dashboard. */
 		redirectTo?: string;
 	};
 
@@ -57,7 +57,7 @@
 		description = mode === "sign-in"
 			? "Enter your email below to sign in to your account"
 			: "Enter your information below to create your account",
-		redirectTo = "/auth/profile",
+		redirectTo = "/auth/dashboard",
 		submitLabel = mode === "sign-in" ? "Sign In" : "Create Account",
 		submitLoadingLabel = mode === "sign-in"
 			? "Signing in..."

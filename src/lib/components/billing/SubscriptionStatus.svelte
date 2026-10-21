@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { authClient } from "$lib/auth-client";
-	import { getPlan } from "$lib/billing/plans";
+	import { authClient } from "#lib/auth-client.js";
+	import { getPlan } from "#lib/billing/plans.js";
 
 	interface SubscriptionData {
 		status: string;

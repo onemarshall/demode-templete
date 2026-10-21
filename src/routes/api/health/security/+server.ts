@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-import { getSecurityStorage } from '$lib/auth/server/security-storage';
-import { logger } from '$lib/auth/shared/logger';
+import { getSecurityStorage } from '#lib/auth/server/security-storage.js';
+import { logger } from '#lib/auth/shared/logger.js';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {

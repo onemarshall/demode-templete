@@ -14,8 +14,8 @@ import { jwt } from 'better-auth/plugins';
 import { mcp } from '@better-auth/mcp';
 import { cimd } from '@better-auth/cimd';
 import type { BetterAuthPlugin } from 'better-auth';
-import type { FullEnv } from '$lib/auth/shared/env';
-import { logger } from '$lib/auth/shared/logger';
+import type { FullEnv } from '#lib/auth/shared/env/index.js';
+import { logger } from '#lib/auth/shared/logger.js';
 import { fetchClientMetadataResource } from './mcp/transport';
 
 export function buildMcpPlugins(env: FullEnv): BetterAuthPlugin[] {

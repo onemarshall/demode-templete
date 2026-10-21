@@ -9,8 +9,8 @@
 
 import { createAuthEndpoint, sessionMiddleware } from 'better-auth/api';
 import { z } from 'zod';
-import { securityLogger } from '$lib/auth/shared/logger';
-import { isAdminUser } from '$lib/auth/shared/roles';
+import { securityLogger } from '#lib/auth/shared/logger.js';
+import { isAdminUser } from '#lib/auth/shared/roles.js';
 import { clearAllFeatureCaches } from '../core/feature';
 import { getClientIp, isValidIp } from '../core/helpers';
 import type { SecurityConfig } from '../core/feature';

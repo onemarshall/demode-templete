@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authClient } from '$lib/auth-client';
+	import { authClient } from '#lib/auth-client.js';
 
 	async function handlePortal() {
 		// redirect: true opts in to the client's auto-navigation to the

@@ -1,14 +1,14 @@
 <!-- src/lib/components/profile/security/TwoFactorManager/TwoFactorManager.svelte -->
 <script lang="ts">
 	import { dev } from "$app/env";
-	import TwoFactorStatusCard from "$lib/components/security/two-factor/StatusCard.svelte";
-	import PasswordConfirmationDialog from "$lib/components/security/two-factor/PasswordConfirmationDialog.svelte";
-	import QRCodeSetupDialog from "$lib/components/security/two-factor/QRCodeSetupDialog.svelte";
-	import BackupCodesDialog from "$lib/components/security/two-factor/BackupCodesDialog.svelte";
+	import TwoFactorStatusCard from "#lib/components/security/two-factor/StatusCard.svelte";
+	import PasswordConfirmationDialog from "#lib/components/security/two-factor/PasswordConfirmationDialog.svelte";
+	import QRCodeSetupDialog from "#lib/components/security/two-factor/QRCodeSetupDialog.svelte";
+	import BackupCodesDialog from "#lib/components/security/two-factor/BackupCodesDialog.svelte";
 
-	import { useTwoFactorState } from "$lib/auth/client/stores/two-factor.svelte";
-	import { authClient } from "$lib/auth-client";
-	import { logger } from "$lib/auth/shared/logger";
+	import { useTwoFactorState } from "#lib/auth/client/stores/two-factor.svelte.js";
+	import { authClient } from "#lib/auth-client.js";
+	import { logger } from "#lib/auth/shared/logger.js";
 	import type { User } from "better-auth";
 
 	type TwoFactorUser = typeof authClient.$Infer.Session.user;

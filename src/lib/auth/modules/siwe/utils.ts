@@ -4,7 +4,7 @@
  */
 
 import { generateRandomString } from 'better-auth/crypto';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 // Types
 interface ENSResult {

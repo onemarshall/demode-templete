@@ -1,12 +1,12 @@
 <!-- src/lib/components/profile/security/TwoFactorManager/components/PasswordConfirmationDialog.svelte -->
 <script lang="ts">
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Form from '$lib/components/ui/form';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { PasswordInput } from '$lib/components/ui/password-input';
+	import * as Dialog from '#lib/components/ui/dialog/index.js';
+	import * as Form from '#lib/components/ui/form/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { PasswordInput } from '#lib/components/ui/password-input/index.js';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
-	import { passwordSchema } from '$lib/components/forms/schema';
+	import { passwordSchema } from '#lib/components/forms/schema.js';
 	import { Loader } from '@lucide/svelte';
 
 	interface Props {

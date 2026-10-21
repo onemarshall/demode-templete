@@ -1,6 +1,6 @@
 <!-- src/lib/components/profile/security/PasskeyManager/components/PasskeyList.svelte -->
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import { KeyRound } from '@lucide/svelte';
 	import PasskeyItem from './PasskeyItem.svelte';
 	import type { Passkey } from '@better-auth/passkey';

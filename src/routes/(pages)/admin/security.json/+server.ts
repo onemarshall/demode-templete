@@ -1,7 +1,7 @@
 import { json, redirect, error, type RequestHandler } from '@sveltejs/kit';
-import { auth } from '$lib/auth/server/config';
-import { getSecurityDashboard } from '$lib/remote';
-import type { SessionUser } from '$lib/auth/server/auth-helpers';
+import { auth } from '#lib/auth/server/config.js';
+import { getSecurityDashboard } from '#lib/remote/index.js';
+import type { SessionUser } from '#lib/auth/server/auth-helpers.js';
 
 export const GET: RequestHandler = async ({ request }) => {
 	const session = await auth.api.getSession({ headers: request.headers });

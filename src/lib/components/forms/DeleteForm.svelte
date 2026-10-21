@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Card from '$lib/components/ui/card/index.js';
-	import * as Form from '$lib/components/ui/form';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { passwordSchema, type PasswordSchema } from '$lib/components/forms/schema';
-	import { cn } from '$lib/utils.ts';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import * as Form from '#lib/components/ui/form/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { passwordSchema, type PasswordSchema } from '#lib/components/forms/schema.js';
+	import { cn } from '#lib/utils.ts';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
-	import { PasswordInput } from '$lib/components/ui/password-input';
+	import { PasswordInput } from '#lib/components/ui/password-input/index.js';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { HTMLAttributes } from 'svelte/elements';
 

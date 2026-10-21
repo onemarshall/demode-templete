@@ -1,5 +1,5 @@
 import type { CMSProvider, CMSUser, CMSFile, CMSConfig } from '../types';
-import { createProviderLogger } from '$lib/auth/shared/logger';
+import { createProviderLogger } from '#lib/auth/shared/logger.js';
 import type { ConsolaInstance } from 'consola';
 
 type MaybePayloadUser = Record<string, unknown> & {

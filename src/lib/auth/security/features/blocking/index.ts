@@ -11,7 +11,7 @@ import type { BlockingFeatureConfig } from './types';
 import { FEATURE_PRIORITY } from '../../core/feature';
 import { getBlockStatus } from './temp-block';
 import { isIPBlocked, getBlockReason } from './ip-block';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 export const blockingFeature: SecurityFeature = {
 	id: 'blocking',

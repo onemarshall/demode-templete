@@ -1,13 +1,13 @@
 import { json, error } from '@sveltejs/kit';
 import { Creem } from 'creem';
 import { z } from 'zod';
-import { auth } from '$lib/auth/server/config';
-import { getDB } from '$lib/auth/server/database/db';
-import { getServerEnv, publicEnv } from '$lib/auth/shared/env';
-import { logger } from '$lib/auth/shared/logger';
-import { getClientIp, getIdentifier } from '$lib/auth/security/core/helpers';
-import { slidingWindowCheck } from '$lib/auth/security/features/rate-limit/sliding-window';
-import { validateBypassToken } from '$lib/auth/security/endpoints/captcha';
+import { auth } from '#lib/auth/server/config.js';
+import { getDB } from '#lib/auth/server/database/db.js';
+import { getServerEnv, publicEnv } from '#lib/auth/shared/env/index.js';
+import { logger } from '#lib/auth/shared/logger.js';
+import { getClientIp, getIdentifier } from '#lib/auth/security/core/helpers.js';
+import { slidingWindowCheck } from '#lib/auth/security/features/rate-limit/sliding-window.js';
+import { validateBypassToken } from '#lib/auth/security/endpoints/captcha.js';
 import type { RequestHandler } from './$types';
 
 // Rate limit: per-IP guards against a single source spraying random emails,

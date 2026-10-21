@@ -13,8 +13,8 @@ The mock email provider logs all emails to memory instead of sending them.
 #### Email Provider Setup
 
 ```typescript
-import { initializeEmail } from '$lib/server/email';
-import { MockEmailProvider } from '$lib/server/email/providers/mock';
+import { initializeEmail } from '#lib/server/email';
+import { MockEmailProvider } from '#lib/server/email/providers/mock';
 
 const email = new MockEmailProvider({
 	provider: 'mock',
@@ -26,7 +26,7 @@ const email = new MockEmailProvider({
 
 ```typescript
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MockEmailProvider } from '$lib/server/email/providers/mock';
+import { MockEmailProvider } from '#lib/server/email/providers/mock';
 
 describe('Email Sending', () => {
 	let emailProvider: MockEmailProvider;
@@ -118,8 +118,8 @@ The mock storage provider stores files in memory instead of uploading them.
 #### Storage Provider Setup
 
 ```typescript
-import { initializeStorage } from '$lib/server/storage';
-import { MockStorageProvider } from '$lib/server/storage/providers/mock';
+import { initializeStorage } from '#lib/server/storage';
+import { MockStorageProvider } from '#lib/server/storage/providers/mock';
 
 const storage = new MockStorageProvider({
 	provider: 'mock'
@@ -130,7 +130,7 @@ const storage = new MockStorageProvider({
 
 ```typescript
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MockStorageProvider } from '$lib/server/storage/providers/mock';
+import { MockStorageProvider } from '#lib/server/storage/providers/mock';
 
 describe('File Storage', () => {
 	let storageProvider: MockStorageProvider;

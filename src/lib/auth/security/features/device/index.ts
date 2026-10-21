@@ -10,7 +10,7 @@ import type { SecurityFeature, SecurityConfig, FeatureResult } from '../../core/
 import type { SecurityContext } from '../../core/context';
 import type { DeviceFeatureConfig, TrustedDevice } from './types';
 import { FEATURE_PRIORITY } from '../../core/feature';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 import { CacheManager } from '../../core/cache';
 import { hashString, generateShortId } from '../../core/helpers';
 import { deviceRiskFactors, positiveRiskFactors } from '../../core/risk-engine';

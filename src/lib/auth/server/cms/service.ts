@@ -6,7 +6,7 @@
 
 import { getCMSProvider } from './index';
 import type { CMSUser, CMSFile } from './types';
-import { logger, securityLogger } from '$lib/auth/shared/logger';
+import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 
 /**
  * Get user from CMS

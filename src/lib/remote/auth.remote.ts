@@ -1,8 +1,8 @@
 import { form, query, getRequestEvent } from '$app/server';
-import { auth } from '$lib/auth/server/config';
+import { auth } from '#lib/auth/server/config.js';
 import { z } from 'zod';
 import { redirect } from '@sveltejs/kit';
-import { setAuthCookies } from '$lib/auth/server/utils';
+import { setAuthCookies } from '#lib/auth/server/utils.js';
 
 const nameRegex = /^[\p{L}\s'-]+$/u;
 
@@ -76,7 +76,7 @@ export const login = form(loginRemoteSchema, async (data) => {
 
   setAuthCookies(cookies, response.headers);
 
-  redirect(303, '/auth/profile');
+  redirect(303, '/auth/dashboard');
 });
 
 export const signup = form(signupRemoteSchema, async (data) => {

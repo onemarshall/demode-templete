@@ -1,6 +1,6 @@
 <!-- src/lib/components/auth/StatusMessage.svelte -->
 <script lang="ts">
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
+	import { Alert, AlertDescription } from '#lib/components/ui/alert/index.js';
 	import { Shield } from '@lucide/svelte';
 
 	let {

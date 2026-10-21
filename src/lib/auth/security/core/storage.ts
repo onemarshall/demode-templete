@@ -14,7 +14,7 @@
  *   - otherwise           → in-memory
  */
 
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 // ============================================
 // Core interface — keeps feature code clean
@@ -116,7 +116,7 @@ export function createMemoryAdapter(): StorageAdapter {
 // ============================================
 
 export async function createRedisAdapter(redisUrl: string): Promise<StorageAdapter> {
-	const { getSharedRedisClient } = await import('$lib/auth/shared/redis');
+	const { getSharedRedisClient } = await import('#lib/auth/shared/redis/index.js');
 	const redis = await getSharedRedisClient('SecurityStorage', { url: redisUrl });
 
 	return {
@@ -216,7 +216,7 @@ CREATE TABLE IF NOT EXISTS auth_security_sets (
 `;
 
 export async function createPostgresAdapter(): Promise<StorageAdapter> {
-	const { getDB } = await import('$lib/auth/server/database/db');
+	const { getDB } = await import('#lib/auth/server/database/db.js');
 	const pool = await getDB();
 
 	await pool.query(PG_INIT_SQL);

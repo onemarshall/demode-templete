@@ -1,9 +1,9 @@
 <!-- src/lib/components/profile/security/PasskeyManager/PasskeyManager.svelte -->
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
+	import * as Card from '#lib/components/ui/card/index.js';
 	import { KeyRound } from '@lucide/svelte';
-	import { authClient } from '$lib/auth-client';
-	import { logger } from '$lib/auth/shared/logger';
+	import { authClient } from '#lib/auth-client.js';
+	import { logger } from '#lib/auth/shared/logger.js';
 	import {
 		PasskeyWebAuthnCheck,
 		PasskeyItem,

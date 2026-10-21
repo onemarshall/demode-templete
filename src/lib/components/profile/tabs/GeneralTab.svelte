@@ -2,19 +2,19 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms";
 	import { zod4Client } from "sveltekit-superforms/adapters";
-	import { profileSchema } from "$lib/components/forms/schema";
-	import * as Card from "$lib/components/ui/card";
-	import * as Form from "$lib/components/ui/form";
-	import { Button } from "$lib/components/ui/button";
-	import { Input } from "$lib/components/ui/input";
-	import { Badge } from "$lib/components/ui/badge";
-	import { Separator } from "$lib/components/ui/separator";
-	import { authClient } from "$lib/auth-client";
+	import { profileSchema } from "#lib/components/forms/schema.js";
+	import * as Card from "#lib/components/ui/card/index.js";
+	import * as Form from "#lib/components/ui/form/index.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import { Input } from "#lib/components/ui/input/index.js";
+	import { Badge } from "#lib/components/ui/badge/index.js";
+	import { Separator } from "#lib/components/ui/separator/index.js";
+	import { authClient } from "#lib/auth-client.js";
 	import { toast } from "svelte-sonner";
-	import * as ImageCropper from "$lib/components/ui/image-cropper";
-	import { getAvatarInitials } from "$lib/components/profile/utils/avatar";
-	import { uploadAvatar, deleteAvatar } from "$lib/avatar/avatarService";
-	import { logger } from "$lib/auth/shared/logger";
+	import * as ImageCropper from "#lib/components/ui/image-cropper/index.js";
+	import { getAvatarInitials } from "#lib/components/profile/utils/avatar.js";
+	import { uploadAvatar, deleteAvatar } from "#lib/avatar/avatarService.js";
+	import { logger } from "#lib/auth/shared/logger.js";
 	import type { GeneralTabProps } from "./types";
 
 	type Props = GeneralTabProps & {

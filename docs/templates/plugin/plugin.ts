@@ -12,7 +12,7 @@
 
 import type { BetterAuthPlugin } from 'better-auth';
 // import { moduleName } from 'better-auth/plugins';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 interface ModuleEnv {
 	PUBLIC_MODULE_NAME_ENABLED?: boolean;

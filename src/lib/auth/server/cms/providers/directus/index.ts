@@ -8,8 +8,8 @@ import {
 	type DirectusSyncClient,
 	type DirectusSyncUser
 } from 'better-auth-directus';
-import type { CMSProvider, CMSUser, CMSFile, CMSConfig } from '$lib/auth/server/cms/types';
-import { createProviderLogger } from '$lib/auth/shared/logger';
+import type { CMSProvider, CMSUser, CMSFile, CMSConfig } from '#lib/auth/server/cms/types.js';
+import { createProviderLogger } from '#lib/auth/shared/logger.js';
 
 interface DirectusCMSConfig {
 	defaultRoleId?: string;

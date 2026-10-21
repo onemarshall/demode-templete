@@ -7,9 +7,9 @@
  * Moved to the proposed auth structure with updated imports.
  */
 
-import { logger, securityLogger } from '$lib/auth/shared/logger';
-import { publicEnv } from '$lib/auth/shared/env';
-import type { SecurityHeaders } from '$lib/auth/security/types';
+import { logger, securityLogger } from '#lib/auth/shared/logger.js';
+import { publicEnv } from '#lib/auth/shared/env/index.js';
+import type { SecurityHeaders } from '#lib/auth/security/types.js';
 import { get, type Readable } from 'svelte/store';
 import type { User, Session } from 'better-auth';
 
@@ -20,7 +20,7 @@ import type { User, Session } from 'better-auth';
 // Type-only import of the concrete client instance avoids a runtime cycle
 // ($lib/auth-client imports helpers at runtime) while keeping the full
 // plugin-inferred session/user types (e.g. twoFactorEnabled) in sync.
-import type { authClient } from '$lib/auth-client';
+import type { authClient } from '#lib/auth-client.js';
 
 type AuthClient = typeof authClient;
 

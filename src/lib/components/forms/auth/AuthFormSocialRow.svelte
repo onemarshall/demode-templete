@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { authClient } from "$lib/auth-client";
-	import { Button } from "$lib/components/ui/button";
-	import { Separator } from "$lib/components/ui/separator";
-	import { logger } from "$lib/auth/shared/logger";
-	import Github from "$lib/components/icons/Github.svelte";
-	import Google from "$lib/components/icons/Google.svelte";
+	import { authClient } from "#lib/auth-client.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import { Separator } from "#lib/components/ui/separator/index.js";
+	import { logger } from "#lib/auth/shared/logger.js";
+	import Github from "#lib/components/icons/Github.svelte";
+	import Google from "#lib/components/icons/Google.svelte";
 	import { Loader } from "@lucide/svelte";
 	import type { Component, Snippet } from "svelte";
 

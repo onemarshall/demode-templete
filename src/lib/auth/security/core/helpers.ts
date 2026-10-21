@@ -8,7 +8,7 @@
  * - plugins/fraud-detection/services/extraction.ts
  */
 
-import { isDevelopment as envIsDevelopment } from '$lib/auth/shared/env';
+import { isDevelopment as envIsDevelopment } from '#lib/auth/shared/env/index.js';
 
 // ============================================
 // Constants

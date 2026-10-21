@@ -4,7 +4,7 @@
  * Provides cache statistics, clearing, and pruning functionality.
  */
 
-import { logger, securityLogger } from '$lib/auth/shared/logger';
+import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 import { getRedis } from './redis';
 
 // ============================================

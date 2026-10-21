@@ -2,7 +2,7 @@
 	import { Checkbox as CheckboxPrimitive } from "bits-ui";
 	import RiCheckLine from 'remixicon-svelte/icons/check-line';
 	import RiSubtractLine from 'remixicon-svelte/icons/subtract-line';
-	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
+	import { cn, type WithoutChildrenOrChild } from "#lib/utils.js";
 
 	let {
 		ref = $bindable(null),

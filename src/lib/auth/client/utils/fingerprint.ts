@@ -3,7 +3,7 @@
  * Generates persistent device fingerprints using stable browser characteristics
  */
 
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 export interface DeviceFingerprint {
 	id: string;

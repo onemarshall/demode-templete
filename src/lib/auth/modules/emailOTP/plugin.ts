@@ -4,8 +4,8 @@
 
 import { emailOTP } from 'better-auth/plugins';
 import type { BetterAuthPlugin } from 'better-auth';
-import { logger } from '$lib/auth/shared/logger';
-import { sendOTPEmail } from '$lib/auth/server/email';
+import { logger } from '#lib/auth/shared/logger.js';
+import { sendOTPEmail } from '#lib/auth/server/email/index.js';
 
 interface EmailOTPEnv {
 	AUTH_EMAIL_OTP_PLUGIN?: boolean;

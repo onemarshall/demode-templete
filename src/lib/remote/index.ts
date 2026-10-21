@@ -9,7 +9,7 @@
  *
  * Usage:
  * ```typescript
- * import { getDashboardMetrics, signIn, getAllUsers } from '$lib/remote';
+ * import { getDashboardMetrics, signIn, getAllUsers } from '#lib/remote/index.js';
  *
  * // In a Svelte component with await
  * const metrics = await getDashboardMetrics('24h');

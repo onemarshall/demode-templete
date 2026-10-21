@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Users, Clock, Activity, LogOut } from '@lucide/svelte';
-	import type { SessionAnalytics } from '$lib/auth/security/services/sdk';
+	import type { SessionAnalytics } from '#lib/auth/security/services/sdk.js';
 
 	let { sessionAnalytics = null }: { sessionAnalytics: SessionAnalytics | null } = $props();
 

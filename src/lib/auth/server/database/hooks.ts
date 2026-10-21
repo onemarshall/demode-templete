@@ -1,7 +1,7 @@
 // src/lib/auth/server/database/hooks.ts
-import { getDirectusCMSProvider } from '$lib/auth/server/plugins/cms';
-import { getServerEnv } from '$lib/auth/shared/env';
-import { logger, securityLogger } from '$lib/auth/shared/logger';
+import { getDirectusCMSProvider } from '#lib/auth/server/plugins/cms.js';
+import { getServerEnv } from '#lib/auth/shared/env/index.js';
+import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 import type { BetterAuthOptions } from 'better-auth';
 import type { User } from './types';
 
@@ -64,7 +64,7 @@ async function trackSession(session: SessionData): Promise<void> {
 		};
 
 		try {
-			const { getSharedRedisClient } = await import('$lib/auth/shared/redis');
+			const { getSharedRedisClient } = await import('#lib/auth/shared/redis/index.js');
 			const redis = await getSharedRedisClient('security');
 			const securityAnalyticsSessionData = await deriveSecurityAnalyticsSessionData(redis, session);
 			await Promise.all([

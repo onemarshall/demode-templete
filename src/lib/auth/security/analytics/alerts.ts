@@ -4,7 +4,7 @@
  * Generates and manages security alerts based on thresholds.
  */
 
-import { securityLogger } from '$lib/auth/shared/logger';
+import { securityLogger } from '#lib/auth/shared/logger.js';
 import type { SecurityAnalyticsEvent } from './collector';
 
 // ============================================

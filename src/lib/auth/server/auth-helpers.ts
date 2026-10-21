@@ -8,12 +8,12 @@
 import { getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { auth } from './config';
-import { getUserRoles, isAdminUser } from '$lib/auth/shared/roles';
+import { getUserRoles, isAdminUser } from '#lib/auth/shared/roles.js';
 
 // Re-exported for backwards compatibility — the canonical implementations
-// live in '$lib/auth/shared/roles' (pure module, no config side-effects).
+// live in '#lib/auth/shared/roles.js' (pure module, no config side-effects).
 export { getUserRoles, isAdminUser };
-export type { AdminAuthorizationOptions, UserWithRoles } from '$lib/auth/shared/roles';
+export type { AdminAuthorizationOptions, UserWithRoles } from '#lib/auth/shared/roles.js';
 
 // ============================================
 // Types

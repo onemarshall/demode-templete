@@ -17,8 +17,8 @@ import {
 	createMagicLinkEmailContent,
 } from '../emails'
 import { buildTemplateEmail } from './template-dispatch'
-import { createProviderLogger } from '$lib/auth/shared/logger'
-import { getServerEnv } from '$lib/auth/shared/env'
+import { createProviderLogger } from '#lib/auth/shared/logger.js'
+import { getServerEnv } from '#lib/auth/shared/env/index.js'
 
 interface EmailLog {
 	timestamp: Date

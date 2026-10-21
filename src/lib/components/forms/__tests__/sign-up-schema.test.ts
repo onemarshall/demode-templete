@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { signUpSchema } from '$lib/components/forms/schema';
+import { signUpSchema } from '#lib/components/forms/schema.js';
 
 /**
  * These tests cover core validation rules for the sign-up form.

@@ -9,7 +9,7 @@
 
 import type { BetterAuthPlugin } from 'better-auth';
 import { oAuthProxy } from 'better-auth/plugins';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 interface OAuthProxyEnv {
 	AUTH_OAUTH_PROXY_PLUGIN?: boolean;

@@ -1,8 +1,8 @@
 import { form, getRequestEvent } from '$app/server';
-import { auth } from '$lib/auth/server/config';
-import { getCMSProvider } from '$lib/auth/server/cms';
-import type { DirectusCMSProviderType } from '$lib/auth/server/cms/providers/directus';
-import { logger } from '$lib/auth/shared/logger';
+import { auth } from '#lib/auth/server/config.js';
+import { getCMSProvider } from '#lib/auth/server/cms/index.js';
+import type { DirectusCMSProviderType } from '#lib/auth/server/cms/providers/directus/index.js';
+import { logger } from '#lib/auth/shared/logger.js';
 import { error } from '@sveltejs/kit';
 
 export const uploadAvatar = form(async () => {

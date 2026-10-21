@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { UserX, AlertTriangle, Lock, Activity } from '@lucide/svelte';
-	import type { UserRiskProfile } from '$lib/auth/security/services/sdk';
+	import type { UserRiskProfile } from '#lib/auth/security/services/sdk.js';
 
 	let { userRiskProfiles = [] }: { userRiskProfiles: UserRiskProfile[] } = $props();
 

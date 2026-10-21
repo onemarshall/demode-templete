@@ -1,6 +1,6 @@
 // src/lib/auth/server/database/integration.ts
 import { manualHooks, avatarHooks } from './hooks';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 import type { User } from './types';
 
 /**

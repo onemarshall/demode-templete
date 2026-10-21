@@ -1,11 +1,11 @@
 import type { RequestHandler } from './$types';
-import { auth } from '$lib/auth/server/config';
-import { isAdminUser, type UserWithRoles } from '$lib/auth/shared/roles';
-import { logger } from '$lib/auth/shared/logger';
-import { getSharedRedisClient } from '$lib/auth/shared/redis';
-import { getDB } from '$lib/auth/server/database/db';
-import { getServerEnv } from '$lib/auth/shared/env';
-import { emitSystemHealth } from '$lib/monitoring/apm';
+import { auth } from '#lib/auth/server/config.js';
+import { isAdminUser, type UserWithRoles } from '#lib/auth/shared/roles.js';
+import { logger } from '#lib/auth/shared/logger.js';
+import { getSharedRedisClient } from '#lib/auth/shared/redis/index.js';
+import { getDB } from '#lib/auth/server/database/db.js';
+import { getServerEnv } from '#lib/auth/shared/env/index.js';
+import { emitSystemHealth } from '#lib/monitoring/apm.js';
 import * as os from 'node:os';
 
 type CheckStatus = 'operational' | 'degraded' | 'critical';

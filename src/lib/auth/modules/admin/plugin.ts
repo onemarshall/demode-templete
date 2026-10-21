@@ -4,7 +4,7 @@
 
 import { admin } from 'better-auth/plugins';
 import type { BetterAuthPlugin } from 'better-auth';
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 interface AdminEnv {
 	AUTH_ADMIN_PLUGIN?: boolean;

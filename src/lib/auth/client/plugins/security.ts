@@ -4,7 +4,7 @@
  * Security-related client plugins for Better Auth.
  */
 
-import { logger } from '$lib/auth/shared/logger';
+import { logger } from '#lib/auth/shared/logger.js';
 
 // Note: Better Auth client plugins are not strongly typed yet
 // Using a generic plugin interface for now

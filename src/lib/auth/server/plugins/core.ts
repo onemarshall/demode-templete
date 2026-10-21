@@ -5,8 +5,8 @@
  */
 
 import type { BetterAuthPlugin } from 'better-auth';
-import type { FullEnv } from '$lib/auth/shared/env';
-import { buildCorePlugins as buildModuleCorePlugins } from '$lib/auth/modules/core';
+import type { FullEnv } from '#lib/auth/shared/env/index.js';
+import { buildCorePlugins as buildModuleCorePlugins } from '#lib/auth/modules/core.js';
 
 /**
  *  core plugins based on environment configuration
@@ -30,7 +30,7 @@ export {
 	PasskeyPlugin,
 	SIWEPlugin,
 	TwoFactorPlugin
-} from '$lib/auth/modules/core';
+} from '#lib/auth/modules/core.js';
 
 // Re-export lastLoginMethod for direct use
 export { lastLoginMethod } from 'better-auth/plugins';

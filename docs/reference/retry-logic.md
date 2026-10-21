@@ -61,7 +61,7 @@ Only transient errors are retried. Permanent errors fail immediately:
 ### Basic Retry
 
 ```typescript
-import { retry } from '$lib/server/utils/retry';
+import { retry } from '#lib/server/utils/retry';
 
 const result = await retry(async () => await directusService.syncUser(user), {
 	maxAttempts: 3,
@@ -73,7 +73,7 @@ const result = await retry(async () => await directusService.syncUser(user), {
 ### Using Presets
 
 ```typescript
-import { retry, RETRY_PRESETS } from '$lib/server/utils/retry';
+import { retry, RETRY_PRESETS } from '#lib/server/utils/retry';
 
 // Aggressive retry - 5 attempts, up to 60 seconds
 const result = await retry(async () => await directusService.syncUser(user), {
@@ -103,7 +103,7 @@ const result = await retry(async () => await directusService.syncUser(user), {
 ### Retry Wrapper
 
 ```typescript
-import { withRetry } from '$lib/server/utils/retry';
+import { withRetry } from '#lib/server/utils/retry';
 
 // Create a wrapped function
 const syncWithRetry = withRetry(async (user) => await directusService.syncUser(user), {
@@ -118,7 +118,7 @@ await syncWithRetry(user2);
 ### Custom Retryable Check
 
 ```typescript
-import { retry } from '$lib/server/utils/retry';
+import { retry } from '#lib/server/utils/retry';
 
 const result = await retry(async () => await someOperation(), {
 	maxAttempts: 3,
@@ -135,7 +135,7 @@ const result = await retry(async () => await someOperation(), {
 ### Synchronous Retry
 
 ```typescript
-import { retrySyncWithBackoff } from '$lib/server/utils/retry';
+import { retrySyncWithBackoff } from '#lib/server/utils/retry';
 
 const result = retrySyncWithBackoff(() => JSON.parse(data), { maxAttempts: 2 });
 ```
@@ -170,7 +170,7 @@ interface RetryOptions {
 ### Directus Sync with Retry
 
 ```typescript
-import { retry, RETRY_PRESETS } from '$lib/server/utils/retry';
+import { retry, RETRY_PRESETS } from '#lib/server/utils/retry';
 
 export class DirectusUserService {
 	async syncUser(user: BetterAuthUser) {
@@ -218,8 +218,8 @@ export class DirectusUserService {
 
 ```typescript
 import { json } from '@sveltejs/kit';
-import { retry, RETRY_PRESETS } from '$lib/server/utils/retry';
-import { handleError } from '$lib/server/utils/error-handler';
+import { retry, RETRY_PRESETS } from '#lib/server/utils/retry';
+import { handleError } from '#lib/server/utils/error-handler';
 
 export async function POST({ request }) {
 	try {
@@ -257,8 +257,8 @@ export async function POST({ request }) {
 
 ```typescript
 import { fail } from '@sveltejs/kit';
-import { retry, RETRY_PRESETS } from '$lib/server/utils/retry';
-import { handleError } from '$lib/server/utils/error-handler';
+import { retry, RETRY_PRESETS } from '#lib/server/utils/retry';
+import { handleError } from '#lib/server/utils/error-handler';
 
 export const actions = {
 	syncUser: async ({ request }) => {
@@ -304,7 +304,7 @@ Retry operations are automatically logged:
 ### Retryable vs Non-Retryable
 
 ```typescript
-import { retry, isRetryableError } from '$lib/server/utils/retry';
+import { retry, isRetryableError } from '#lib/server/utils/retry';
 
 try {
 	await retry(async () => {
@@ -440,7 +440,7 @@ RETRY_PRESETS.standard;
 
 ```typescript
 import { describe, it, expect, vi } from 'vitest';
-import { retry, isRetryableError } from '$lib/server/utils/retry';
+import { retry, isRetryableError } from '#lib/server/utils/retry';
 
 describe('Retry Logic', () => {
 	it('retries on transient errors', async () => {

@@ -1,5 +1,5 @@
-import { getDB } from '$lib/auth/server/database/db';
-import { logger } from '$lib/auth/shared/logger';
+import { getDB } from '#lib/auth/server/database/db.js';
+import { logger } from '#lib/auth/shared/logger.js';
 
 interface SubscriptionRow {
 	id: string;

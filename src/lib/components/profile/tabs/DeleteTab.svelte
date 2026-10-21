@@ -1,8 +1,8 @@
 <!-- src/lib/components/profile/DeleteTab.svelte -->
 <script lang="ts">
-	import DeleteUserForm from '$lib/components/forms/DeleteUserForm.svelte';
-	import * as Card from '$lib/components/ui/card';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
+	import DeleteUserForm from '#lib/components/forms/DeleteUserForm.svelte';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Alert, AlertDescription } from '#lib/components/ui/alert/index.js';
 	import { AlertTriangle } from '@lucide/svelte';
 
 	interface Props {
