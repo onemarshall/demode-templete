@@ -1915,7 +1915,7 @@ SSR-safe client with Svelte 5 runes:
 
 ```typescript
 // client/store.ts
-import { browser } from '$app/environment';
+import { browser } from '$app/env';
 
 interface SecurityClientState {
 	isReady: boolean;

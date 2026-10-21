@@ -108,9 +108,15 @@ export default defineConfig({
     // Allow the tunnel hostname through Vite's dev-server host check.
     // ".trycloudflare.com" covers quick tunnels; siteHost covers named tunnels.
     allowedHosts: siteHost ? [siteHost, ".trycloudflare.com"] : [".trycloudflare.com"],
+    fs: {
+      allow: [
+        process.cwd(),
+        '/Users/rob/.bun/install/cache/links',
+      ],
+    },
   },
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       plugins: [
         visualizer({
           filename: "stats.md",
