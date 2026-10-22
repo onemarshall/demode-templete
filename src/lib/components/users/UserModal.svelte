@@ -280,7 +280,7 @@
 						<div class="text-muted-foreground py-8 text-center text-sm">No active sessions</div>
 					{:else}
 						<div class="divide-y rounded-lg border">
-							{#each sessions as session (session.token)}
+							{#each sessions as session, index (session.token)}
 								<div class="flex items-center justify-between gap-4 p-3">
 									<div class="min-w-0 flex-1 space-y-1">
 										<div class="flex items-center gap-2">
@@ -305,7 +305,7 @@
 											{formatDateTime(session.expiresAt ?? null)}
 										</p>
 									</div>
-									<form {...revokeSession}>
+									<form {...revokeSession.for(`${user.id}:${index}`)}>
 										<input type="hidden" name="sessionToken" value={session.token} />
 										<Button
 											type="submit"

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as Card from '#lib/components/ui/card/index.js';
+	import * as ToggleGroup from '#lib/components/ui/toggle-group/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import type { ActionSource, ActionStatus, ActionsFilterState, Severity } from './types';
@@ -8,7 +8,6 @@
 		value,
 		availableSeverities,
 		availableSources,
-		availableStatuses,
 		onChange,
 		onReset
 	}: {
@@ -25,8 +24,7 @@
 	}
 </script>
 
-<Card.Root>
-	<Card.Content class="space-y-3 pt-4">
+<div class="flex flex-col gap-3 pt-3">
 		<div class="grid gap-3 lg:grid-cols-4">
 			<div class="lg:col-span-2">
 				<label class="mb-1 block text-xs font-medium" for="actions-filter-search">Search</label>
@@ -51,52 +49,22 @@
 						})}
 				>
 					<option value="all">All sources</option>
-					{#each availableSources as source}
+					{#each availableSources as source (source)}
 						<option value={source}>{source.replaceAll('_', ' ')}</option>
 					{/each}
 				</select>
 			</div>
 
-			<div>
-				<label class="mb-1 block text-xs font-medium" for="actions-filter-status">Status</label>
-				<select
-					id="actions-filter-status"
-					class="bg-background border-input h-9 w-full rounded-md border px-3 text-sm"
-					value={value.status}
-					onchange={(event) =>
-						update({
-							status: (event.currentTarget as HTMLSelectElement)
-								.value as ActionsFilterState['status']
-						})}
-				>
-					<option value="all">All statuses</option>
-					{#each availableStatuses as status}
-						<option value={status}>{status.replaceAll('_', ' ')}</option>
-					{/each}
-				</select>
-			</div>
 		</div>
 
 		<div class="flex flex-wrap items-center gap-2">
 			<span class="text-muted-foreground text-xs">Severity:</span>
-			<Button
-				size="sm"
-				variant={value.severity === 'all' ? 'default' : 'outline'}
-				onclick={() => update({ severity: 'all' })}
-				class="h-7 px-2 text-xs"
-			>
-				All
-			</Button>
-			{#each availableSeverities as severity}
-				<Button
-					size="sm"
-					variant={value.severity === severity ? 'default' : 'outline'}
-					onclick={() => update({ severity })}
-					class="h-7 px-2 text-xs capitalize"
-				>
-					{severity}
-				</Button>
-			{/each}
+			<ToggleGroup.Root type="single" value={value.severity} variant="outline" size="sm" class="flex-wrap" aria-label="Severity" onValueChange={(next) => update({ severity: (next || 'all') as ActionsFilterState['severity'] })}>
+				<ToggleGroup.Item value="all">All</ToggleGroup.Item>
+				{#each availableSeverities as severity (severity)}
+					<ToggleGroup.Item value={severity}>{severity}</ToggleGroup.Item>
+				{/each}
+			</ToggleGroup.Root>
 
 			<div class="ml-auto flex items-center gap-2">
 				<label class="flex items-center gap-2 text-xs">
@@ -111,5 +79,4 @@
 				<Button size="sm" variant="ghost" onclick={onReset} class="h-7 px-2 text-xs">Reset</Button>
 			</div>
 		</div>
-	</Card.Content>
-</Card.Root>
+</div>

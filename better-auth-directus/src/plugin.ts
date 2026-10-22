@@ -40,9 +40,15 @@ export function directusSyncPlugin(options: DirectusSyncPluginOptions): BetterAu
 		id: 'directus-sync',
 
 		init: async () => {
+			// Non-fatal: an unreachable Directus must not take down the entire
+			// auth stack. Sync operations already degrade through the client's
+			// circuit-breaker boundary, so warn and let them retry on demand.
 			const isHealthy = await client.healthCheck();
 			if (!isHealthy) {
-				throw new Error('Directus sync health check failed during plugin initialization');
+				console.warn(
+					'[better-auth-directus] Health check failed during plugin initialization — ' +
+						'Directus sync is degraded and will retry on demand.'
+				);
 			}
 		}
 	};

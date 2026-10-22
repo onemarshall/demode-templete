@@ -1,64 +1,70 @@
-import type { IncidentCounts, RecommendedActionItem } from './triage';
+import type { IncidentCounts, RecommendedActionItem } from "./triage";
 
-export type StatusLevel = 'safe' | 'watch' | 'act_now';
+export type StatusLevel = "safe" | "watch" | "act_now" | "unknown";
 
 export interface SecurityStatus {
-	level: StatusLevel;
-	headline: string;
-	detail: string;
+  level: StatusLevel;
+  headline: string;
+  detail: string;
 }
 
 interface DeriveStatusInput {
-	counts: IncidentCounts;
-	actions: RecommendedActionItem[];
+  counts: IncidentCounts;
+  actions: RecommendedActionItem[];
+  monitoring?: { available: boolean; observedEvents: number; detail?: string };
 }
 
-export function deriveSecurityStatus({ counts, actions }: DeriveStatusInput): SecurityStatus {
-	const openActions = actions.filter((a) => a.status !== 'acknowledged' && a.status !== 'resolved');
-	const criticalOpen = openActions.filter((a) => a.severity === 'critical').length;
-	const highOpen = openActions.filter((a) => a.severity === 'high').length;
-	const mediumOpen = openActions.filter((a) => a.severity === 'medium').length;
-	const totalOpen = openActions.length;
+export function deriveSecurityStatus({
+  counts,
+  actions,
+  monitoring,
+}: DeriveStatusInput): SecurityStatus {
+  // Acknowledgement records review, not resolution of the underlying signal.
+  const unresolved = actions.filter((action) => action.status !== "resolved");
+  const coverage = !monitoring?.available
+    ? "Monitoring is unavailable; the current picture may be incomplete."
+    : monitoring.observedEvents === 0
+      ? "No recorded events are available to assess activity."
+      : (monitoring.detail ??
+        "Based on the available recorded events; this is not a guarantee of safety.");
+  const critical = unresolved.filter((action) => action.severity === "critical").length;
 
-	if (criticalOpen > 0) {
-		return {
-			level: 'act_now',
-			headline: pluralise(criticalOpen, 'critical issue', 'critical issues') + ' need your attention now.',
-			detail: buildDetail(openActions)
-		};
-	}
-
-	if (highOpen + mediumOpen > 0) {
-		return {
-			level: 'watch',
-			headline: `You're mostly safe. ${pluralise(totalOpen, 'thing', 'things')} to keep an eye on.`,
-			detail: buildDetail(openActions)
-		};
-	}
-
-	if (counts.newLast15m > 0) {
-		return {
-			level: 'safe',
-			headline: "You're safe.",
-			detail: `${counts.newLast15m} new low-severity ${counts.newLast15m === 1 ? 'signal' : 'signals'} in the last 15 minutes. Nothing requires action.`
-		};
-	}
-
-	return {
-		level: 'safe',
-		headline: "You're safe.",
-		detail: 'No active threats. Nothing requires your attention right now.'
-	};
+  if (critical > 0) {
+    return {
+      level: "act_now",
+      headline: `${pluralise(critical, "critical signal needs", "critical signals need")} review.`,
+      detail: `${buildDetail(unresolved)} ${coverage}`,
+    };
+  }
+  if (unresolved.length > 0) {
+    return {
+      level: "watch",
+      headline: `${pluralise(unresolved.length, "security check needs", "security checks need")} review.`,
+      detail: `${buildDetail(unresolved)} ${coverage}`,
+    };
+  }
+  if (!monitoring?.available || monitoring.observedEvents === 0) {
+    return {
+      level: "unknown",
+      headline: monitoring?.available
+        ? "No activity data to assess yet."
+        : "Monitoring coverage needs checking.",
+      detail: coverage,
+    };
+  }
+  return {
+    level: "safe",
+    headline: "No prioritised checks in the available records.",
+    detail: `${counts.newLast15m > 0 ? `${counts.newLast15m} recent signals recorded. ` : ""}${coverage}`,
+  };
 }
 
 function pluralise(n: number, singular: string, plural: string): string {
-	return `${n} ${n === 1 ? singular : plural}`;
+  return `${n} ${n === 1 ? singular : plural}`;
 }
 
 function buildDetail(actions: RecommendedActionItem[]): string {
-	if (actions.length === 0) return 'No open recommended actions.';
-	const top = actions.slice(0, 2).map((a) => a.title.replace(/\.$/, ''));
-	const remainder = actions.length - top.length;
-	const tail = remainder > 0 ? ` · +${remainder} more` : '';
-	return top.join(' · ') + tail + '.';
+  const top = actions.slice(0, 2).map((action) => action.title.replace(/\.$/, ""));
+  const remainder = actions.length - top.length;
+  return top.join(" · ") + (remainder > 0 ? ` · +${remainder} more` : "") + ".";
 }

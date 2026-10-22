@@ -55,20 +55,6 @@
 	// 2FA requires password-based auth
 	const canEnable2FA = $derived(hasPassword && !isSocialLoginOnly && !isSiweLogin && !isMagicLinkLogin);
 
-	// Log for debugging
-	$effect(() => {
-		logger.info('SecurityTab: User password detection', {
-			lastLoginMethod: (user as any)?.lastLoginMethod,
-			hasPassword,
-			password: (user as any)?.password,
-			passwordHash: (user as any)?.passwordHash,
-			isSocialLoginOnly,
-			isSiweLogin,
-			canEnable2FA,
-			connectedProviders: (user as any)?.connectedProviders,
-			userKeys: user ? Object.keys(user) : []
-		});
-	});
 
 	let hasError = $derived(error.length > 0);
 	let hasSuccess = $derived(success.length > 0);
@@ -147,19 +133,9 @@
 		}
 	}
 
-	// Auto-clear messages
-	$effect(() => {
-		if (hasError || hasSuccess) {
-			const timeout = setTimeout(() => {
-				error = '';
-				success = '';
-			}, 5000);
-			return () => clearTimeout(timeout);
-		}
-	});
 </script>
 
-<div class="space-y-6">
+<div class="flex flex-col gap-6">
 	<!-- Global Success/Error Messages -->
 	{#if hasSuccess}
 		<Alert.Root
@@ -177,6 +153,21 @@
 		</Alert.Root>
 	{/if}
 
+	<Card.Root>
+		<Card.Header>
+			<Card.Title>What protects this account?</Card.Title>
+			<Card.Description>Review the recorded settings, then choose the next useful step below.</Card.Description>
+		</Card.Header>
+		<Card.Content class="flex flex-col gap-4">
+			<dl class="grid gap-3 text-sm sm:grid-cols-2">
+				<div><dt class="text-muted-foreground">Email</dt><dd>{user.emailVerified ? 'Verified' : 'Not verified'}</dd></div>
+				<div><dt class="text-muted-foreground">Two-factor authentication</dt><dd>{typeof (user as User & { twoFactorEnabled?: boolean }).twoFactorEnabled === 'boolean' ? ((user as User & { twoFactorEnabled?: boolean }).twoFactorEnabled ? 'Enabled' : 'Not enabled') : 'Status unavailable'}</dd></div>
+			</dl>
+			<p class="text-muted-foreground text-sm">{!user.emailVerified && !isSiweLogin && !isSocialLoginOnly ? 'Verify your email below so you can receive account verification messages.' : canEnable2FA && !(user as User & { twoFactorEnabled?: boolean }).twoFactorEnabled ? 'Review two-factor authentication below to add a verification step to sign-in.' : 'Review your active sessions and sign out any you do not recognise.'}</p>
+			<Button variant="outline" href="/auth/sessions">Review active sessions</Button>
+		</Card.Content>
+	</Card.Root>
+
 	<!-- Password & Authentication - Hidden for SIWE and social login users -->
 	{#if !isSiweLogin && !isSocialLoginOnly}
 		<Card.Root>
@@ -193,11 +184,11 @@
 			</Card.Header>
 			<Card.Content class="space-y-4">
 				{#if hasPassword && !isMagicLinkLogin}
-					<div class="flex items-center justify-between">
+					<div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
 						<div>
 							<h4 class="font-medium">Password</h4>
 							<p class="text-muted-foreground text-sm">
-								Change your password to keep your account secure
+								Update your password if it has been shared or exposed
 							</p>
 						</div>
 						<Button variant="outline" onclick={() => goto('/auth/change-password')}>
@@ -206,18 +197,18 @@
 					</div>
 					<Separator />
 				{/if}
-				<div class="flex items-center justify-between">
+				<div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
 					<div>
 						<h4 class="font-medium">Email</h4>
 						<p class="text-muted-foreground text-sm">
-							Change your email to keep your account secure
+							Keep an address you can access for account messages
 						</p>
 					</div>
 					<Button variant="outline" onclick={() => goto('/auth/change-email')}>Change Email</Button>
 				</div>
 				<Separator />
 
-				<div class="flex items-center justify-between">
+				<div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
 					<div>
 						<h4 class="font-medium">Email Verification</h4>
 						<p class="text-muted-foreground text-sm">
@@ -362,7 +353,7 @@
 			</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-4">
-			<div class="flex items-center justify-between">
+			<div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
 				<div>
 					<h4 class="font-medium">Active Sessions</h4>
 					<p class="text-muted-foreground text-sm">
@@ -374,11 +365,11 @@
 
 			<Separator />
 
-			<div class="flex items-center justify-between">
+			<div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
 				<div>
 					<h4 class="font-medium">Trusted Devices</h4>
 					<p class="text-muted-foreground text-sm">
-						Manage devices that can skip 2FA verification
+						Review trust used to skip a future 2FA prompt; removing trust does not sign out a session
 					</p>
 				</div>
 				<Button variant="outline" onclick={() => goto('/auth/trusted-devices')}>

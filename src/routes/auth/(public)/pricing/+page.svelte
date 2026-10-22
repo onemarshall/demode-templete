@@ -2,9 +2,6 @@
 	import { authClient } from "#lib/auth-client.js";
 	import { goto } from "$app/navigation";
 	import { PLANS as plans } from "#lib/billing/plans.js";
-	import { publicEnv } from "#lib/auth/shared/env/index.js";
-	import CapWidgetAdapter from "#lib/components/forms/shared/CapWidgetAdapter.svelte";
-	import { computeCapEndpoint } from "#lib/components/forms/auth/captcha-endpoint.js";
 
 	const session = authClient.useSession();
 	const isAuthed = $derived(!!$session.data?.user);
@@ -15,15 +12,6 @@
 	let currentPlan = $state<string | null>(null);
 	let guestModalPlanId = $state<string | null>(null);
 	let guestEmail = $state("");
-
-	// Captcha state (mirrors the sign-up flow). The guest-checkout endpoint
-	// requires a bypass token in production when PUBLIC_AUTH_SECURITY_PLUGIN
-	// is enabled; we get one by solving the cap.js widget and POSTing the
-	// resulting token to /api/auth/security/verify-captcha.
-	let showCaptcha = $state(false);
-	let captchaError = $state("");
-	const captchaRequired = Boolean(publicEnv.PUBLIC_AUTH_SECURITY_PLUGIN);
-	const capEndpoint = computeCapEndpoint();
 
 	$effect(() => {
 		if (!isAuthed) {
@@ -90,17 +78,10 @@
 	async function submitGuestCheckout(event: SubmitEvent) {
 		event.preventDefault();
 		if (!guestModalPlanId) return;
-		if (captchaRequired) {
-			// Show the captcha; the actual checkout fires from
-			// handleCaptchaComplete once we have a bypass token.
-			captchaError = "";
-			showCaptcha = true;
-			return;
-		}
 		await startCheckout();
 	}
 
-	async function startCheckout(captchaBypassToken?: string) {
+	async function startCheckout() {
 		if (!guestModalPlanId) return;
 		const planId = guestModalPlanId;
 		loading = planId;
@@ -115,7 +96,6 @@
 					email: guestEmail,
 					successUrl: "/auth/profile?subscription=success",
 					cancelUrl: "/pricing?subscription=canceled",
-					...(captchaBypassToken ? { captchaBypassToken } : {}),
 				}),
 			});
 
@@ -138,37 +118,6 @@
 		} finally {
 			loading = null;
 		}
-	}
-
-	async function handleCaptchaComplete(token: string) {
-		try {
-			const res = await fetch("/api/auth/security/verify-captcha", {
-				method: "POST",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify({ token }),
-			});
-			const data = (await res.json().catch(() => ({}))) as {
-				success?: boolean;
-				bypassToken?: string;
-				error?: string;
-			};
-			if (!res.ok || !data.success || !data.bypassToken) {
-				captchaError = data.error ?? "Captcha verification failed.";
-				return;
-			}
-			showCaptcha = false;
-			captchaError = "";
-			await startCheckout(data.bypassToken);
-		} catch (err) {
-			captchaError =
-				err instanceof Error
-					? err.message
-					: "Captcha verification error.";
-		}
-	}
-
-	function handleCaptchaError(err: Error) {
-		captchaError = err.message;
 	}
 
 	async function openPortal() {
@@ -409,8 +358,6 @@
 							onclick={() => {
 								guestModalPlanId = null;
 								guestEmail = "";
-								showCaptcha = false;
-								captchaError = "";
 							}}
 							class="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
 						>
@@ -418,8 +365,7 @@
 						</button>
 						<button
 							type="submit"
-							disabled={loading === guestModalPlanId ||
-								showCaptcha}
+							disabled={loading === guestModalPlanId}
 							class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
 						>
 							{loading === guestModalPlanId
@@ -427,30 +373,6 @@
 								: "Continue"}
 						</button>
 					</div>
-					{#if showCaptcha}
-						<div class="rounded-lg border border-gray-200 p-4">
-							{#if !capEndpoint}
-								<p class="text-sm text-red-600">
-									Captcha endpoint is not configured.
-								</p>
-							{:else}
-								<p class="mb-2 text-sm text-gray-700">
-									Please complete the captcha to continue:
-								</p>
-								<CapWidgetAdapter
-									endpoint={capEndpoint}
-									onSolve={handleCaptchaComplete}
-									onerror={handleCaptchaError}
-									class="w-full"
-								/>
-								{#if captchaError}
-									<p class="mt-2 text-sm text-red-600">
-										{captchaError}
-									</p>
-								{/if}
-							{/if}
-						</div>
-					{/if}
 					<p class="text-center text-xs text-gray-500">
 						Already have an account?
 						<a

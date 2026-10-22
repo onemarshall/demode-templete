@@ -115,6 +115,9 @@ export function buildSecurityPlugins(env: Record<string, unknown>): BetterAuthPl
 			captcha: {
 				enabled: parseBool(env.AUTH_CAPTCHA_ENABLED) ?? true,
 				provider: 'capjs',
+				secretKey: env.CAP_SECRET as string | undefined,
+				endpoint: env.PUBLIC_CAP_ENDPOINT as string | undefined,
+				siteKey: env.PUBLIC_CAP_KEY as string | undefined,
 				bypassTtlSeconds: 1800
 			},
 

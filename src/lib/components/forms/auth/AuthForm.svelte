@@ -12,6 +12,8 @@
 	import AuthEmailField from "./AuthEmailField.svelte";
 	import AuthPasswordField from "./AuthPasswordField.svelte";
 	import PasskeyButton from "./PasskeyButton.svelte";
+	import AuthCaptchaPanel from "./AuthCaptchaPanel.svelte";
+	import { verifyCaptchaAndStoreBypass } from "./captcha-endpoint.js";
 
 	type Mode = "sign-in" | "sign-up";
 
@@ -79,6 +81,23 @@
 	}: Props = $props();
 
 	let verifiedMessage = $state("");
+
+	// ---- captcha (risk-based; the server demands it via a 403 captchaRequired) ----
+	let captchaError = $state("");
+	let captchaVerifying = $state(false);
+	let formElement: HTMLFormElement | null = $state(null);
+
+	async function handleCaptchaSolve(token: string) {
+		captchaError = "";
+		captchaVerifying = true;
+		const outcome = await verifyCaptchaAndStoreBypass(token);
+		captchaVerifying = false;
+		if (outcome.ok) {
+			formElement?.requestSubmit();
+		} else {
+			captchaError = outcome.error ?? "Captcha verification failed. Please try again.";
+		}
+	}
 
 	// ---- last sign-in method (from Better Auth lastLoginMethod plugin cookie) ----
 	// The server plugin always sets `better-auth.last_used_login_method` (httpOnly: false).
@@ -154,6 +173,16 @@
 	);
 	const hasError = $derived(resultError.length > 0);
 	const hasSuccess = $derived(successMessage.length > 0);
+	const resultCaptchaRequired = $derived.by(() => {
+		const r = formAction.result;
+		return Boolean(
+			r &&
+				typeof r === "object" &&
+				"captchaRequired" in r &&
+				(r as { captchaRequired?: unknown }).captchaRequired,
+		);
+	});
+	const captchaRequired = $derived(resultCaptchaRequired);
 
 	const socialEnabled = $derived(
 		showSocial && Boolean(publicEnv.PUBLIC_AUTH_SOCIAL_LOGINS_ENABLED),
@@ -237,7 +266,7 @@
 		/>
 	{/if}
 
-	<form {...formAction} class="space-y-4">
+	<form bind:this={formElement} {...formAction} class="space-y-4">
 		{#if mode === "sign-up" && formAction.fields.name}
 			{@const nameField = formAction.fields.name}
 			<div class="space-y-2">
@@ -312,7 +341,15 @@
 			/>
 		{/if}
 
-		<Button type="submit" class="w-full" disabled={formAction.pending}>
+		{#if captchaRequired}
+			<AuthCaptchaPanel
+				onSolve={handleCaptchaSolve}
+				error={captchaError}
+				message="One more check: please complete the captcha to continue."
+			/>
+		{/if}
+
+		<Button type="submit" class="w-full" disabled={formAction.pending || captchaVerifying}>
 			{#if formAction.pending}
 				<Loader class="mr-2 h-4 w-4 animate-spin" />
 				{submitLoadingLabel}

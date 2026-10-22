@@ -13,7 +13,7 @@ import { FEATURE_PRIORITY } from '../../core/feature';
 import { logger } from '#lib/auth/shared/logger.js';
 import { hashUserAgent } from '../../core/helpers';
 import { positiveRiskFactors } from '../../core/risk-engine';
-import { validateBypassToken, issueBypassToken } from '../../endpoints/captcha';
+import { validateBypassToken, issueBypassToken, verifyCapToken } from '../../endpoints/captcha';
 
 const BYPASS_TTL_SECONDS = 3600;
 
@@ -174,8 +174,17 @@ function extractCaptchaResponse(ctx: SecurityContext): string | undefined {
  * that the client sends via the X-Captcha-Bypass header on subsequent requests.
  */
 function extractBypassToken(ctx: SecurityContext): string | undefined {
-	const token = ctx.getHeader('x-captcha-bypass');
-	return token || undefined;
+	const header = ctx.getHeader('x-captcha-bypass');
+	if (header) return header;
+	// Cookie fallback: the browser flow stores the bypass token in a cookie so
+	// it rides remote-function submissions, whose headers cannot be extended.
+	const cookieHeader = ctx.getHeader('cookie');
+	if (!cookieHeader) return undefined;
+	const match = cookieHeader
+		.split(';')
+		.map((part) => part.trim())
+		.find((part) => part.startsWith('captcha_bypass='));
+	return match ? decodeURIComponent(match.slice('captcha_bypass='.length)) : undefined;
 }
 
 /**
@@ -189,17 +198,15 @@ async function verifyCaptcha(
 	const provider = config.provider ?? 'capjs';
 	const secretKey = config.secretKey;
 
-	// capjs has no remote siteverify — the token is already validated by the
-	// widget's own server round-trip. Auto-pass in development only; refuse
-	// in production so a real provider must be configured.
 	if (provider === 'capjs') {
-		if (process.env.NODE_ENV === 'production') {
-			logger.error(
-				'[CAPTCHA] capjs provider used in production — configure a real provider (hcaptcha, recaptcha, turnstile).'
-			);
-			return { success: false, error_codes: ['provider-not-configured'] };
-		}
-		return { success: true };
+		// Cap standalone exposes a reCAPTCHA-compatible siteverify endpoint;
+		// verifyCapToken auto-passes only when unconfigured in development.
+		const result = await verifyCapToken(token, {
+			endpoint: config.endpoint,
+			siteKey: config.siteKey,
+			secretKey
+		});
+		return { success: result.success, error_codes: result.error ? [result.error] : undefined };
 	}
 
 	if (!secretKey) {

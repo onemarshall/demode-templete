@@ -12,6 +12,7 @@ import type { SecurityConfig, CaptchaFeatureConfig } from '../core/feature';
 import { createStorageAdapter, type StorageAdapter } from '../core/storage';
 import { CacheManager } from '../core/cache';
 import { slidingWindowCheck } from '../features/rate-limit/sliding-window';
+import { isDevelopment } from '#lib/auth/shared/env/index.js';
 
 // ============================================
 // Types
@@ -113,6 +114,49 @@ interface CaptchaProviderConfig {
 	provider: 'capjs' | 'hcaptcha' | 'recaptcha' | 'turnstile';
 	secretKey: string;
 	siteKey?: string;
+	endpoint?: string;
+}
+
+/**
+ * Verify a token against a self-hosted Cap standalone server.
+ *
+ * Cap exposes a reCAPTCHA-compatible siteverify endpoint with the site key
+ * in the path: POST {endpoint}/{siteKey}/siteverify { secret, response }.
+ * Unconfigured, it auto-passes in development only — everywhere else it
+ * refuses, so an unconfigured production deployment fails closed.
+ */
+export async function verifyCapToken(
+	token: string,
+	providerConfig: { endpoint?: string; siteKey?: string; secretKey?: string }
+): Promise<{ success: boolean; error?: string }> {
+	const { endpoint, siteKey, secretKey } = providerConfig;
+	if (!endpoint || !siteKey || !secretKey) {
+		if (isDevelopment()) {
+			securityLogger.warn('[CAPTCHA] capjs unconfigured — auto-passing (development only)');
+			return { success: true };
+		}
+		securityLogger.error('[CAPTCHA] capjs provider not configured (endpoint, site key, secret)');
+		return { success: false, error: 'CAPTCHA provider not configured' };
+	}
+
+	try {
+		const verifyUrl = `${endpoint.replace(/\/+$/, '')}/${siteKey}/siteverify`;
+		const response = await fetch(verifyUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ secret: secretKey, response: token })
+		});
+
+		if (!response.ok) {
+			return { success: false, error: 'Verification service unavailable' };
+		}
+
+		const result = (await response.json()) as { success?: boolean };
+		return { success: Boolean(result.success) };
+	} catch (error) {
+		securityLogger.error('[Security] CAPTCHA verification error', { error, provider: 'capjs' });
+		return { success: false, error: 'Verification error' };
+	}
 }
 
 async function verifyCaptchaToken(
@@ -154,19 +198,9 @@ async function verifyCaptchaToken(
 				});
 				break;
 
-			case 'capjs':
-				// SECURITY: capjs is a development-only provider.
-				// In production, refuse to auto-pass — require a real provider.
-				if (process.env.NODE_ENV === 'production') {
-					securityLogger.error(
-						'[CAPTCHA] capjs provider used in production — this auto-passes all challenges. Configure a real provider (hcaptcha, recaptcha, turnstile).'
-					);
-					return { success: false, error: 'CAPTCHA provider not configured for production' };
-				}
-				securityLogger.warn(
-					'[CAPTCHA] capjs provider auto-passing verification (development only)'
-				);
-				return { success: true };
+			case 'capjs': {
+				return await verifyCapToken(token, providerConfig);
+			}
 
 			default:
 				securityLogger.error(`[CAPTCHA] Unknown provider: ${providerConfig.provider}`);
@@ -267,7 +301,9 @@ export function createCaptchaEndpoint(config: SecurityConfig) {
 
 				const verifyResult = await verifyCaptchaToken(token, ip, {
 					provider,
-					secretKey
+					secretKey,
+					siteKey: captchaSettings.siteKey,
+					endpoint: captchaSettings.endpoint
 				});
 
 				if (!verifyResult.success) {

@@ -126,8 +126,8 @@
 						await goto(
 							`/auth/2fa?reason=stale&redirectTo=${encodeURIComponent(REDIRECT_DESTINATION)}`,
 							{
-								replaceState: true,
-								invalidateAll: true
+								replace: true,
+								refreshAll: true
 							}
 						);
 						return;

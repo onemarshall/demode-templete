@@ -1,35 +1,59 @@
 import type { SerializedSession, SerializedUser } from '#lib/auth/shared/types/serialized-auth.js';
 import { getCMSProvider } from '#lib/auth/server/cms/index.js';
+import { getServerEnvSync } from '#lib/auth/shared/env/index.js';
 import { logger } from '#lib/auth/shared/logger.js';
 
 const CMS_FILE_ID_PATTERN =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** Pull a CMS file id out of either a bare UUID or a `<cms>/assets/<uuid>` URL. */
+function extractCmsFileId(image: string): string | null {
+	if (CMS_FILE_ID_PATTERN.test(image)) return image;
+
+	try {
+		const match = new URL(image).pathname.match(/\/assets\/([^/]+)$/);
+		return match && CMS_FILE_ID_PATTERN.test(match[1]) ? match[1] : null;
+	} catch {
+		return null;
+	}
+}
+
 /**
  * Normalize a Better Auth `user.image` value to something an <img> can render.
- * Legacy rows may hold a bare CMS file UUID instead of a URL — resolve those
- * through the CMS provider's asset URL builder; non-URL values are dropped so
- * they never reach `src` as a relative path (which 404s against /auth/*).
+ *
+ * CMS-backed images are re-resolved through the provider's asset URL builder
+ * rather than passed through verbatim, so rows written against an old
+ * `PUBLIC_CMS_URL` (e.g. a localhost origin baked in at upload time) come out
+ * pointing at the currently configured host instead of being blocked as mixed
+ * content. Non-CMS values are dropped unless they are absolute URLs, so they
+ * never reach `src` as a relative path (which 404s against /auth/*).
  */
 export function resolveUserImage(image: unknown): string | null {
 	if (typeof image !== 'string' || !image.trim()) return null;
 
-	try {
-		return new URL(image).toString();
-	} catch {
-		// Not an absolute URL — may be a bare CMS file id
+	const value = image.trim();
+	const fileId = extractCmsFileId(value);
+
+	if (fileId) {
+		try {
+			const cms = getCMSProvider() as { getAssetUrl?: (id: string) => string };
+			if (typeof cms.getAssetUrl === 'function') return cms.getAssetUrl(fileId);
+		} catch (error) {
+			logger.warn('Could not resolve CMS avatar file id via provider', {
+				image,
+				error: error instanceof Error ? error.message : String(error)
+			});
+		}
+
+		// Provider not initialised yet — fall back to the configured CMS origin
+		// rather than returning a stale host baked into the stored URL.
+		const base = getServerEnvSync().PUBLIC_CMS_URL;
+		if (base) return `${base.replace(/\/+$/, '')}/assets/${fileId}`;
 	}
 
-	if (!CMS_FILE_ID_PATTERN.test(image)) return null;
-
 	try {
-		const cms = getCMSProvider() as { getAssetUrl?: (id: string) => string };
-		return typeof cms.getAssetUrl === 'function' ? cms.getAssetUrl(image) : null;
-	} catch (error) {
-		logger.warn('Could not resolve legacy avatar file id', {
-			image,
-			error: error instanceof Error ? error.message : String(error)
-		});
+		return new URL(value).toString();
+	} catch {
 		return null;
 	}
 }

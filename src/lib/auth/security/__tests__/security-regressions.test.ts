@@ -16,6 +16,7 @@ import { getClientIp as getSharedClientIp } from '../shared/client-ip';
 import { shouldProcessPath } from '../core/helpers';
 import { captchaFeature } from '../features/captcha';
 import { issueBypassToken } from '../endpoints/captcha';
+import { publicEnv } from '#lib/auth/shared/env/index.js';
 import { createSecurityContext, createTestSecurityContext } from '../core/context';
 import { isAdminUser } from '#lib/auth/shared/roles.js';
 import type { SecurityConfig } from '../core/feature';
@@ -197,19 +198,25 @@ describe('captchaFeature.check', () => {
 	});
 
 	it('capjs provider fails closed in production', async () => {
-		vi.stubEnv('NODE_ENV', 'production');
+		// The production signal is PUBLIC_ENV_MODE (reliable on Cloudflare
+		// Workers, where NODE_ENV is not set), not NODE_ENV.
+		const previousMode = publicEnv.PUBLIC_ENV_MODE;
+		publicEnv.PUBLIC_ENV_MODE = 'production';
+		try {
+			const request = createRequest({
+				'cf-connecting-ip': '203.0.113.13',
+				'cf-ray': 'test-ray',
+				'user-agent': 'prod-ua',
+				'x-captcha-token': 'any-token-12345'
+			});
+			const ctx = createSecurityContext(request);
+			ctx.riskScore = 90;
 
-		const request = createRequest({
-			'cf-connecting-ip': '203.0.113.13',
-			'cf-ray': 'test-ray',
-			'user-agent': 'prod-ua',
-			'x-captcha-token': 'any-token-12345'
-		});
-		const ctx = createSecurityContext(request);
-		ctx.riskScore = 90;
-
-		const result = await captchaFeature.check!(ctx, config);
-		expect(result?.block).toBe(true);
+			const result = await captchaFeature.check!(ctx, config);
+			expect(result?.block).toBe(true);
+		} finally {
+			publicEnv.PUBLIC_ENV_MODE = previousMode;
+		}
 	});
 });
 

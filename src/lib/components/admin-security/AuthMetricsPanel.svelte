@@ -1,250 +1,43 @@
 <script lang="ts">
 	import * as Card from '#lib/components/ui/card/index.js';
+	import * as Chart from '#lib/components/ui/chart/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
-	import {
-		TrendingUp,
-		TrendingDown,
-		CheckCircle,
-		XCircle,
-		ShieldAlert,
-		KeyRound,
-		Users,
-		Lock
-	} from '@lucide/svelte';
+	import { BarChart } from 'layerchart';
 	import type { AuthStats } from '#lib/auth/security/services/sdk.js';
-
 	let { authStats = null }: { authStats: AuthStats | null } = $props();
-
-	const maxHourlyTotal = $derived(() => {
-		if (!authStats?.hourlyRates) return 1;
-		return Math.max(...authStats.hourlyRates.map((h) => h.successCount + h.failureCount), 1);
-	});
-
-	function formatHour(hour: number): string {
-		return `${hour.toString().padStart(2, '0')}:00`;
-	}
-
-	function formatTime(timestamp: number): string {
-		return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-	}
-
-	const overallStatus = $derived(() => {
-		if (!authStats) return 'operational';
-		if (authStats.successRate >= 95 && authStats.bruteForceAttempts.length === 0)
-			return 'operational';
-		if (authStats.successRate >= 80 || authStats.bruteForceAttempts.length <= 2) return 'degraded';
-		return 'critical';
-	});
-
-	const statusMeta = {
-		operational: { label: 'Healthy', badge: 'border-emerald-200 text-emerald-700 bg-emerald-50' },
-		degraded: { label: 'Warning', badge: 'border-amber-200 text-amber-800 bg-amber-50' },
-		critical: { label: 'Critical', badge: 'border-red-200 text-red-800 bg-red-50' }
-	};
+	const config = {
+		successCount: { label: 'Successful', color: 'var(--chart-1)' },
+		failureCount: { label: 'Failed', color: 'var(--chart-2)' }
+	} satisfies Chart.ChartConfig;
+	const rows = $derived((authStats?.hourlyRates ?? []).map((row) => ({ ...row, label: `${String(row.hour).padStart(2, '0')}:${String(new Date(row.timestamp).getUTCMinutes()).padStart(2, '0')}` })));
+	const total = $derived((authStats?.successCount ?? 0) + (authStats?.failureCount ?? 0));
 </script>
-
 <Card.Root>
-	<Card.Header>
-		<div class="flex items-center justify-between">
-			<div>
-				<Card.Title class="flex items-center gap-2">
-					<TrendingUp class="h-5 w-5" />
-					Are sign-ins healthy?
-				</Card.Title>
-				<Card.Description
-					>How people are signing in, and whether anything looks off.</Card.Description
-				>
-			</div>
-			{#if authStats}
-				{@const status = overallStatus()}
-				<Badge variant="outline" class={statusMeta[status].badge}>
-					{statusMeta[status].label}
-				</Badge>
-			{/if}
-		</div>
-	</Card.Header>
-	<Card.Content class="space-y-6">
+	<Card.Header><Card.Title>Are people having trouble signing in?</Card.Title><Card.Description>Recorded sign-in outcomes from the recent event sample. Times are UTC; these counts do not establish service availability.</Card.Description></Card.Header>
+	<Card.Content class="flex flex-col gap-6">
 		{#if authStats}
-			<!-- Summary Stats -->
-			<div class="grid gap-4 sm:grid-cols-4">
-				<div class="rounded-lg border p-4 text-center">
-					<div class="flex items-center justify-center gap-2">
-						<CheckCircle class="h-5 w-5 text-green-500" />
-						<span class="text-2xl font-bold text-green-600">{authStats.successCount}</span>
-					</div>
-					<p class="text-muted-foreground text-sm">Successful</p>
-				</div>
-				<div class="rounded-lg border p-4 text-center">
-					<div class="flex items-center justify-center gap-2">
-						<XCircle class="h-5 w-5 text-red-500" />
-						<span class="text-2xl font-bold text-red-600">{authStats.failureCount}</span>
-					</div>
-					<p class="text-muted-foreground text-sm">Failed</p>
-				</div>
-				<div class="rounded-lg border p-4 text-center">
-					<div
-						class="text-2xl font-bold"
-						class:text-green-600={authStats.successRate >= 95}
-						class:text-amber-600={authStats.successRate >= 80 && authStats.successRate < 95}
-						class:text-red-600={authStats.successRate < 80}
-					>
-						{authStats.successRate.toFixed(1)}%
-					</div>
-					<p class="text-muted-foreground text-sm">Success Rate</p>
-				</div>
-				<div class="rounded-lg border p-4 text-center">
-					<div class="flex items-center justify-center gap-2">
-						<ShieldAlert class="h-5 w-5 text-orange-500" />
-						<span class="text-2xl font-bold text-orange-600"
-							>{authStats.bruteForceAttempts.length}</span
-						>
-					</div>
-					<p class="text-muted-foreground text-sm">Brute Force</p>
-				</div>
-			</div>
-
-			<!-- Hourly Login Rates Chart -->
-			<div>
-				<h4 class="mb-3 text-sm font-medium">Login Success/Failure Over Time (24h)</h4>
-				<div class="flex h-32 items-end gap-1">
-					{#each authStats.hourlyRates as hourData (hourData.timestamp)}
-						{@const total = hourData.successCount + hourData.failureCount}
-						{@const maxTotal = maxHourlyTotal()}
-						{@const heightPercent = maxTotal > 0 ? (total / maxTotal) * 100 : 0}
-						{@const successPercent = total > 0 ? (hourData.successCount / total) * 100 : 100}
-						<div class="group relative flex flex-1 flex-col items-center">
-							<div
-								class="relative w-full overflow-hidden rounded-t"
-								style="height: {Math.max(heightPercent, 4)}%"
-								title="{formatHour(
-									hourData.hour
-								)}: {hourData.successCount} success, {hourData.failureCount} failed ({hourData.successRate.toFixed(
-									0
-								)}%)"
-							>
-								<div
-									class="absolute bottom-0 w-full bg-green-500"
-									style="height: {successPercent}%"
-								></div>
-								<div
-									class="absolute top-0 w-full bg-red-500"
-									style="height: {100 - successPercent}%"
-								></div>
-							</div>
-							{#if hourData.hour % 6 === 0}
-								<span class="text-muted-foreground mt-1 text-[0.6rem]">{hourData.hour}h</span>
-							{/if}
-						</div>
-					{/each}
-				</div>
-				<div class="mt-2 flex items-center justify-center gap-4 text-xs">
-					<span class="flex items-center gap-1"
-						><span class="h-2 w-2 rounded bg-green-500"></span> Success</span
-					>
-					<span class="flex items-center gap-1"
-						><span class="h-2 w-2 rounded bg-red-500"></span> Failed</span
-					>
-				</div>
-			</div>
-
-			<!-- 2FA Adoption & Password Resets -->
+			<dl class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+				<div><dt class="text-muted-foreground text-sm">Successful</dt><dd class="text-2xl font-semibold">{authStats.successCount}</dd></div>
+				<div><dt class="text-muted-foreground text-sm">Failed</dt><dd class="text-2xl font-semibold">{authStats.failureCount}</dd></div>
+				<div><dt class="text-muted-foreground text-sm">Failure rate</dt><dd class="text-2xl font-semibold">{total > 0 ? `${(authStats.failureCount / total * 100).toFixed(1)}%` : 'No attempts'}</dd></div>
+				<div><dt class="text-muted-foreground text-sm">Repeated failure patterns</dt><dd class="text-2xl font-semibold">{authStats.bruteForceAttempts.length}</dd></div>
+			</dl>
+			{#if total > 0}
+				<p class="text-sm">{authStats.failureCount} of {total} recorded attempts failed. Repeated failures can warrant investigation; a failed attempt alone does not confirm an attack.</p>
+				<Chart.Container {config} class="h-56 w-full aspect-auto" aria-label="Successful and failed sign-in events by UTC hour; exact counts follow">
+					<BarChart data={rows} x="label" axis="x" seriesLayout="stack" legend series={[{ key: 'successCount', ...config.successCount }, { key: 'failureCount', ...config.failureCount }]} props={{ bars: { strokeWidth: 0 }, xAxis: { format: (value: string) => Number(value.slice(0, 2)) % 6 === 0 ? value : '' } }}>
+						{#snippet tooltip()}<Chart.Tooltip />{/snippet}
+					</BarChart>
+				</Chart.Container>
+				<details><summary class="cursor-pointer text-sm font-medium">View hourly sign-in counts</summary><div class="mt-3 overflow-x-auto"><table class="w-full text-left text-sm"><caption class="sr-only">Recorded sign-in counts by UTC hour</caption><thead><tr><th scope="col" class="p-2">Hour (UTC)</th><th scope="col" class="p-2">Successful</th><th scope="col" class="p-2">Failed</th></tr></thead><tbody>{#each rows as row (row.hour)}<tr class="border-t"><th scope="row" class="p-2 font-normal">{row.label}</th><td class="p-2">{row.successCount}</td><td class="p-2">{row.failureCount}</td></tr>{/each}</tbody></table></div></details>
+			{:else}<p class="text-muted-foreground text-sm">No sign-in attempts were recorded in the returned sample.</p>{/if}
 			<div class="grid gap-4 sm:grid-cols-2">
-				<div class="rounded-lg border p-4">
-					<div class="mb-2 flex items-center gap-2">
-						<Lock class="h-4 w-4 text-blue-500" />
-						<span class="text-sm font-medium">2FA Adoption</span>
-					</div>
-					<div class="flex items-baseline gap-2">
-						<span
-							class="text-3xl font-bold"
-							class:text-green-600={authStats.twoFactorAdoptionRate >= 50}
-							class:text-amber-600={authStats.twoFactorAdoptionRate >= 25 &&
-								authStats.twoFactorAdoptionRate < 50}
-							class:text-red-600={authStats.twoFactorAdoptionRate < 25}
-						>
-							{authStats.twoFactorAdoptionRate.toFixed(0)}%
-						</span>
-						<span class="text-muted-foreground text-sm">
-							({authStats.twoFactorEnabledCount} of {authStats.totalUsersCount} users)
-						</span>
-					</div>
-					<div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
-						<div
-							class="h-full rounded-full transition-all"
-							class:bg-green-500={authStats.twoFactorAdoptionRate >= 50}
-							class:bg-amber-500={authStats.twoFactorAdoptionRate >= 25 &&
-								authStats.twoFactorAdoptionRate < 50}
-							class:bg-red-500={authStats.twoFactorAdoptionRate < 25}
-							style="width: {authStats.twoFactorAdoptionRate}%"
-						></div>
-					</div>
-				</div>
-				<div class="rounded-lg border p-4">
-					<div class="mb-2 flex items-center gap-2">
-						<KeyRound class="h-4 w-4 text-purple-500" />
-						<span class="text-sm font-medium">Password Resets (24h)</span>
-					</div>
-					<div class="flex items-baseline gap-2">
-						<span class="text-3xl font-bold text-purple-600">{authStats.passwordResetRequests}</span
-						>
-						<span class="text-muted-foreground text-sm">requests</span>
-					</div>
-					{#if authStats.passwordResetHourly.some((h) => h.count > 0)}
-						<div class="mt-2 flex h-8 items-end gap-px">
-							{#each authStats.passwordResetHourly as hourData}
-								{@const maxResets = Math.max(
-									...authStats.passwordResetHourly.map((h) => h.count),
-									1
-								)}
-								<div
-									class="flex-1 rounded-t bg-purple-400"
-									style="height: {(hourData.count / maxResets) * 100}%"
-									title="{formatHour(hourData.hour)}: {hourData.count} resets"
-								></div>
-							{/each}
-						</div>
-					{/if}
-				</div>
+				<div class="rounded-lg border p-4"><h4 class="text-sm font-medium">Two-factor authentication adoption</h4>{#if authStats.twoFactorAdoptionRate != null && authStats.twoFactorEnabledCount != null && authStats.totalUsersCount != null}<p class="mt-2 text-2xl font-semibold">{authStats.twoFactorAdoptionRate.toFixed(0)}%</p><p class="text-muted-foreground text-sm">{authStats.twoFactorEnabledCount} of {authStats.totalUsersCount} users</p>{:else}<p class="mt-2 text-sm">Unavailable</p><p class="text-muted-foreground text-xs">An authoritative user and enrollment count is not connected.</p>{/if}</div>
+				<div class="rounded-lg border p-4"><h4 class="text-sm font-medium">Recorded password reset requests</h4><p class="mt-2 text-2xl font-semibold">{authStats.passwordResetRequests}</p><p class="text-muted-foreground text-xs">In the recent event sample</p></div>
 			</div>
-
-			<!-- Brute Force Attempts -->
 			{#if authStats.bruteForceAttempts.length > 0}
-				<div>
-					<h4 class="mb-3 flex items-center gap-2 text-sm font-medium">
-						<ShieldAlert class="h-4 w-4 text-orange-500" />
-						Potential Brute Force Attempts
-					</h4>
-					<div class="space-y-2">
-						{#each authStats.bruteForceAttempts as attempt}
-							<div
-								class="flex items-center justify-between rounded border px-3 py-2 text-sm"
-								class:border-red-200={attempt.isBlocked}
-								class:bg-red-50={attempt.isBlocked}
-							>
-								<div class="flex items-center gap-3">
-									<Users class="h-4 w-4 text-gray-500" />
-									<span class="font-mono text-xs">{attempt.userId}</span>
-									<span class="text-muted-foreground">from</span>
-									<code class="text-xs">{attempt.ip}</code>
-								</div>
-								<div class="flex items-center gap-2">
-									<Badge variant={attempt.isBlocked ? 'destructive' : 'secondary'} class="text-xs">
-										{attempt.failureCount} failures
-									</Badge>
-									{#if attempt.isBlocked}
-										<Badge variant="destructive" class="text-xs">Blocked</Badge>
-									{/if}
-								</div>
-							</div>
-						{/each}
-					</div>
-				</div>
+				<div><h4 class="mb-3 text-sm font-medium">Repeated sign-in failure patterns</h4><div class="flex flex-col gap-2">{#each authStats.bruteForceAttempts as attempt (`${attempt.userId}-${attempt.ip}`)}<div class="flex flex-wrap items-center justify-between gap-3 rounded border px-3 py-2 text-sm"><div class="min-w-0"><p class="break-all font-mono text-xs">{attempt.userId}</p><p class="text-muted-foreground break-all">From {attempt.ip}</p></div><div class="flex flex-wrap items-center gap-2"><Badge variant="secondary">{attempt.failureCount} failures</Badge>{#if attempt.isBlocked}<Badge variant="destructive">IP currently blocked</Badge>{/if}</div></div>{/each}</div></div>
 			{/if}
-		{:else}
-			<div class="text-muted-foreground flex flex-col items-center justify-center py-8">
-				<TrendingUp class="mb-2 h-8 w-8 opacity-50" />
-				<p>No authentication data available</p>
-			</div>
-		{/if}
+		{:else}<p class="text-muted-foreground py-8 text-sm">Authentication analytics are unavailable.</p>{/if}
 	</Card.Content>
 </Card.Root>

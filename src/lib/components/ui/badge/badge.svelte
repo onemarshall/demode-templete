@@ -16,6 +16,8 @@
 				low: "bg-emerald-600/10 text-emerald-700 [a]:hover:bg-emerald-600/20 dark:bg-emerald-400/10 dark:text-emerald-400 dark:[a]:hover:bg-emerald-400/20",
 				medium:
 					"bg-amber-600/10 text-amber-700 [a]:hover:bg-amber-600/20 dark:bg-amber-400/10 dark:text-amber-400 dark:[a]:hover:bg-amber-400/20",
+				warning:
+					"bg-warning/10 text-warning [a]:hover:bg-warning/20 dark:bg-warning/15 dark:text-warning dark:[a]:hover:bg-warning/20",
 				high: "bg-destructive/10 [a]:hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-destructive dark:bg-destructive/20",
 			},
 		},

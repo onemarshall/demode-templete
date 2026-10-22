@@ -129,6 +129,13 @@ export default defineConfig({
       ],
     },
   },
+   ssr: {
+    // @layerstack/utils imports `svelte/store` (locale.js) without declaring
+    // svelte as a dep. Bun installs it via a global links cache outside the
+    // project root, so Node ESM resolution can't find svelte when the file is
+    // SSR-externalized. Bundling it lets Vite resolve svelte via dedupe below.
+    noExternal: ["layerchart", /^@layerstack\//],
+  },
   resolve: {
     alias: {
       $lib: path.resolve(cwd, "./src/lib"),

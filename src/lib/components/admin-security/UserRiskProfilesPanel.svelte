@@ -36,12 +36,12 @@
 			<UserX class="h-5 w-5" />
 			Which users look risky?
 		</Card.Title>
-		<Card.Description>Accounts showing the most suspicious activity right now.</Card.Description>
+		<Card.Description>Accounts ranked by observed risk in the recent event sample. Scores are signals for review, not proof of compromise.</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		{#if userRiskProfiles.length > 0}
 			<div class="space-y-3">
-				{#each userRiskProfiles as user}
+				{#each userRiskProfiles as user (user.userId)}
 					<div
 						class="rounded-lg border p-3"
 						class:border-red-200={user.riskLevel === 'critical'}
@@ -57,15 +57,17 @@
 								<div>
 									<div class="flex items-center gap-2">
 										<span class="font-mono text-sm">{user.userId}</span>
-										{#if user.isLocked}
+										{#if user.isLocked === true}
 											<Badge variant="destructive" class="text-xs">
 												<Lock class="mr-1 h-3 w-3" />
 												Locked
 											</Badge>
+										{:else if user.isLocked == null}
+											<Badge variant="outline">Lock status unavailable</Badge>
 										{/if}
 									</div>
 									<div class="text-muted-foreground flex items-center gap-2 text-xs">
-										<span>Last active: {formatTimeAgo(user.lastActivity)}</span>
+										<span>Last recorded event: {formatTimeAgo(user.lastActivity)}</span>
 										{#if user.suspiciousActivities > 0}
 											<span class="flex items-center gap-1 text-amber-600">
 												<AlertTriangle class="h-3 w-3" />
@@ -77,7 +79,7 @@
 							</div>
 							<div class="flex items-center gap-3">
 								<div class="text-right">
-									<div class="text-lg font-bold">{user.riskScore}</div>
+									<div class="text-lg font-bold">{user.riskScore}/100</div>
 									<Badge variant="outline" class={riskLevelColors[user.riskLevel] ?? ''}>
 										{user.riskLevel}
 									</Badge>
@@ -93,7 +95,7 @@
 						{#if user.lockoutHistory.length > 0}
 							<div class="mt-2 border-t pt-2">
 								<span class="text-muted-foreground text-xs">Lockout history:</span>
-								{#each user.lockoutHistory.slice(0, 2) as lockout}
+								{#each user.lockoutHistory.slice(0, 2) as lockout (`${lockout.lockedAt}-${lockout.reason}`)}
 									<div class="text-xs text-red-600">
 										{lockout.reason} - {formatTimeAgo(lockout.lockedAt)}
 									</div>

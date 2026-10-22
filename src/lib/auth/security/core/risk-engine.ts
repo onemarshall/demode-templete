@@ -6,6 +6,8 @@
  */
 
 import { clamp } from './helpers';
+import { RISK_LEVEL_THRESHOLDS } from './risk-levels.js';
+export { RISK_LEVEL_THRESHOLDS } from './risk-levels.js';
 
 // ============================================
 // Types
@@ -98,9 +100,9 @@ export function calculateRiskScore(factors: RiskFactor[]): number {
  * Determine risk level from score
  */
 export function getRiskLevel(score: number): RiskLevel {
-	if (score >= 80) return 'critical';
-	if (score >= 60) return 'high';
-	if (score >= 40) return 'medium';
+	if (score >= RISK_LEVEL_THRESHOLDS.critical) return 'critical';
+	if (score >= RISK_LEVEL_THRESHOLDS.high) return 'high';
+	if (score >= RISK_LEVEL_THRESHOLDS.medium) return 'medium';
 	return 'low';
 }
 

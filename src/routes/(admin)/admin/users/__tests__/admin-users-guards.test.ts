@@ -75,6 +75,8 @@ describe('/admin/users load guards', () => {
 		mocks.getSession.mockReset();
 		mocks.getServerEnv.mockReset();
 		mocks.admin.listUsers.mockReset();
+		mocks.admin.getUser.mockReset();
+		mocks.admin.listUserSessions.mockReset();
 
 		mocks.getServerEnv.mockResolvedValue({
 			AUTH_ADMIN_ROLES: ['admin'],
@@ -82,6 +84,35 @@ describe('/admin/users load guards', () => {
 		});
 
 		mocks.admin.listUsers.mockResolvedValue({ users: [] });
+	});
+
+	it('loads the selected user from the direct Better Auth response', async () => {
+		const user: SessionUser = {
+			id: 'u_admin',
+			email: 'admin@example.com',
+			name: 'Admin',
+			emailVerified: true,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			role: 'admin'
+		};
+		const sessions = [
+			{ token: 'session_1', userId: user.id },
+			{ token: 'session_2', userId: user.id }
+		];
+		mocks.getSession.mockResolvedValue(createSession(user));
+		mocks.admin.listUsers.mockResolvedValue({ users: [user] });
+		mocks.admin.getUser.mockResolvedValue(user);
+		mocks.admin.listUserSessions.mockResolvedValue({ sessions });
+
+		const url = new URL(`http://localhost/admin/users?user=${user.id}`);
+		const result = await load(createLoadArgs(url));
+
+		expect(result).toMatchObject({ users: [user], selectedId: user.id, user, sessions });
+		expect(mocks.admin.getUser).toHaveBeenCalledWith({
+			query: { id: user.id },
+			headers: expect.any(Headers)
+		});
 	});
 
 	it('redirects to /auth/sign-in when session is missing', async () => {

@@ -16,10 +16,6 @@ interface AdminListUsersResponse {
 	total?: number;
 }
 
-interface AdminGetUserResponse {
-	user?: UserDetail;
-}
-
 interface AdminListSessionsResponse {
 	sessions: SessionItem[];
 }
@@ -29,7 +25,7 @@ interface AdminApi {
 		query?: { limit?: number; page?: number; cursor?: string };
 		headers: Headers;
 	}): Promise<AdminListUsersResponse>;
-	getUser(input: { query: { id: string }; headers: Headers }): Promise<AdminGetUserResponse>;
+	getUser(input: { query: { id: string }; headers: Headers }): Promise<UserDetail>;
 	listUserSessions(input: {
 		body: { userId: string };
 		headers: Headers;
@@ -145,7 +141,7 @@ export const load: PageServerLoad = async ({ request, url }) => {
 		return {
 			users,
 			selectedId,
-			user: userRes?.user ?? null,
+			user: userRes ?? null,
 			sessions: sessionsRes?.sessions ?? []
 		};
 	} catch (e) {

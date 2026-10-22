@@ -328,7 +328,7 @@ export class AnalyticsCollector {
 		}
 	}
 
-	async flush(): Promise<void> {
+	async flush(throwOnError = false): Promise<void> {
 		if (this.buffer.length === 0) return;
 
 		const events = [...this.buffer];
@@ -340,11 +340,12 @@ export class AnalyticsCollector {
 		} catch (error) {
 			this.buffer.unshift(...events);
 			securityLogger.error('[Analytics] Flush failed, events re-queued', { error });
+			if (throwOnError) throw error;
 		}
 	}
 
 	async getRecentEvents(limit = 100): Promise<SecurityAnalyticsEvent[]> {
-		await this.flush();
+		await this.flush(true);
 		return this.storage.getRecentEvents(limit);
 	}
 

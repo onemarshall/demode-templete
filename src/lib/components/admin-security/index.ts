@@ -17,6 +17,8 @@ export { default as RateLimitStatsPanel } from './RateLimitStatsPanel.svelte';
 export { default as IPIntelligencePanel } from './IPIntelligencePanel.svelte';
 export { default as UserRiskProfilesPanel } from './UserRiskProfilesPanel.svelte';
 export { default as APISecurityPanel } from './APISecurityPanel.svelte';
+export { default as EscalationPolicyPanel } from './EscalationPolicyPanel.svelte';
+export { default as AutomationActionsPanel } from './AutomationActionsPanel.svelte';
 export { default as TimeAnalysisPanel } from './TimeAnalysisPanel.svelte';
 export { default as ThreatFeedPanel } from './ThreatFeedPanel.svelte';
 export { default as StatusHero } from './StatusHero.svelte';

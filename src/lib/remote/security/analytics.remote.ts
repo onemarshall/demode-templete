@@ -366,6 +366,8 @@ export const getSecurityDashboard = query(emptySchema, async () => {
 
 		return {
 			metrics: data.metrics,
+			coverage: data.coverage,
+			events: data.events ?? [],
 			sessions: data.sessions,
 			devices: data.devices,
 			systemHealth: data.systemHealth,
@@ -379,11 +381,13 @@ export const getSecurityDashboard = query(emptySchema, async () => {
 			apiSecurityStats: data.apiSecurityStats,
 			timeAnalysis: data.timeAnalysis,
 			threatFeed: data.threatFeed,
+			escalationPolicy: data.escalationPolicy,
+			automationActions: data.automationActions,
 			threats,
 			flagged,
 			apiStatus: data.apiStatus,
 			error: data.error,
-			lastUpdated: new Date().toISOString(),
+			lastUpdated: data.lastUpdated,
 		}
 	} catch (err) {
 		logger.error('[Remote Functions] Failed to load security dashboard:', err)

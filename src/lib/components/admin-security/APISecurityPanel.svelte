@@ -28,25 +28,24 @@
 			<Code class="h-5 w-5" />
 			Is the API being abused?
 		</Card.Title>
-		<Card.Description>Suspicious endpoint usage and traffic patterns.</Card.Description>
+		<Card.Description>Recorded endpoint counts and rule-based signals in the recent sample; these do not confirm abuse.</Card.Description>
 	</Card.Header>
-	<Card.Content class="space-y-6">
+	<Card.Content class="flex flex-col gap-6">
 		{#if apiSecurityStats}
 			<!-- Endpoint Abuse -->
 			{#if apiSecurityStats.endpointAbuse.length > 0}
 				<div>
 					<h4 class="mb-3 text-sm font-medium">Endpoint Activity</h4>
-					<div class="space-y-2">
-						{#each apiSecurityStats.endpointAbuse.slice(0, 6) as endpoint}
+					<div class="flex flex-col gap-2">
+						{#each apiSecurityStats.endpointAbuse.slice(0, 6) as endpoint (endpoint.endpoint)}
 							<div
-								class="flex items-center justify-between rounded border px-3 py-2 text-sm"
-								class:border-red-200={endpoint.isAbusive}
-								class:bg-red-50={endpoint.isAbusive}
+								class="flex flex-wrap items-center justify-between gap-3 rounded border px-3 py-2 text-sm"
+
 							>
 								<div class="flex items-center gap-2">
 									<code class="max-w-[200px] truncate text-xs">{endpoint.endpoint}</code>
 									{#if endpoint.isAbusive}
-										<Badge variant="destructive" class="text-xs">Abuse detected</Badge>
+										<Badge variant="secondary" class="text-xs">Volume rule matched</Badge>
 									{/if}
 								</div>
 								<div class="flex items-center gap-3 text-xs">
@@ -66,9 +65,9 @@
 						<AlertTriangle class="h-4 w-4 text-amber-500" />
 						Unusual Patterns Detected
 					</h4>
-					<div class="space-y-2">
-						{#each apiSecurityStats.unusualPatterns as pattern}
-							<div class="flex items-center justify-between rounded border px-3 py-2 text-sm">
+					<div class="flex flex-col gap-2">
+						{#each apiSecurityStats.unusualPatterns as pattern (pattern.pattern)}
+							<div class="flex flex-wrap items-center justify-between gap-3 rounded border px-3 py-2 text-sm">
 								<span>{pattern.pattern}</span>
 								<div class="flex items-center gap-2">
 									<Badge class={severityColors[pattern.severity] ?? ''}>
@@ -89,9 +88,9 @@
 						<Key class="h-4 w-4" />
 						API Key Usage
 					</h4>
-					<div class="space-y-2">
-						{#each apiSecurityStats.apiKeyUsage as key}
-							<div class="flex items-center justify-between rounded border px-3 py-2 text-sm">
+					<div class="flex flex-col gap-2">
+						{#each apiSecurityStats.apiKeyUsage as key (key.keyId)}
+							<div class="flex flex-wrap items-center justify-between gap-3 rounded border px-3 py-2 text-sm">
 								<code class="text-xs">{key.keyId}</code>
 								<div class="flex items-center gap-3">
 									<span class="text-muted-foreground text-xs">{formatTimeAgo(key.lastUsed)}</span>

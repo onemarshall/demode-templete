@@ -135,6 +135,8 @@ export interface RateLimitTier {
 export interface CaptchaFeatureConfig {
 	enabled?: boolean;
 	provider?: 'capjs' | 'hcaptcha' | 'recaptcha' | 'turnstile';
+	/** Base URL of a self-hosted Cap standalone server (capjs provider). */
+	endpoint?: string;
 	siteKey?: string;
 	secretKey?: string;
 	bypassTtlSeconds?: number;

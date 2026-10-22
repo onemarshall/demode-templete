@@ -1,109 +1,36 @@
 <script lang="ts">
 	import * as Card from '#lib/components/ui/card/index.js';
-	import { Activity } from '@lucide/svelte';
+	import * as Chart from '#lib/components/ui/chart/index.js';
+	import { BarChart } from 'layerchart';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import type { DashboardMetrics } from '#lib/auth/security/types.js';
+	import { RISK_LEVEL_THRESHOLDS } from '#lib/auth/security/core/risk-levels.js';
 
-	let { metrics }: { metrics: DashboardMetrics } = $props();
-
-	// Calculate risk percentages
-	const riskPercentages = $derived(() => {
-		const low = metrics?.riskDistribution?.low ?? 0;
-		const medium = metrics?.riskDistribution?.medium ?? 0;
-		const high = metrics?.riskDistribution?.high ?? 0;
-		const critical = metrics?.riskDistribution?.critical ?? 0;
-
-		const total = low + medium + high + critical;
-
-		if (total === 0) return { low: 0, medium: 0, high: 0, critical: 0 };
-
-		return {
-			low: Math.round((low / total) * 100),
-			medium: Math.round((medium / total) * 100),
-			high: Math.round((high / total) * 100),
-			critical: Math.round((critical / total) * 100)
-		};
-	});
+	type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
+	let { metrics, onSelectRisk }: { metrics: DashboardMetrics; onSelectRisk?: (risk: RiskLevel) => void } = $props();
+	const config = { count: { label: 'Recorded events', color: 'var(--chart-1)' } } satisfies Chart.ChartConfig;
+	const rows = $derived([
+		{ risk: 'low' as RiskLevel, label: `Low (0–<${RISK_LEVEL_THRESHOLDS.medium})`, count: metrics.riskDistribution.low },
+		{ risk: 'medium' as RiskLevel, label: `Medium (${RISK_LEVEL_THRESHOLDS.medium}–<${RISK_LEVEL_THRESHOLDS.high})`, count: metrics.riskDistribution.medium },
+		{ risk: 'high' as RiskLevel, label: `High (${RISK_LEVEL_THRESHOLDS.high}–<${RISK_LEVEL_THRESHOLDS.critical})`, count: metrics.riskDistribution.high },
+		{ risk: 'critical' as RiskLevel, label: `Critical (${RISK_LEVEL_THRESHOLDS.critical}–100)`, count: metrics.riskDistribution.critical }
+	]);
+	const total = $derived(rows.reduce((sum, row) => sum + row.count, 0));
 </script>
-
 <Card.Root>
 	<Card.Header>
-		<Card.Title class="flex items-center gap-2">
-			<Activity class="h-5 w-5" />
-			Risk Distribution
-		</Card.Title>
-		<Card.Description>
-			Breakdown of session risk levels across all analyzed sessions
-		</Card.Description>
+		<Card.Title>How much recorded activity has elevated risk?</Card.Title>
+		<Card.Description>Event counts in the recent sample, using the security engine's 0–100 risk scale.</Card.Description>
 	</Card.Header>
-	<Card.Content class="space-y-4">
-		{@const percents = riskPercentages()}
-
-		<!-- Low Risk -->
-		<div class="space-y-3">
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<div class="h-3 w-3 rounded-full bg-green-500"></div>
-					<span class="text-sm">Low Risk (0-3)</span>
-				</div>
-				<div class="flex items-center gap-2">
-					<span class="text-sm font-medium">{metrics?.riskDistribution?.low ?? 0}</span>
-					<span class="text-muted-foreground text-xs">({percents.low}%)</span>
-				</div>
-			</div>
-			<div class="bg-muted h-2 w-full rounded-full">
-				<div class="h-2 rounded-full bg-green-500" style="width: {percents.low}%"></div>
-			</div>
-		</div>
-
-		<!-- Medium Risk -->
-		<div class="space-y-3">
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<div class="h-3 w-3 rounded-full bg-yellow-500"></div>
-					<span class="text-sm">Medium Risk (4-6)</span>
-				</div>
-				<div class="flex items-center gap-2">
-					<span class="text-sm font-medium">{metrics?.riskDistribution?.medium ?? 0}</span>
-					<span class="text-muted-foreground text-xs">({percents.medium}%)</span>
-				</div>
-			</div>
-			<div class="bg-muted h-2 w-full rounded-full">
-				<div class="h-2 rounded-full bg-yellow-500" style="width: {percents.medium}%"></div>
-			</div>
-		</div>
-
-		<!-- High Risk -->
-		<div class="space-y-3">
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<div class="h-3 w-3 rounded-full bg-orange-500"></div>
-					<span class="text-sm">High Risk (7-8)</span>
-				</div>
-				<div class="flex items-center gap-2">
-					<span class="text-sm font-medium">{metrics?.riskDistribution?.high ?? 0}</span>
-					<span class="text-muted-foreground text-xs">({percents.high}%)</span>
-				</div>
-			</div>
-			<div class="bg-muted h-2 w-full rounded-full">
-				<div class="h-2 rounded-full bg-orange-500" style="width: {percents.high}%"></div>
-			</div>
-		</div>
-
-		<!-- Critical Risk -->
-		<div class="space-y-3">
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<div class="h-3 w-3 rounded-full bg-red-500"></div>
-					<span class="text-sm">Critical Risk (9+)</span>
-				</div>
-				<div class="flex items-center gap-2">
-					<span class="text-sm font-medium">{metrics?.riskDistribution?.critical ?? 0}</span>
-					<span class="text-muted-foreground text-xs">({percents.critical}%)</span>
-				</div>
-			</div>
-			<div class="bg-muted h-2 w-full rounded-full">
-				<div class="h-2 rounded-full bg-red-500" style="width: {percents.critical}%"></div>
-			</div>
-		</div>
+	<Card.Content class="flex flex-col gap-4">
+		{#if total > 0}
+			<p class="text-sm">{metrics.riskDistribution.high + metrics.riskDistribution.critical} of {total} events were classified high or critical. A risk score is a signal for review, not proof of an attack.</p>
+			<Chart.Container {config} class="h-48 w-full aspect-auto" aria-label="Recorded events by risk level; exact counts follow">
+				<BarChart data={rows} x="count" y="label" orientation="horizontal" axis="y" padding={{ left: 58, right: 12, top: 8, bottom: 8 }} props={{ yAxis: { format: (value: string) => value.split(' (')[0] }, bars: { strokeWidth: 0 } }} series={[{ key: 'count', ...config.count }]} onBarClick={(_event, detail) => onSelectRisk?.(detail.data.risk)}>
+					{#snippet tooltip()}<Chart.Tooltip />{/snippet}
+				</BarChart>
+			</Chart.Container>
+			<dl class="grid grid-cols-2 gap-3 text-sm">{#each rows as row (row.label)}<div><dt class="text-muted-foreground">{row.label}</dt><dd>{row.count} events ({Math.round(row.count / total * 100)}%)</dd>{#if onSelectRisk}<Button variant="outline" size="sm" disabled={row.count === 0} onclick={() => onSelectRisk?.(row.risk)} aria-label={`Review ${row.risk} risk events`}>Review events</Button>{/if}</div>{/each}</dl>
+		{:else}<p class="text-muted-foreground py-4 text-sm">No risk-scored events in the returned sample.</p>{/if}
 	</Card.Content>
 </Card.Root>

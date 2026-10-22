@@ -76,7 +76,8 @@ function startCleanupInterval(): void {
 	// Only run cleanup on server (has setInterval)
 	if (typeof setInterval === 'undefined') return;
 
-	cleanupInterval = setInterval(() => {
+	try {
+		cleanupInterval = setInterval(() => {
 		const now = Date.now();
 		const cutoff = now - DEDUPE_WINDOW_MS;
 
@@ -102,6 +103,11 @@ function startCleanupInterval(): void {
 
 	// Don't prevent process exit
 	cleanupInterval?.unref?.();
+	} catch {
+		// Cloudflare Workers module init runs in global scope, where timers are
+		// disallowed. The dedupe map is bounded by MAX_RECENT_LOGS anyway; the
+		// next call from inside a request handler starts the interval.
+	}
 }
 
 /**
@@ -150,6 +156,9 @@ function serializeArgs(args: unknown[]): string {
  * Check if a log should be suppressed due to recent duplicate
  */
 function shouldSuppress(scope: string, args: unknown[]): boolean {
+	// Start lazily on first deduped log: Workers forbid timers and async I/O in
+	// global scope, so the cleanup interval must begin inside a request handler.
+	startCleanupInterval();
 	const key = `${scope}:${serializeArgs(args)}`;
 	const now = Date.now();
 	const lastLoggedAt = recentLogs.get(key);
@@ -190,8 +199,9 @@ function createDedupedLogger(logger: ConsolaInstance, dedupe = true): ConsolaIns
 	}) as ConsolaInstance;
 }
 
-// Start cleanup on module load
-startCleanupInterval();
+// The cleanup interval starts lazily via shouldSuppress — starting it at
+// module load throws "Disallowed operation called within global scope" on
+// Cloudflare Workers (timers are only allowed inside request handlers).
 
 // ============================================
 // Base Logger

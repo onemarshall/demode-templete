@@ -1,355 +1,83 @@
 <script lang="ts">
-	import * as Card from "#lib/components/ui/card/index.js";
-	import { Badge } from "#lib/components/ui/badge/index.js";
-	import { Button } from "#lib/components/ui/button/index.js";
-	import { Separator } from "#lib/components/ui/separator/index.js";
-	import {
-		Eye,
-		ChevronDown,
-		ChevronUp,
-		Ban,
-		ShieldCheck,
-		X,
-		RefreshCw,
-		Shield,
-	} from "@lucide/svelte";
-	import { enhance } from "$app/forms";
-	import type { FlaggedSession } from "#lib/auth/security/types.js";
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import * as Alert from '#lib/components/ui/alert/index.js';
+	import { Eye, Ban, RefreshCw } from '@lucide/svelte';
+	import { enhance } from '$app/forms';
+	import type { FlaggedSession } from '#lib/auth/security/types.js';
+	import { humaniseRiskFactor } from '#lib/auth/security/core/risk-factor-labels.js';
 
-	let { sessions }: { sessions: FlaggedSession[] } = $props();
-
-	let expandedSession = $state<string | null>(null);
+	let { sessions, selectedEntityId }: { sessions: FlaggedSession[]; selectedEntityId?: string } = $props();
 	let actionInProgress = $state<string | null>(null);
-
-	function getRiskBadgeVariant(score: number): "low" | "medium" | "high" {
-		if (score >= 50) return "high";
-		if (score >= 25) return "medium";
-		return "low";
-	}
-
-	function getCountryFlag(countryCode: string): string {
-		if (!countryCode || countryCode === "XX") return "🌍";
-		const codePoints = countryCode
-			.toUpperCase()
-			.split("")
-			.map((char) => 127397 + char.charCodeAt(0));
-		return String.fromCodePoint(...codePoints);
-	}
-
-	function toggleSessionExpand(sessionId: string) {
-		expandedSession = expandedSession === sessionId ? null : sessionId;
-	}
+	let actionError = $state<string | null>(null);
 </script>
 
 <Card.Root>
 	<Card.Header>
-		<Card.Title class="flex items-center gap-2">
-			<Eye class="h-5 w-5" />
-			Who logged in suspiciously?
-		</Card.Title>
+		<Card.Title class="flex items-center gap-2"><Eye /> Which recorded sessions need review?</Card.Title>
 		<Card.Description>
-			Sign-ins that scored high on risk and are worth a look. Click to expand details.
+			Risk signals are reasons to investigate, not proof of account misuse. Expand a record to see the evidence and available response.
 		</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		{#if sessions && sessions.length > 0}
-			<div class="space-y-3">
-				{#each sessions as session}
-					{@const sessionId = `${session.userId}:${session.ip}`}
-					{@const isExpanded = expandedSession === sessionId}
-					<div class="rounded-lg border">
-						<!-- Session Header (clickable) -->
-						<button
-							type="button"
-							class="hover:bg-muted/50 flex w-full items-start justify-between p-4 text-left transition-colors"
-							onclick={() => toggleSessionExpand(sessionId)}
-						>
-							<div class="space-y-1">
-								<div class="flex items-center gap-2">
-									<span class="font-mono text-sm"
-										>{session.userId?.slice(0, 8) ??
-											"unknown"}...</span
-									>
-									<Badge
-										variant={getRiskBadgeVariant(
-											session.riskScore,
-										)}
-									>
-										Risk: {session.riskScore}
-									</Badge>
-									{#if session.isVpn}
-										<Badge variant="medium">VPN</Badge>
-									{/if}
-								</div>
-								<p class="text-muted-foreground text-xs">
-									IP: {session.ip}
-								</p>
-								<div class="flex flex-wrap gap-1 pt-1">
-									{#each (session.riskFactors || []).slice(0, 5) as factor}
-										<Badge
-											variant="outline"
-											class="text-[0.65rem]"
-										>
-											{factor.replace(/_/g, " ")}
-										</Badge>
-									{/each}
-									{#if (session.riskFactors || []).length > 5}
-										<Badge
-											variant="outline"
-											class="text-[0.65rem]"
-										>
-											+{(session.riskFactors || [])
-												.length - 5} more
-										</Badge>
-									{/if}
-								</div>
+		{#if actionError}
+			<Alert.Root variant="destructive" class="mb-4"><Alert.Title>IP could not be blocked</Alert.Title><Alert.Description>{actionError}</Alert.Description></Alert.Root>
+		{/if}
+		<div class="flex flex-col gap-3">
+			{#each sessions ?? [] as session, index (`${session.sessionId}:${index}`)}
+				<details class="rounded-lg border p-4" open={selectedEntityId === session.sessionId}>
+					<summary class="cursor-pointer break-words">
+						<span class="inline-flex max-w-full flex-wrap items-center gap-2 align-middle">
+							<span class="font-mono text-sm">{session.ip}</span>
+							<Badge variant={session.riskLevel === 'critical' ? 'destructive' : session.riskLevel}>Risk: {session.riskScore}/100 · {session.riskLevel}</Badge>
+							{#if session.isBlocked}<Badge variant="secondary">Blocked</Badge>{/if}
+						</span>
+					</summary>
+					<div class="mt-4 flex flex-col gap-4">
+						<dl class="grid gap-3 break-all text-sm sm:grid-cols-2">
+							<div><dt class="text-muted-foreground">Session reference</dt><dd>{session.sessionId}</dd></div>
+							<div><dt class="text-muted-foreground">User</dt><dd>{session.userId ?? 'Not recorded'}</dd></div>
+							<div><dt class="text-muted-foreground">Recorded at</dt><dd>{new Date(session.flaggedAt).toLocaleString()}</dd></div>
+							<div><dt class="text-muted-foreground">Device trust</dt><dd>{session.trustLevel ?? 'Not assessed'}</dd></div>
+						</dl>
+						<div class="flex flex-col gap-2">
+							<h4 class="text-sm font-medium">Why this needs review</h4>
+							<div class="flex flex-wrap gap-1">
+								{#each session.riskFactors ?? session.factors ?? [] as factor, factorIndex (`${factor}:${factorIndex}`)}
+									<Badge variant="outline">{humaniseRiskFactor(factor)}</Badge>
+								{:else}<p class="text-muted-foreground text-sm">The source did not record individual risk factors.</p>{/each}
 							</div>
-							<div class="flex items-center gap-2">
-								<div class="flex gap-1">
-									<Badge
-										variant={session.trustLevel === "high"
-											? "low"
-											: "high"}
-										class="text-[0.6rem]"
-									>
-										Device
-									</Badge>
-									<Badge
-										variant={session.trustLevel === "high"
-											? "low"
-											: "high"}
-										class="text-[0.6rem]"
-									>
-										Behavior
-									</Badge>
-									<Badge
-										variant={session.trustLevel === "high"
-											? "low"
-											: "high"}
-										class="text-[0.6rem]"
-									>
-										Location
-									</Badge>
-								</div>
-								{#if isExpanded}
-									<ChevronUp
-										class="text-muted-foreground h-4 w-4"
-									/>
-								{:else}
-									<ChevronDown
-										class="text-muted-foreground h-4 w-4"
-									/>
-								{/if}
-							</div>
-						</button>
-
-						<!-- Expanded Details -->
-						{#if isExpanded}
-							<div class="bg-muted/30 border-t p-4">
-								<div class="grid gap-4 md:grid-cols-2">
-									<!-- Session Details -->
-									<div class="space-y-2">
-										<h4 class="text-sm font-semibold">
-											Session Details
-										</h4>
-										<div class="space-y-1 text-sm">
-											<p>
-												<span
-													class="text-muted-foreground"
-													>User ID:</span
-												>
-												{session.userId}
-											</p>
-											<p>
-												<span
-													class="text-muted-foreground"
-													>IP Address:</span
-												>
-												{session.ip}
-											</p>
-											<p>
-												<span
-													class="text-muted-foreground"
-													>Trust Level:</span
-												>
-												{session.trustLevel}
-											</p>
-											<p>
-												<span
-													class="text-muted-foreground"
-													>Risk Level:</span
-												>
-												{session.riskLevel}
-											</p>
-										</div>
-										{#if session.countryCode}
-											<div class="mt-2">
-												<p
-													class="text-muted-foreground text-xs"
-												>
-													Location
-												</p>
-												<p class="text-sm">
-													{getCountryFlag(
-														session.countryCode ||
-															"",
-													)}
-													{session.city || "Unknown"}
-												</p>
-											</div>
-										{/if}
-									</div>
-
-									<!-- All Risk Factors -->
-									<div class="space-y-2">
-										<h4 class="text-sm font-semibold">
-											All Risk Factors
-										</h4>
-										<div class="flex flex-wrap gap-1">
-											{#each session.riskFactors as factor}
-												<Badge
-													variant="outline"
-													class="text-xs"
-												>
-													{factor.replace(/_/g, " ")}
-												</Badge>
-											{/each}
-										</div>
-									</div>
-								</div>
-
-								<!-- Action Buttons -->
-								<Separator {...{ class: "my-4" }} />
-								<div class="flex flex-wrap gap-2">
-									<form
-										method="POST"
-										action="?/blockIp"
-										use:enhance={() => {
-											actionInProgress = `block:${session.ip}`;
-											return async ({ update }) => {
-												await update();
-												actionInProgress = null;
-											};
-										}}
-									>
-										<input
-											type="hidden"
-											name="ip"
-											value={session.ip}
-										/>
-										<Button
-											type="submit"
-											variant="destructive"
-											size="sm"
-											class="gap-1"
-											disabled={actionInProgress ===
-												`block:${session.ip}`}
-										>
-											{#if actionInProgress === `block:${session.ip}`}
-												<RefreshCw
-													class="h-3 w-3 animate-spin"
-												/>
-											{:else}
-												<Ban class="h-3 w-3" />
-											{/if}
-											Block IP
-										</Button>
-									</form>
-
-									<form
-										method="POST"
-										action="?/whitelistDevice"
-										use:enhance={() => {
-											actionInProgress = `whitelist:${session.userId}`;
-											return async ({ update }) => {
-												await update();
-												actionInProgress = null;
-											};
-										}}
-									>
-										<input
-											type="hidden"
-											name="visitorId"
-											value={session.deviceId ||
-												session.userId}
-										/>
-										<input
-											type="hidden"
-											name="userId"
-											value={session.userId}
-										/>
-										<Button
-											type="submit"
-											variant="outline"
-											size="sm"
-											class="gap-1"
-											disabled={actionInProgress ===
-												`whitelist:${session.userId}`}
-										>
-											{#if actionInProgress === `whitelist:${session.userId}`}
-												<RefreshCw
-													class="h-3 w-3 animate-spin"
-												/>
-											{:else}
-												<ShieldCheck class="h-3 w-3" />
-											{/if}
-											Whitelist Device
-										</Button>
-									</form>
-
-									<form
-										method="POST"
-										action="?/dismissSession"
-										use:enhance={() => {
-											actionInProgress = `dismiss:${sessionId}`;
-											return async ({ update }) => {
-												await update();
-												actionInProgress = null;
-											};
-										}}
-									>
-										<input
-											type="hidden"
-											name="userId"
-											value={session.userId}
-										/>
-										<input
-											type="hidden"
-											name="ip"
-											value={session.ip}
-										/>
-										<Button
-											type="submit"
-											variant="ghost"
-											size="sm"
-											class="gap-1"
-											disabled={actionInProgress ===
-												`dismiss:${sessionId}`}
-										>
-											{#if actionInProgress === `dismiss:${sessionId}`}
-												<RefreshCw
-													class="h-3 w-3 animate-spin"
-												/>
-											{:else}
-												<X class="h-3 w-3" />
-											{/if}
-											Dismiss
-										</Button>
-									</form>
-								</div>
-							</div>
+						</div>
+						{#if session.isBlocked}
+							<p class="text-muted-foreground text-sm">This record was blocked when recorded. Check current enforcement in Blocked IPs before taking another action.</p>
+						{:else}
+							<details>
+								<summary class="cursor-pointer text-sm font-medium">Block requests from this IP…</summary>
+								<p class="text-muted-foreground my-3 text-sm">Blocking {session.ip} can also affect other people using the same network. It does not revoke an existing sign-in session. You can remove the block in Blocked IPs.</p>
+								<form method="POST" action="?/blockIp" use:enhance={() => {
+									actionInProgress = session.sessionId;
+									actionError = null;
+									return async ({ update, result }) => {
+										try {
+											if (result.type === 'error' || result.type === 'failure' || (result.type === 'success' && result.data?.success === false)) actionError = 'The request failed. Review the block list before retrying.';
+											if (result.type !== 'error') await update();
+										} finally { actionInProgress = null; }
+									};
+								}}>
+									<input type="hidden" name="ip" value={session.ip} />
+									<Button type="submit" variant="destructive" size="sm" disabled={actionInProgress !== null}>
+										{#if actionInProgress === session.sessionId}<RefreshCw data-icon="inline-start" class="animate-spin" />{:else}<Ban data-icon="inline-start" />{/if}
+										Confirm IP block
+									</Button>
+								</form>
+							</details>
 						{/if}
 					</div>
-				{/each}
-			</div>
-		{:else}
-			<div class="text-muted-foreground py-8 text-center">
-				<Shield class="mx-auto h-12 w-12 opacity-50" />
-				<p class="mt-2">No flagged sessions</p>
-				<p class="text-sm">
-					All sessions are within acceptable risk thresholds
-				</p>
-			</div>
-		{/if}
+				</details>
+			{:else}
+				<p class="text-muted-foreground py-6 text-sm">No flagged records were returned. Check monitoring coverage above before drawing conclusions about current activity.</p>
+			{/each}
+		</div>
 	</Card.Content>
 </Card.Root>

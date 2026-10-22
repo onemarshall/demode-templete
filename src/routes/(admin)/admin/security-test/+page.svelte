@@ -114,10 +114,21 @@
 		}
 	];
 
+	interface ScenarioTestResult {
+		scenario: string;
+		success: boolean;
+		data: { injected: number };
+		timestamp: string;
+	}
+
+	interface ScenarioInjectResponse {
+		success: boolean;
+		injected: number;
+		error?: string;
+	}
+
 	let loadingScenarios = $state<Set<string>>(new Set());
-	let results = $state<Array<{ scenario: string; success: boolean; data: any; timestamp: string }>>(
-		[]
-	);
+	let results = $state<ScenarioTestResult[]>([]);
 	let error = $state<string>('');
 	let broadcastChannel: BroadcastChannel | null = null;
 
@@ -144,7 +155,7 @@
 				}
 			);
 
-			const injectResult = await injectResponse.json();
+			const injectResult: ScenarioInjectResponse = await injectResponse.json();
 
 			if (!injectResponse.ok) {
 				throw new Error(injectResult.error || 'Failed to inject scenario');

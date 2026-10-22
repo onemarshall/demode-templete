@@ -54,9 +54,13 @@ export const login = form(loginRemoteSchema, async (data) => {
 
   if (!response.ok) {
     let message = 'This password is invalid.';
+    let captchaRequired = false;
 
     try {
       const raw = await response.clone().json();
+      captchaRequired =
+        typeof raw === 'object' && raw !== null &&
+        (raw as { captchaRequired?: unknown }).captchaRequired === true;
       const parsed = authErrorResponseSchema.safeParse(raw);
       if (parsed.success) {
         const serverMessage = parsed.data.message || parsed.data.error;
@@ -70,7 +74,8 @@ export const login = form(loginRemoteSchema, async (data) => {
     }
 
     return {
-      error: message
+      error: message,
+      ...(captchaRequired ? { captchaRequired: true } : {})
     };
   }
 
@@ -93,8 +98,12 @@ export const signup = form(signupRemoteSchema, async (data) => {
 
   if (!response.ok) {
     let message = 'Failed to create your account. Please try again.';
+    let captchaRequired = false;
     try {
       const raw = await response.clone().json();
+      captchaRequired =
+        typeof raw === 'object' && raw !== null &&
+        (raw as { captchaRequired?: unknown }).captchaRequired === true;
       const parsed = authErrorResponseSchema.safeParse(raw);
       if (parsed.success) {
         message = parsed.data.message || parsed.data.error || message;
@@ -102,7 +111,7 @@ export const signup = form(signupRemoteSchema, async (data) => {
     } catch {
       // Ignore parse failures, fall back to generic message
     }
-    return { error: message };
+    return { error: message, ...(captchaRequired ? { captchaRequired: true } : {}) };
   }
 
   setAuthCookies(cookies, response.headers);

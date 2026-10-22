@@ -1,120 +1,34 @@
 <script lang="ts">
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
-	import { Users, Clock, Activity, LogOut } from '@lucide/svelte';
 	import type { SessionAnalytics } from '#lib/auth/security/services/sdk.js';
-
 	let { sessionAnalytics = null }: { sessionAnalytics: SessionAnalytics | null } = $props();
-
 	function formatDuration(ms: number): string {
 		const minutes = Math.floor(ms / 60000);
-		if (minutes < 60) return `${minutes}m`;
-		const hours = Math.floor(minutes / 60);
-		return `${hours}h ${minutes % 60}m`;
+		return minutes < 60 ? `${minutes}m` : `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
 	}
-
-	const maxDistribution = $derived(() => {
-		if (!sessionAnalytics?.sessionDurationDistribution) return 1;
-		return Math.max(...sessionAnalytics.sessionDurationDistribution.map((d) => d.count), 1);
-	});
 </script>
-
 <Card.Root>
 	<Card.Header>
-		<Card.Title class="flex items-center gap-2">
-			<Activity class="h-5 w-5" />
-			How are people staying signed in?
-		</Card.Title>
-		<Card.Description>Active sessions, how long they last, and how they end.</Card.Description>
+		<Card.Title>What session activity was recorded?</Card.Title>
+		<Card.Description>Observed session identifiers and explicit end events in the recent sample. These records do not establish which sessions are currently active or concurrent.</Card.Description>
 	</Card.Header>
-	<Card.Content class="space-y-6">
+	<Card.Content class="flex flex-col gap-6">
 		{#if sessionAnalytics}
-			<!-- Summary Stats -->
-			<div class="grid gap-4 sm:grid-cols-3">
-				<div class="rounded-lg border p-4 text-center">
-					<div class="flex items-center justify-center gap-2">
-						<Users class="h-5 w-5 text-blue-500" />
-						<span class="text-2xl font-bold text-blue-600"
-							>{sessionAnalytics.activeSessionsCount}</span
-						>
-					</div>
-					<p class="text-muted-foreground text-sm">Active Sessions</p>
-				</div>
-				<div class="rounded-lg border p-4 text-center">
-					<div class="flex items-center justify-center gap-2">
-						<Clock class="h-5 w-5 text-purple-500" />
-						<span class="text-2xl font-bold text-purple-600"
-							>{formatDuration(sessionAnalytics.averageSessionDuration)}</span
-						>
-					</div>
-					<p class="text-muted-foreground text-sm">Avg Duration</p>
-				</div>
-				<div class="rounded-lg border p-4 text-center">
-					<div class="flex items-center justify-center gap-2">
-						<LogOut class="h-5 w-5 text-orange-500" />
-						<span class="text-2xl font-bold text-orange-600">
-							{sessionAnalytics.invalidationReasons.reduce((sum, r) => sum + r.count, 0)}
-						</span>
-					</div>
-					<p class="text-muted-foreground text-sm">Sessions Ended</p>
-				</div>
-			</div>
-
-			<!-- Duration Distribution -->
-			<div>
-				<h4 class="mb-3 text-sm font-medium">Session Duration Distribution</h4>
-				<div class="space-y-2">
-					{#each sessionAnalytics.sessionDurationDistribution as bucket}
-						{@const max = maxDistribution()}
-						{@const widthPercent = max > 0 ? (bucket.count / max) * 100 : 0}
-						<div class="flex items-center gap-3">
-							<span class="text-muted-foreground w-20 text-xs">{bucket.range}</span>
-							<div class="h-4 flex-1 overflow-hidden rounded bg-gray-100">
-								<div
-									class="h-full rounded bg-blue-500 transition-all"
-									style="width: {widthPercent}%"
-								></div>
-							</div>
-							<span class="w-8 text-right text-xs font-medium">{bucket.count}</span>
-						</div>
-					{/each}
-				</div>
-			</div>
-
-			<!-- Concurrent Sessions Per User -->
+			<dl class="grid gap-4 sm:grid-cols-3">
+				<div><dt class="text-muted-foreground text-sm">Distinct observed sessions</dt><dd class="text-2xl font-semibold">{sessionAnalytics.activeSessionsCount}</dd></div>
+				<div><dt class="text-muted-foreground text-sm">Average recorded duration</dt><dd class="text-2xl font-semibold">{sessionAnalytics.averageSessionDuration == null ? 'Unavailable' : formatDuration(sessionAnalytics.averageSessionDuration)}</dd><p class="text-muted-foreground text-xs">Only explicit duration measurements; no inferred lifetime</p></div>
+				<div><dt class="text-muted-foreground text-sm">Recorded end events</dt><dd class="text-2xl font-semibold">{sessionAnalytics.invalidationReasons.reduce((sum, reason) => sum + reason.count, 0)}</dd></div>
+			</dl>
+			{#if sessionAnalytics.sessionDurationDistribution.some((bucket) => bucket.count > 0)}
+				<div><h4 class="mb-3 text-sm font-medium">Explicitly recorded session durations</h4><dl class="flex flex-col gap-2">{#each sessionAnalytics.sessionDurationDistribution as bucket (bucket.range)}<div class="flex justify-between gap-3 text-sm"><dt>{bucket.range}</dt><dd>{bucket.count}</dd></div>{/each}</dl></div>
+			{/if}
 			{#if sessionAnalytics.concurrentSessionsPerUser.length > 0}
-				<div>
-					<h4 class="mb-3 text-sm font-medium">Users with Multiple Sessions</h4>
-					<div class="space-y-2">
-						{#each sessionAnalytics.concurrentSessionsPerUser as user}
-							<div class="flex items-center justify-between rounded border px-3 py-2 text-sm">
-								<span class="font-mono text-xs">{user.userId}</span>
-								<Badge variant="secondary">{user.sessionCount} sessions</Badge>
-							</div>
-						{/each}
-					</div>
-				</div>
+				<div><h4 class="mb-3 text-sm font-medium">Users with multiple observed session identifiers</h4><div class="flex flex-col gap-2">{#each sessionAnalytics.concurrentSessionsPerUser as user (user.userId)}<div class="flex flex-wrap justify-between gap-2 rounded border px-3 py-2 text-sm"><span class="break-all font-mono text-xs">{user.userId}</span><Badge variant="secondary">{user.sessionCount} observed sessions</Badge></div>{/each}</div></div>
 			{/if}
-
-			<!-- Invalidation Reasons -->
 			{#if sessionAnalytics.invalidationReasons.length > 0}
-				<div>
-					<h4 class="mb-3 text-sm font-medium">Session End Reasons</h4>
-					<div class="grid gap-2 sm:grid-cols-2">
-						{#each sessionAnalytics.invalidationReasons as reason}
-							<div class="flex items-center justify-between rounded border px-3 py-2">
-								<span class="text-sm">{reason.reason}</span>
-								<Badge variant="outline">{reason.count}</Badge>
-							</div>
-						{/each}
-					</div>
-				</div>
+				<div><h4 class="mb-3 text-sm font-medium">Recorded reasons for ending sessions</h4><dl class="flex flex-col gap-2">{#each sessionAnalytics.invalidationReasons as reason (reason.reason)}<div class="flex justify-between gap-3 text-sm"><dt>{reason.reason}</dt><dd>{reason.count}</dd></div>{/each}</dl></div>
 			{/if}
-		{:else}
-			<div class="text-muted-foreground flex flex-col items-center justify-center py-8">
-				<Activity class="mb-2 h-8 w-8 opacity-50" />
-				<p>No session data available</p>
-			</div>
-		{/if}
+		{:else}<p class="text-muted-foreground py-8 text-sm">Session analytics are unavailable.</p>{/if}
 	</Card.Content>
 </Card.Root>

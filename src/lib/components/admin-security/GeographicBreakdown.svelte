@@ -16,8 +16,8 @@
 	}
 
 	function getRiskBadgeVariant(score: number): 'low' | 'medium' | 'high' {
-		if (score >= 50) return 'high';
-		if (score >= 25) return 'medium';
+		if (score >= 60) return 'high';
+		if (score >= 40) return 'medium';
 		return 'low';
 	}
 </script>
@@ -28,12 +28,12 @@
 			<MapPin class="h-5 w-5" />
 			Where in the world is activity?
 		</Card.Title>
-		<Card.Description>Top countries by recent session count.</Card.Description>
+		<Card.Description>Countries recorded by an authoritative location source, where available.</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		{#if metrics?.geographicBreakdown && metrics.geographicBreakdown.length > 0}
 			<div class="space-y-2">
-				{#each metrics.geographicBreakdown as geo}
+				{#each metrics.geographicBreakdown as geo (geo.country)}
 					<div class="flex items-center justify-between rounded-lg border p-2">
 						<div class="flex items-center gap-2">
 							<span class="text-lg">{getCountryFlag(geo.countryCode ?? '')}</span>
@@ -43,7 +43,7 @@
 							<Badge variant={getRiskBadgeVariant(geo.averageRisk ?? 0)} class="text-xs">
 								Avg: {geo.averageRisk ?? 0}
 							</Badge>
-							<span class="text-muted-foreground text-sm">{geo.sessions ?? 0} sessions</span>
+							<span class="text-muted-foreground text-sm">{geo.count} events</span>
 						</div>
 					</div>
 				{/each}
@@ -51,7 +51,7 @@
 		{:else}
 			<div class="text-muted-foreground flex h-32 items-center justify-center">
 				<Globe class="mr-2 h-8 w-8 opacity-50" />
-				<p class="text-sm">No geographic data available</p>
+				<p class="text-sm">Geographic reporting is unavailable; no location source is connected.</p>
 			</div>
 		{/if}
 	</Card.Content>

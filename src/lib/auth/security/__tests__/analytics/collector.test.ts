@@ -325,3 +325,16 @@ describe('createAnalyticsCollector', () => {
 		collector.destroy();
 	});
 });
+
+describe('dashboard read availability', () => {
+	it('surfaces a failed flush instead of returning a misleading healthy empty sample', async () => {
+		const storage = new InMemoryStorageAdapter();
+		const collector = new AnalyticsCollector(storage, { enabled: true, samplingRate: 1, batchSize: 100, flushIntervalMs: 0 });
+		await collector.recordEvent(createTestSecurityContext(), 'test');
+		const write = vi.spyOn(storage, 'recordEvents').mockRejectedValue(new Error('Write unavailable'));
+		await expect(collector.getRecentEvents(200)).rejects.toThrow('Write unavailable');
+		expect(collector.getStats().bufferSize).toBe(1);
+		write.mockRestore();
+		collector.destroy();
+	});
+});

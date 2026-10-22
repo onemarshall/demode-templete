@@ -1,188 +1,69 @@
-<!-- src/routes/auth/(app)/trusted-devices/+page.svelte -->
 <script lang="ts">
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
-	import { Alert, AlertDescription } from '#lib/components/ui/alert/index.js';
+	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
-	import { Separator } from '#lib/components/ui/separator/index.js';
-	import { Laptop, Shield, CircleCheck, CircleAlert, Info } from '@lucide/svelte';
 	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
-	import { goto, invalidateAll } from '$app/navigation';
-	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
+	import { enhance, type SubmitFunction } from '$app/forms';
+	import type { PageData } from './$types';
 
-	let { data } = $props();
-
+	let { data }: { data: PageData } = $props();
 	let isRevoking = $state(false);
 	let successMessage = $state('');
 	let errorMessage = $state('');
 
-	// Auto-clear messages
-	$effect(() => {
-		if (successMessage || errorMessage) {
-			const timeout = setTimeout(() => {
-				successMessage = '';
-				errorMessage = '';
-			}, 5000);
-			return () => clearTimeout(timeout);
-		}
-	});
+	const submitTrustAction: SubmitFunction = () => {
+		isRevoking = true;
+		errorMessage = '';
+		successMessage = '';
+		return async ({ result }) => {
+			try {
+				if (result.type === 'success' && result.data?.success === true) {
+					successMessage = typeof result.data.message === 'string' ? result.data.message : 'Trust was removed from this browser. The current session remains signed in.';
+				} else {
+					errorMessage = result.type === 'failure' && typeof result.data?.error === 'string' ? result.data.error : 'The request could not be completed. Check your connection and try again.';
+				}
+				await invalidateAll();
+			} catch {
+				errorMessage = 'The device view could not be refreshed. Refresh this page before repeating the action.';
+			} finally { isRevoking = false; }
+		};
+	};
 </script>
 
-<div class="mx-auto w-full max-w-4xl space-y-6">
-	<PageHeader
-		title="Trusted Devices"
-		description="Manage devices that can skip two-factor authentication."
-		backHref="/auth/sessions"
-	/>
+<div class="mx-auto flex w-full max-w-4xl flex-col gap-6">
+	<PageHeader title="When will this browser ask for verification?" description="Review the trust setting used to skip a two-factor prompt on a future sign-in." backHref="/auth/sessions" />
+	{#if successMessage}<Alert.Root role="status"><Alert.Title>Trust setting updated</Alert.Title><Alert.Description>{successMessage}</Alert.Description></Alert.Root>{/if}
+	{#if errorMessage}<Alert.Root variant="destructive"><Alert.Title>Action needs attention</Alert.Title><Alert.Description>{errorMessage}</Alert.Description></Alert.Root>{/if}
 
-	<!-- Success/Error Messages -->
-	{#if successMessage}
-		<Alert
-			class="border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-200"
-		>
-			<CircleCheck class="h-4 w-4" />
-			<AlertDescription>{successMessage}</AlertDescription>
-		</Alert>
-	{/if}
+	<Alert.Root><Alert.Title>Trust and sign-in are separate</Alert.Title><Alert.Description>Removing this browser's trust means it may need two-factor verification on a future sign-in. It does not sign out the current session. To end an unfamiliar sign-in, use Active sessions.</Alert.Description></Alert.Root>
 
-	{#if errorMessage}
-		<Alert variant="destructive">
-			<CircleAlert class="h-4 w-4" />
-			<AlertDescription>{errorMessage}</AlertDescription>
-		</Alert>
-	{/if}
-
-	<!-- How It Works -->
-	<Alert>
-		<Info class="h-4 w-4" />
-		<AlertDescription>
-			When you verify 2FA and choose "Trust this device", the device is remembered for 60 days.
-			You won't need to enter a verification code on trusted devices.
-		</AlertDescription>
-	</Alert>
-
-	<!-- Current Device Status -->
 	<Card.Root>
-		<Card.Header>
-			<Card.Title class="flex items-center gap-2">
-				<Laptop class="h-5 w-5" />
-				Current Device
-			</Card.Title>
-			<Card.Description>
-				{data.currentDevice?.browserName || 'Unknown'} on {data.currentDevice?.osName ||
-					'Unknown'}
-			</Card.Description>
-		</Card.Header>
-		<Card.Content class="space-y-4">
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<Shield class="text-muted-foreground h-4 w-4" />
-					<span class="text-sm">Trust Status</span>
-				</div>
-				{#if data.isCurrentDeviceTrusted}
-					<Badge variant="success" class="flex items-center gap-1">
-						<CircleCheck class="h-3 w-3" />
-						Trusted
-					</Badge>
-				{:else}
-					<Badge variant="secondary">Not Trusted</Badge>
-				{/if}
-			</div>
-
-			{#if data.currentDevice?.ip}
-				<div class="flex items-center justify-between">
-					<span class="text-muted-foreground text-sm">IP Address</span>
-					<span class="font-mono text-sm">{data.currentDevice.ip}</span>
-				</div>
-			{/if}
-
-			<Separator />
-
+		<Card.Header><Card.Title>This browser</Card.Title><Card.Description>{data.currentDevice?.browserName || 'Unknown browser'} on {data.currentDevice?.osName || 'unknown device'} · inferred from the browser's reported information</Card.Description></Card.Header>
+		<Card.Content class="flex flex-col gap-4">
+			<div class="flex flex-wrap items-center justify-between gap-2"><span class="text-sm">Trust cookie</span><Badge variant="secondary">{data.isCurrentDeviceTrusted ? 'Present in this browser' : 'Not detected'}</Badge></div>
+			<p class="text-muted-foreground text-sm">Cookie presence alone does not confirm that a trust token is valid or unexpired. Other browsers' trust settings are not listed here.</p>
+			{#if data.currentDevice?.ip}<p class="text-muted-foreground break-all text-sm">Current IP: {data.currentDevice.ip}</p>{/if}
 			{#if data.isCurrentDeviceTrusted}
-				<div class="space-y-3">
-					<p class="text-muted-foreground text-sm">
-						This device is trusted and will skip 2FA verification.
-					</p>
-					<form
-						method="POST"
-						action="?/revokeCurrentDevice"
-						use:enhance={() => {
-							isRevoking = true;
-							return async ({ result }) => {
-								isRevoking = false;
-								if (result.type === 'success') {
-									successMessage =
-										'Device trust revoked. You will need to verify 2FA on next sign-in.';
-									await invalidateAll();
-								} else if (result.type === 'failure') {
-									errorMessage = (result.data?.error as string) || 'Failed to revoke trust';
-								}
-							};
-						}}
-					>
-						<Button type="submit" variant="destructive" size="sm" disabled={isRevoking}>
-							{isRevoking ? 'Revoking...' : 'Revoke Trust'}
-						</Button>
-					</form>
-				</div>
-			{:else}
-				<p class="text-muted-foreground text-sm">
-					To trust this device, enable 2FA and select "Trust this device" during verification.
-				</p>
-			{/if}
+				<form method="POST" action="?/revokeCurrentDevice" use:enhance={submitTrustAction}><Button type="submit" variant="outline" size="sm" disabled={isRevoking}>{isRevoking ? 'Updating…' : 'Remove trust from this browser'}</Button></form>
+			{:else}<p class="text-muted-foreground text-sm">If two-factor authentication is enabled, you can choose to trust this browser when you complete verification.</p>{/if}
 		</Card.Content>
 	</Card.Root>
 
-	<!-- 2FA Status -->
 	{#if !data.twoFactorEnabled}
-		<Card.Root class="border-amber-200 dark:border-amber-800">
-			<Card.Header>
-				<Card.Title class="text-amber-700 dark:text-amber-300">
-					Two-Factor Authentication Required
-				</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<p class="text-muted-foreground mb-4 text-sm">
-					You need to enable two-factor authentication before you can use trusted devices.
-				</p>
-				<Button onclick={() => goto('/auth/security')} variant="outline" size="sm">
-					Go to Security Settings
-				</Button>
-			</Card.Content>
-		</Card.Root>
-	{/if}
-
-	<!-- Revoke All Devices -->
-	{#if data.twoFactorEnabled}
+		<Card.Root><Card.Header><Card.Title>Two-factor authentication is not enabled</Card.Title><Card.Description>Trusted-device settings apply when two-factor authentication is enabled for your account.</Card.Description></Card.Header><Card.Content><Button href="/auth/security" variant="outline" size="sm">Review account protection</Button></Card.Content></Card.Root>
+	{:else}
 		<Card.Root>
-			<Card.Header>
-				<Card.Title>Revoke All Trusted Devices</Card.Title>
-				<Card.Description>
-					This will require 2FA verification on all your devices, including this one.
-				</Card.Description>
-			</Card.Header>
+			<Card.Header><Card.Title>Need to end other sign-ins too?</Card.Title><Card.Description>Remove trust from this browser and sign out other active sessions. Trust cookies stored in other browsers remain unchanged.</Card.Description></Card.Header>
 			<Card.Content>
-				<form
-					method="POST"
-					action="?/revokeAllDevices"
-					use:enhance={() => {
-						isRevoking = true;
-						return async ({ result }) => {
-							isRevoking = false;
-							if (result.type === 'success') {
-								successMessage = 'All device trusts have been revoked.';
-								await invalidateAll();
-							} else if (result.type === 'failure') {
-								errorMessage = (result.data?.error as string) || 'Failed to revoke all devices';
-							}
-						};
-					}}
-				>
-					<Button type="submit" variant="outline" size="sm" disabled={isRevoking}>
-						Revoke All Devices
-					</Button>
-				</form>
+				<details>
+					<summary class="cursor-pointer text-sm">Review and confirm…</summary>
+					<p class="text-muted-foreground my-3 text-sm">You stay signed in here. Other sessions will need to sign in again.</p>
+					<form method="POST" action="?/revokeAllDevices" use:enhance={submitTrustAction}><Button type="submit" variant="destructive" size="sm" disabled={isRevoking}>{isRevoking ? 'Updating…' : 'Remove trust here and sign out other sessions'}</Button></form>
+				</details>
 			</Card.Content>
 		</Card.Root>
 	{/if}
+	<div class="flex flex-wrap gap-2"><Button href="/auth/sessions" variant="outline">Review active sessions</Button><Button href="/auth/security" variant="ghost">Account protection</Button></div>
 </div>

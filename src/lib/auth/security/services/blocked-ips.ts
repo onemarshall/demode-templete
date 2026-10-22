@@ -42,6 +42,7 @@ export interface BlockedIPsQuery {
 }
 
 export interface BlockedIPsResponse {
+	error?: string;
 	ips: BlockedIP[];
 	total: number;
 	page: number;
@@ -132,6 +133,7 @@ export async function getBlockedIPs(query: BlockedIPsQuery): Promise<BlockedIPsR
 	} catch (error) {
 		logger.error('[SecurityServices] Failed to get blocked IPs:', error);
 		return {
+			error: 'Blocked IP data is unavailable',
 			ips: [],
 			total: 0,
 			page: 1,

@@ -224,6 +224,7 @@ export interface RateLimitHeaders {
 }
 
 export interface FlaggedSession {
+	sourceEventId?: string;
 	sessionId: string;
 	userId?: string;
 	ip: string;

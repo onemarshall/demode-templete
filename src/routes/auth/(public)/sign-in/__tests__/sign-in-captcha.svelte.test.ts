@@ -33,11 +33,14 @@ describe('AuthCaptchaPanel - Captcha widget', () => {
 	});
 
 	it('renders captcha widget when endpoint is available', async () => {
-		publicEnv.PUBLIC_CAP_ENDPOINT = 'https://captcha.test/abc';
+		// The widget endpoint is composed from the cap server base URL and the
+		// site key: {endpoint}/{siteKey}/
+		publicEnv.PUBLIC_CAP_ENDPOINT = 'https://captcha.test';
+		publicEnv.PUBLIC_CAP_KEY = 'abc';
 
 		render(AuthCaptchaPanel, { props: { onSolve: vi.fn() } });
 
 		const widget = await screen.findByTestId('cap-widget');
-		expect(widget).toHaveAttribute('data-endpoint', 'https://captcha.test/abc');
+		expect(widget).toHaveAttribute('data-endpoint', 'https://captcha.test/abc/');
 	});
 });
