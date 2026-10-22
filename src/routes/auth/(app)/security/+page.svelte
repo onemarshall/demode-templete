@@ -9,10 +9,10 @@
 	let session = $derived(data.session);
 
 	// Detect if user is logged in via SIWE (Ethereum wallet)
-	const isSiweLogin = $derived(
-		(user as any)?.lastLoginMethod === 'siwe' ||
-			(user as any)?.walletAddresses?.length > 0
-	);
+	const isSiweLogin = $derived.by(() => {
+		const u = user as { lastLoginMethod?: string | null; walletAddresses?: unknown[] } | undefined;
+		return u?.lastLoginMethod === 'siwe' || (u?.walletAddresses?.length ?? 0) > 0;
+	});
 </script>
 
 <div class="mx-auto w-full max-w-4xl space-y-6">

@@ -4,6 +4,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { publicEnv, isDevelopment } from '#lib/auth/shared/env/index.js';
 	import { Toaster } from 'svelte-sonner';
+	import { ModeWatcher } from "mode-watcher";
 	import type { LayoutData } from './$types';
 	import type { Snippet } from 'svelte';
 
@@ -59,7 +60,7 @@
 		cleanup?.();
 	});
 </script>
-
+<ModeWatcher />
 <Toaster richColors position="top-right" />
 {@render children()}
 

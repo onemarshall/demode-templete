@@ -11,6 +11,12 @@
 				outline: "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
 				ghost: "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
 				link: "text-primary underline-offset-4 hover:underline",
+				success:
+					"bg-emerald-600/10 text-emerald-700 [a]:hover:bg-emerald-600/20 dark:bg-emerald-400/10 dark:text-emerald-400 dark:[a]:hover:bg-emerald-400/20",
+				low: "bg-emerald-600/10 text-emerald-700 [a]:hover:bg-emerald-600/20 dark:bg-emerald-400/10 dark:text-emerald-400 dark:[a]:hover:bg-emerald-400/20",
+				medium:
+					"bg-amber-600/10 text-amber-700 [a]:hover:bg-amber-600/20 dark:bg-amber-400/10 dark:text-amber-400 dark:[a]:hover:bg-amber-400/20",
+				high: "bg-destructive/10 [a]:hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-destructive dark:bg-destructive/20",
 			},
 		},
 		defaultVariants: {

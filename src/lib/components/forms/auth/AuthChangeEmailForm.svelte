@@ -93,7 +93,7 @@
 	}
 </script>
 
-<AuthFormCard {title} {description} bare>
+<AuthFormCard {title} {description}>
 	<div class="mb-2 flex items-center gap-2">
 		<Button
 			variant="ghost"

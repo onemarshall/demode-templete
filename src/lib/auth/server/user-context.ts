@@ -1,6 +1,8 @@
 // src/lib/auth/server/user-context.ts
 import { Pool } from 'pg';
+import type { User as BetterAuthUser } from 'better-auth';
 import { auth } from '#lib/auth.js';
+import { resolveUserImage } from '#lib/auth/server/session-serializer.js';
 import { logger } from '#lib/auth/shared/logger.js';
 import { getServerEnv } from '#lib/auth/shared/env/index.js';
 
@@ -18,9 +20,25 @@ export interface OAuthAccount {
 	accountId: string;
 }
 
+/**
+ * Session user plus the extended fields the account pages need.
+ * The index signature keeps it assignable to `Record<string, unknown>` while
+ * still preserving named properties through object spreads (a plain
+ * `Record<string, unknown>` collapses to only the literal keys when spread).
+ */
+export interface AuthContextUser extends BetterAuthUser {
+	lastLoginMethod: string | null;
+	password: string | null;
+	walletAddresses: WalletAddress[];
+	connectedProviders: string[];
+	isOAuthUser: boolean;
+	twoFactorEnabled: boolean;
+	[key: string]: unknown;
+}
+
 export interface AuthUserContext {
 	session: NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>['session'];
-	user: Record<string, unknown>;
+	user: AuthContextUser;
 	rawUser: Record<string, unknown>;
 	oauthAccounts: OAuthAccount[];
 }
@@ -123,8 +141,9 @@ export async function loadAuthUserContext(headers: Headers): Promise<AuthUserCon
 
 	const sessionUser = session.user as Record<string, unknown>;
 
-	const normalizedUser = {
+	const normalizedUser: AuthContextUser = {
 		...session.user,
+		image: resolveUserImage(sessionUser.image),
 		twoFactorEnabled:
 			'twoFactorEnabled' in sessionUser ? Boolean(sessionUser.twoFactorEnabled) : false,
 		lastLoginMethod,
@@ -132,7 +151,7 @@ export async function loadAuthUserContext(headers: Headers): Promise<AuthUserCon
 		walletAddresses,
 		connectedProviders: oauthProviders,
 		isOAuthUser: hasOauthProvider
-	} as Record<string, unknown>;
+	};
 
 	return {
 		session: session.session,

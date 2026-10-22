@@ -3,6 +3,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Alert, AlertDescription } from '#lib/components/ui/alert/index.js';
+	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
 	import {
 		Loader2,
 		Play,
@@ -199,14 +200,15 @@
 	<title>Security Test Dashboard | Admin</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-6xl space-y-6 p-6">
-	<div class="flex items-center justify-between">
-		<div>
-			<h1 class="text-3xl font-bold">Security Test Dashboard</h1>
-			<p class="text-muted-foreground">Simulate security events to test the monitoring system</p>
-		</div>
-		<Button variant="outline" onclick={clearResults} class="gap-2">Clear Results</Button>
-	</div>
+<div class="space-y-6">
+	<PageHeader
+		title="Security Test Dashboard"
+		description="Simulate security events to test the monitoring system"
+	>
+		{#snippet actions()}
+			<Button variant="outline" onclick={clearResults} class="gap-2">Clear Results</Button>
+		{/snippet}
+	</PageHeader>
 
 	{#if error}
 		<Alert variant="destructive">

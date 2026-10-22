@@ -7,6 +7,7 @@
 	import * as Dialog from '#lib/components/ui/dialog/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Select from '#lib/components/ui/select/index.js';
+	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
 	import type { UserListItem } from '#lib/components/users/types.js';
 
 	interface Props {
@@ -152,17 +153,15 @@
 	<title>Admin · Users</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-6xl space-y-6 p-6">
+<div class="space-y-6">
 	<!-- Header -->
-	<div class="flex items-center justify-between">
-		<div>
-			<p class="text-muted-foreground text-xs tracking-wide uppercase">Admin</p>
-			<h1 class="text-2xl font-semibold">Users</h1>
-		</div>
-		{#if hasUsers}
-			<span class="text-muted-foreground text-sm">{data.users.length} users</span>
-		{/if}
-	</div>
+	<PageHeader title="Users" description="Manage accounts, roles and access across the application.">
+		{#snippet actions()}
+			{#if hasUsers}
+				<span class="text-muted-foreground text-sm">{data.users.length} users</span>
+			{/if}
+		{/snippet}
+	</PageHeader>
 
 	<!-- Error display -->
 	{#if formError}

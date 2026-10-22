@@ -86,12 +86,12 @@
 			title="Sessions &amp; Devices"
 			description="Manage your active sessions and trusted devices."
 		>
-			{#snippet actions()}
+			<!-- {#snippet actions()}
 				<Button onclick={handleRefresh} variant="outline" size="sm" disabled={isLoading}>
 					{isLoading ? 'Refreshing...' : 'Refresh'}
 				</Button>
 				<Button onclick={handleSignOut} variant="destructive" size="sm">Sign Out</Button>
-			{/snippet}
+			{/snippet} -->
 		</PageHeader>
 
 		<div class="grid gap-6 md:grid-cols-2">
@@ -120,7 +120,7 @@
 					</div>
 					<Separator />
 					<div class="space-y-2 text-sm">
-						<div class="flex flex-col gap-1">
+						<div class="flex flex-row items-center justify-between">
 							<span class="text-muted-foreground">ID:</span>
 							<span class="font-mono text-xs break-all">{user.id}</span>
 						</div>

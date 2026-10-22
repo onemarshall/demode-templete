@@ -41,34 +41,37 @@
 		avatarSrc = user?.image || "";
 	});
 
-	// Form for profile updates (reactive to incoming formData)
-	const form = $derived(
-		superForm(formData, {
-			validators: zod4Client(profileSchema),
-			SPA: true,
-			onSubmit: async ({ formData, cancel }) => {
-				cancel();
-				isUpdating = true;
-				try {
-					const newName = formData.get("name") as string;
+	// Form for profile updates. superForm must be instantiated once — wrapping it
+	// in $derived creates a new instance (with the same auto-generated data id)
+	// whenever `formData` changes, which triggers the duplicate-id warning.
+	// Incoming data is synced via the $effect below instead.
+	// svelte-ignore state_referenced_locally
+	const form = superForm(formData, {
+		id: "profile-general",
+		validators: zod4Client(profileSchema),
+		SPA: true,
+		onSubmit: async ({ formData: submitData, cancel }) => {
+			cancel();
+			isUpdating = true;
+			try {
+				const newName = submitData.get("name") as string;
 
-					// Only update name - don't touch image (it's managed separately via avatar upload/delete)
-					await authClient.updateUser({
-						name: newName,
-					});
+				// Only update name - don't touch image (it's managed separately via avatar upload/delete)
+				await authClient.updateUser({
+					name: newName,
+				});
 
-					// Update form store to match the new values
-					$formStore.name = newName;
-					initialUser = { ...initialUser, name: newName };
-				} finally {
-					isUpdating = false;
-				}
-			},
-		}),
-	);
+				// Update form store to match the new values
+				$formStore.name = newName;
+				initialUser = { ...initialUser, name: newName };
+			} finally {
+				isUpdating = false;
+			}
+		},
+	});
 
-	const formStore = $derived(form.form);
-	const enhance = $derived(form.enhance);
+	const formStore = form.form;
+	const enhance = form.enhance;
 
 	// Keep form data in sync when parent updates it
 	$effect(() => {

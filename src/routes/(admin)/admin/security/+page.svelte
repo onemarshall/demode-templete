@@ -2,6 +2,7 @@
 	import * as Card from '#lib/components/ui/card/index.js'
 	import * as Alert from '#lib/components/ui/alert/index.js'
 	import { Button } from '#lib/components/ui/button/index.js'
+	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte'
 	import { dev } from '$app/env'
 	import { invalidateAll } from '$app/navigation'
 	import { onMount } from 'svelte'
@@ -292,9 +293,13 @@
 	<title>Security Dashboard | Admin</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-9xl space-y-6 p-6">
+<div class="space-y-6">
 	<!-- Header -->
-	<DashboardHeader {form} />
+	<PageHeader title="Security" description="Aggregate security intelligence across all users">
+		{#snippet actions()}
+			<DashboardHeader {form} />
+		{/snippet}
+	</PageHeader>
 
 	<div class="flex items-center justify-between">
 		<div class="flex items-center gap-2">

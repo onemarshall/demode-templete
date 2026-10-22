@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { authClient } from "#lib/auth-client.js";
 	import { getPlan } from "#lib/billing/plans.js";
+	import { Button } from "$lib/components/ui/button/index.js";
+	import { Spinner } from "$lib/components/ui/spinner/index.js";
 
+import * as Card from '#lib/components/ui/card/index.js';
+	
 	interface SubscriptionData {
 		status: string;
 		product: {
@@ -127,11 +131,11 @@
 	}
 </script>
 
-<div class="rounded-lg border border-gray-200 bg-white p-6">
-	<h2 class="text-lg font-semibold text-gray-900 mb-4">
+<Card.Root>
+	<Card.Content class="space-y-2">
+	<h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
 		Subscription Status
 	</h2>
-
 	{#if !subscription && (sessionLoading || loading)}
 		<div class="flex items-center justify-center py-8">
 			<div
@@ -149,24 +153,26 @@
 	{:else if error}
 		<div class="p-3 bg-red-50 border border-red-200 rounded-md">
 			<p class="text-sm text-red-700">{error}</p>
-			<button
+			<Button
 				onclick={loadSubscriptionData}
-				class="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+				variant="link"
+				size="sm"
+				class="mt-2 text-red-600 hover:text-red-800"
 			>
-				Retry
-			</button>
+				<Spinner data-icon="inline-start" /> Retry
+			</Button>
 		</div>
 	{:else if subscription}
 		<div class="space-y-4">
 			<div class="flex items-center justify-between">
-				<span class="text-sm text-gray-600">Status</span>
+				<span class="text-sm text-gray-600 dark:text-gray-100">Status</span>
 				<span
 					class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
 					{subscription.status === 'active'
 						? 'bg-green-100 text-green-800'
 						: subscription.status === 'trialing'
 							? 'bg-blue-100 text-blue-800'
-							: 'bg-gray-100 text-gray-800'}"
+							: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100'}"
 				>
 					{subscription.status}
 				</span>
@@ -174,8 +180,8 @@
 
 			{#if enrichedProduct?.name}
 				<div class="flex items-center justify-between">
-					<span class="text-sm text-gray-600">Plan</span>
-					<span class="text-sm font-medium text-gray-900"
+					<span class="text-sm text-gray-600 dark:text-gray-100">Plan</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-gray-100"
 						>{enrichedProduct.name}</span
 					>
 				</div>
@@ -183,8 +189,8 @@
 
 			{#if enrichedProduct?.price != null && enrichedProduct?.currency}
 				<div class="flex items-center justify-between">
-					<span class="text-sm text-gray-600">Price</span>
-					<span class="text-sm font-medium text-gray-900">
+					<span class="text-sm text-gray-600 dark:text-gray-100">Price</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-gray-100">
 						{new Intl.NumberFormat(undefined, {
 							style: "currency",
 							currency: enrichedProduct.currency.toUpperCase(),
@@ -195,8 +201,8 @@
 
 			{#if subscription.periodEnd}
 				<div class="flex items-center justify-between">
-					<span class="text-sm text-gray-600">Renews</span>
-					<span class="text-sm font-medium text-gray-900"
+					<span class="text-sm text-gray-600 dark:text-gray-100">Renews</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-gray-100"
 						>{formatDate(subscription.periodEnd)}</span
 					>
 				</div>
@@ -204,19 +210,18 @@
 
 			<div class="border-t border-gray-200 pt-4 mt-4">
 				<div class="flex gap-3">
-					<button
-						onclick={openPortal}
-						class="flex-1 py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-md transition-colors"
-					>
-						Manage
-					</button>
+					<Button onclick={openPortal} class="flex-1" variant="outline">
+					<Spinner data-icon="inline-start" /> Manage
+				</Button>
+
 					{#if subscription.status === "active"}
-						<button
+						<Button
 							onclick={handleCancel}
-							class="flex-1 py-2 px-4 bg-red-50 hover:bg-red-100 text-red-700 font-medium rounded-md transition-colors"
+							variant="destructive"
+							class="flex-1"
 						>
 							Cancel
-						</button>
+						</Button>
 					{/if}
 				</div>
 			</div>
@@ -224,12 +229,9 @@
 	{:else}
 		<div class="text-center py-8">
 			<p class="text-gray-600 mb-4">No active subscription</p>
-			<a
-				href="/subscribe"
-				class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
-			>
-				View Plans
-			</a>
+			<Button href="/subscribe">View Plans</Button>
 		</div>
 	{/if}
-</div>
+	</Card.Content>
+</Card.Root>
+

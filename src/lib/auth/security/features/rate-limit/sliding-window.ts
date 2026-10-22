@@ -12,7 +12,9 @@ import { logger } from '#lib/auth/shared/logger.js';
 let storageAdapter: StorageAdapter | null = null;
 
 // Redis-native client kept separately for Lua script path
-let nativeRedis: Awaited<ReturnType<typeof import('#lib/auth/shared/redis')['getSharedRedisClient']>> | null = null;
+let nativeRedis: Awaited<
+	ReturnType<typeof import('#lib/auth/shared/redis/index.js')['getSharedRedisClient']>
+> | null = null;
 
 async function getStorage(): Promise<StorageAdapter> {
 	if (!storageAdapter) {

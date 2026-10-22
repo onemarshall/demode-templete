@@ -87,7 +87,7 @@
 			{/if}
 
 			{#if hasError}
-				<Alert variant="error">
+				<Alert variant="destructive">
 					<AlertDescription>{error}</AlertDescription>
 				</Alert>
 			{/if}

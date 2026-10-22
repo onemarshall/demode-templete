@@ -8,6 +8,7 @@
 	import AppBreadcrumb from "./app-breadcrumb.svelte";
 	import CustomSidebarTrigger from "./custom-sidebar-trigger.svelte";
 	import NavUser from "./nav-user.svelte";
+	import ThemeToggle from "./theme-toggle.svelte";
 	import { getNavLinks, isItemActive, type ShellUser } from "./app-shared";
 
 	let { user = null }: { user?: ShellUser | null } = $props();
@@ -41,6 +42,7 @@
 		<Button aria-label="Notifications" size="icon-xs" variant="outline">
 			<BellIcon />
 		</Button>
+		<ThemeToggle />
 		<Separator class="h-4 data-[orientation=vertical]:self-center" orientation="vertical" />
 		<NavUser {user} />
 	</div>

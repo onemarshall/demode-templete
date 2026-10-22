@@ -78,7 +78,7 @@
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			{#if hasError}
-				<Alert variant="error">
+				<Alert variant="destructive">
 					<AlertDescription>{error}</AlertDescription>
 				</Alert>
 			{/if}

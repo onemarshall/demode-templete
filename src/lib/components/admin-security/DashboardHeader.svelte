@@ -22,47 +22,41 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<div>
-		<h1 class="text-3xl font-bold">Security Dashboard</h1>
-		<p class="text-muted-foreground">Aggregate security intelligence across all users</p>
-	</div>
-	<div class="flex items-center gap-3">
-		{#if showSuccess && form?.success}
-			<div class="flex items-center gap-2 text-sm text-green-600">
-				<Check class="h-4 w-4" />
-				<span>Cache cleared successfully</span>
-			</div>
-		{/if}
-		<form
-			method="POST"
-			action="?/clearCache"
-			use:enhance={() => {
-				isClearing = true;
-				return async ({ update, result }) => {
-					await update();
-					isClearing = false;
+<div class="flex items-center gap-3">
+	{#if showSuccess && form?.success}
+		<div class="flex items-center gap-2 text-sm text-green-600">
+			<Check class="h-4 w-4" />
+			<span>Cache cleared successfully</span>
+		</div>
+	{/if}
+	<form
+		method="POST"
+		action="?/clearCache"
+		use:enhance={() => {
+			isClearing = true;
+			return async ({ update, result }) => {
+				await update();
+				isClearing = false;
 
-					if (result.type === 'success') {
-						// Show cleared state for 2 seconds before refreshing
-						dataCleared = true;
-						setTimeout(() => {
-							invalidateAll();
-							dataCleared = false;
-						}, 2000);
-					}
-				};
-			}}
-		>
-			<Button variant="outline" type="submit" class="gap-2" disabled={isClearing}>
-				{#if isClearing}
-					<RefreshCw class="h-4 w-4 animate-spin" />
-					Clearing...
-				{:else}
-					<Trash2 class="h-4 w-4" />
-					Reset Dashboard Data
-				{/if}
-			</Button>
-		</form>
-	</div>
+				if (result.type === 'success') {
+					// Show cleared state for 2 seconds before refreshing
+					dataCleared = true;
+					setTimeout(() => {
+						invalidateAll();
+						dataCleared = false;
+					}, 2000);
+				}
+			};
+		}}
+	>
+		<Button variant="outline" type="submit" class="gap-2" disabled={isClearing}>
+			{#if isClearing}
+				<RefreshCw class="h-4 w-4 animate-spin" />
+				Clearing...
+			{:else}
+				<Trash2 class="h-4 w-4" />
+				Reset Dashboard Data
+			{/if}
+		</Button>
+	</form>
 </div>

@@ -13,11 +13,11 @@
 
 	<div class="space-y-4">
 		<SubscriptionStatus initial={data.subscription} />
-		<Card.Root>
+		<!-- <Card.Root>
 			<Card.Content class="space-y-2 pt-6">
 				<p class="text-sm font-medium">Billing</p>
 				<CustomerPortalButton />
 			</Card.Content>
-		</Card.Root>
+		</Card.Root> -->
 	</div>
 </div>

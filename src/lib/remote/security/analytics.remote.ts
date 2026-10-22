@@ -49,7 +49,7 @@ function requireRequestEvent() {
  */
 async function getAuthenticatedContextWithSDK() {
 	const event = requireRequestEvent()
-	const sdk = new SecurityDashboardSDK({ baseUrl: event.url.origin })
+	const sdk = new SecurityDashboardSDK({ baseUrl: new URL(event.request.url).origin })
 	const context = await sdk.authenticateRequest(event.request)
 	return { sdk, context }
 }
