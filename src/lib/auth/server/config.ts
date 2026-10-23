@@ -14,13 +14,15 @@ import { initializeEmail, getEmailVerificationConfig, getEmailAndPasswordConfig 
 // Core imports
 import { buildCorePlugins } from './plugins/core';
 import { buildSecurityPlugins } from './plugins/security';
-import { buildMcpPlugins } from './plugins/mcp';
 import { buildCMSPlugin } from './plugins/cms';
 import { getDatabaseOptions } from './options/database';
 import { getUserOptions } from './options/user';
 import { getSocialProviders } from './options/socials';
 import { databaseHooks } from './options/databaseHooks';
 import { getServerEnv } from '#lib/auth/shared/env/index.js';
+import { accountDeletionPolicyPlugin } from './deletion-policy';
+import { accountUnlinkPolicyPlugin } from './account-unlink-policy';
+import { historyPlugin } from './plugins/history';
 
 const env = await getServerEnv();
 
@@ -81,9 +83,11 @@ export const auth = betterAuth({
 
 	// Plugins
 	plugins: [
+		accountDeletionPolicyPlugin,
+		accountUnlinkPolicyPlugin,
+		historyPlugin(),
 		...buildCorePlugins(env),
 		...buildSecurityPlugins(env),
-		...buildMcpPlugins(env),
 		...(cmsPlugin ? [cmsPlugin] : []),
 		// Add test utils in test environment
 		...(process.env.NODE_ENV === 'test' ? [testUtils({ captureOTP: true })] : [])

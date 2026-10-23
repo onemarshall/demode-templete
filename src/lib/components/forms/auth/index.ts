@@ -16,8 +16,8 @@ export { default as AuthFormAlert } from './AuthFormAlert.svelte';
 export { default as AuthFormSocialRow } from './AuthFormSocialRow.svelte';
 export { default as AuthFormFooterLink } from './AuthFormFooterLink.svelte';
 export { default as AuthCaptchaPanel } from './AuthCaptchaPanel.svelte';
-export { default as PasskeyButton } from './PasskeyButton.svelte';
-export { default as SocialButton } from './SocialButton.svelte';
+export { default as AuthPasskeyButton } from './AuthPasskeyButton.svelte';
+export { default as AuthSocialButton } from './AuthSocialButton.svelte';
 
 // Utilities
 export { computeCapEndpoint } from './captcha-endpoint';

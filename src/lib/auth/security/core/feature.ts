@@ -46,6 +46,8 @@ export interface SecurityConfig {
 	enabled: boolean;
 	skipInDevelopment: boolean;
 	captchaThreshold: number;
+	/** Endpoint-relative paths whose UI supports a CAPTCHA challenge. */
+	captchaPaths?: string[];
 	blockThreshold: number;
 	includePaths: string[];
 	excludePaths: string[];

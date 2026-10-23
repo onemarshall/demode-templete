@@ -12,7 +12,7 @@ import { logger } from '#lib/auth/shared/logger.js';
 // Default configuration constants
 const DEFAULTS = {
 	thresholds: {
-		captcha: 40,
+		captcha: 0,
 		block: 80
 	},
 	rateLimit: {
@@ -57,7 +57,8 @@ export function buildSecurityPlugins(env: Record<string, unknown>): BetterAuthPl
 		// includePaths = process all endpoints; excludePaths lists
 		// endpoint-relative paths to skip.
 		includePaths: [],
-		excludePaths: ['/get-session', '/ok', '/error', '/security/', '/delete-user/callback'],
+		// Ending a session must remain possible without a CAPTCHA challenge.
+		excludePaths: ['/sign-out', '/get-session', '/ok', '/error', '/security/', '/delete-user/callback'],
 
 		resilience: {
 			failMode,

@@ -27,6 +27,7 @@ import * as Card from '#lib/components/ui/card/index.js';
 
 	// svelte-ignore state_referenced_locally
 	let loading = $state(false);
+	let portalLoading = $state(false);
 	let error = $state<string | null>(null);
 	// svelte-ignore state_referenced_locally
 	let subscription = $state<SubscriptionData | null>(initial ?? null);
@@ -116,12 +117,21 @@ import * as Card from '#lib/components/ui/card/index.js';
 	}
 
 	async function openPortal() {
-		const { error: portalError } = await authClient.creem.createPortal({
-			redirect: true
-		});
-
-		if (portalError) {
-			error = portalError.message ?? "Failed to open portal";
+		if (portalLoading) return;
+		portalLoading = true;
+		error = null;
+		try {
+			const { error: portalError } = await authClient.creem.createPortal({
+				redirect: true
+			});
+			if (portalError) {
+				error = portalError.message ?? "Failed to open portal";
+				portalLoading = false;
+			}
+			// On success, keep the spinner until the portal navigation leaves this page.
+		} catch (err) {
+			error = err instanceof Error ? err.message : "Failed to open portal";
+			portalLoading = false;
 		}
 	}
 
@@ -210,8 +220,11 @@ import * as Card from '#lib/components/ui/card/index.js';
 
 			<div class="border-t border-gray-200 pt-4 mt-4">
 				<div class="flex gap-3">
-					<Button onclick={openPortal} class="flex-1" variant="outline">
-					<Spinner data-icon="inline-start" /> Manage
+					<Button onclick={openPortal} class="flex-1" variant="outline" disabled={portalLoading} aria-busy={portalLoading}>
+					{#if portalLoading}
+						<Spinner data-icon="inline-start" />
+					{/if}
+					Manage
 				</Button>
 
 					{#if subscription.status === "active"}

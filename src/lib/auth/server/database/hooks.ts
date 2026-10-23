@@ -2,6 +2,7 @@
 import { getDirectusCMSProvider } from '#lib/auth/server/plugins/cms.js';
 import { getServerEnv } from '#lib/auth/shared/env/index.js';
 import { logger, securityLogger } from '#lib/auth/shared/logger.js';
+import { recordHistory } from '#lib/auth/server/history.js';
 import type { BetterAuthOptions } from 'better-auth';
 import type { User } from './types';
 
@@ -15,6 +16,13 @@ interface SessionData {
 	ipAddress?: string | null;
 	userAgent?: string | null;
 	createdAt: Date;
+}
+
+function summarizeClient(userAgent?: string | null): string | undefined {
+	if (!userAgent) return undefined;
+	const browser = /Edg\//.test(userAgent) ? 'Edge' : /Firefox\//.test(userAgent) ? 'Firefox' : /Chrome\//.test(userAgent) ? 'Chrome' : /Safari\//.test(userAgent) ? 'Safari' : 'Browser';
+	const platform = /Android/.test(userAgent) ? 'Android' : /iPhone|iPad/.test(userAgent) ? 'iOS' : /Windows/.test(userAgent) ? 'Windows' : /Mac OS/.test(userAgent) ? 'macOS' : /Linux/.test(userAgent) ? 'Linux' : 'Unknown device';
+	return `${browser} on ${platform}`;
 }
 
 // ============================================
@@ -54,6 +62,24 @@ async function syncUserToCMS(user: User, action: 'create' | 'update'): Promise<v
 
 async function trackSession(session: SessionData): Promise<void> {
 	try {
+		const device = summarizeClient(session.userAgent);
+		try {
+			await recordHistory({
+				category: 'security',
+				action: 'session_created',
+				outcome: 'success',
+				actorId: session.userId,
+				metadata: {
+					method: 'session',
+					...(session.ipAddress ? { ipAddress: session.ipAddress } : {}),
+					...(device ? { device } : {})
+				}
+			});
+		} catch (error) {
+			securityLogger.error('[History] Failed to record successful sign-in', {
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
 		const sessionData = {
 			id: session.token,
 			userId: session.userId,
@@ -80,7 +106,6 @@ async function trackSession(session: SessionData): Promise<void> {
 		}
 
 		securityLogger.info('[Hooks] Session tracked', {
-			sessionId: session.token,
 			userId: session.userId
 		});
 	} catch (error) {

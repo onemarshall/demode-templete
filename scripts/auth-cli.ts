@@ -2,16 +2,10 @@
 import { betterAuth } from 'better-auth';
 import { Pool } from 'pg';
 // Import any plugins that CREATE TABLES directly (not from your builders)
-import { twoFactor, admin, magicLink, siwe, lastLoginMethod, jwt } from 'better-auth/plugins';
+import { twoFactor, admin, magicLink, siwe, lastLoginMethod, organization } from 'better-auth/plugins';
 import { passkey } from '@better-auth/passkey';
 import { creem } from '@creem_io/better-auth';
-import { mcp } from '@better-auth/mcp';
-import { cimd } from '@better-auth/cimd';
-// The CLI runs under Node, so the bundled Node transport is used here.
-// The app itself (Bun) injects its own transport via server/plugins/mcp.
-import { fetchClientMetadataResource } from '@better-auth/cimd/node';
-
-const MCP_RESOURCE = process.env.PUBLIC_SITE_URL || 'http://localhost:3000';
+import { ac, owner, admin as organizationAdmin, member } from '../src/lib/auth/modules/organization/permissions.js';
 
 const PASSKEY_ENABLED = process.env.PUBLIC_AUTH_PASSKEYS_PLUGIN === 'true';
 const PASSKEY_RPID = process.env.PUBLIC_AUTH_PASSKEY_RPID;
@@ -39,6 +33,19 @@ export const auth = betterAuth({
 			storeInDatabase: true
 		}),
 		admin(),
+		// Montsel tenancy foundation (Appendix B.3 decisions; hooks are not
+		// needed for schema generation).
+		organization({
+			ac,
+			roles: { owner, admin: organizationAdmin, member },
+			allowUserToCreateOrganization: true,
+			organizationLimit: 10,
+			membershipLimit: 100,
+			requireEmailVerificationOnInvitation: true,
+			disableOrganizationDeletion: true,
+			cancelPendingInvitationsOnReInvite: true,
+			async sendInvitationEmail() {}
+		}),
 		// Minimal config to satisfy required args; this file is only for migrations
 		magicLink({
 			async sendMagicLink() {
@@ -53,17 +60,6 @@ export const auth = betterAuth({
 			verifyMessage: async () => true
 		}),
 		twoFactor(),
-		// MCP OAuth provider schema (oauthClient, oauthAccessToken, oauthRefreshToken, oauthConsent, oauthClientAssertion)
-		jwt(),
-		mcp({
-			loginPage: '/auth/sign-in',
-			consentPage: '/auth/consent',
-			resource: MCP_RESOURCE
-		}),
-		cimd({
-			fetchClientMetadataResource,
-			metadataProfile: 'mcp-2026-07-28'
-		}),
 		creem({
 			apiKey: process.env.CREEM_API_KEY || 'cli-placeholder',
 			webhookSecret: process.env.CREEM_WEBHOOK_SECRET,

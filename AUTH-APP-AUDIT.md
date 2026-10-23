@@ -46,7 +46,7 @@ A complete, self-hosted authentication and account system: public auth flows, au
 | Security data JSON | `security.json` | |
 
 ### APIs
-`api/auth/[...all]` (Better Auth), `api/checkout/guest` (Creem), `api/confirm-delete`, `api/delete`, `api/email`, `api/health/security`, `api/system-health` (DB/Redis/geo/CMS probes), `api/mcp` (MCP integration), `api/test/directus`, `api/test-live-threats`, `api/admin/security/scenarios` + `inject` (**dev/test-gated — 404 in production**, verified).
+`api/auth/[...all]` (Better Auth), `api/checkout/guest` (Creem), `api/confirm-delete`, `api/delete`, `api/email`, `api/health/security`, `api/system-health` (DB/Redis/geo/CMS probes), `api/test/directus`, `api/test-live-threats`, `api/admin/security/scenarios` + `inject` (**dev/test-gated — 404 in production**, verified).
 
 ### Better Auth plugins (all env-gated, verified in `modules/core.ts`)
 Last Login Method (always on) · Admin · Passkey · Two-Factor · Magic Link · SIWE · Email OTP · One-Time Token · OAuth Proxy · Creem · custom Security plugin (risk engine) · CMS plugin (Directus bidirectional sync) · MCP plugins.

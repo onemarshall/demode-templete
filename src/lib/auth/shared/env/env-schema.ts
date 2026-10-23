@@ -276,6 +276,9 @@ const authFeaturesEnvSchema = z.object({
 	PUBLIC_AUTH_ADMIN_PLUGIN: envBoolean.default(false),
 	AUTH_ADMIN_ENABLED: envBoolean.default(false),
 	AUTH_ADMIN_PLUGIN: envBoolean.default(false),
+	// Organizations (Montsel tenancy foundation)
+	AUTH_ORGANIZATION_PLUGIN: envBoolean.default(false),
+	MONTSEL_RECOVERY_TOKEN: z.string().min(32).optional(),
 	AUTH_ADMIN_DEFAULT_ROLE: z.string().default('user'),
 	AUTH_ADMIN_ROLES: stringArray.default(['admin']),
 	AUTH_ADMIN_USER_IDS: stringArray.optional(),
@@ -313,9 +316,6 @@ const authFeaturesEnvSchema = z.object({
 	AUTH_LAST_LOGIN_METHOD_ENABLED: envBoolean.default(true),
 	AUTH_LAST_LOGIN_METHOD_STORE_DB: envBoolean.default(true),
 	AUTH_ONE_TIME_TOKEN_ENABLED: envBoolean.default(false),
-
-	// MCP (Model Context Protocol) OAuth provider
-	AUTH_MCP_PLUGIN: envBoolean.default(false)
 });
 
 /**

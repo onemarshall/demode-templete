@@ -7,7 +7,9 @@
 
 	let { label, items }: SidebarNavGroup = $props();
 
+	const sidebar = Sidebar.useSidebar();
 	const pathname = $derived(page.url.pathname);
+	const closeMobileSidebar = () => sidebar.setOpenMobile(false);
 </script>
 
 <Sidebar.Group>
@@ -43,7 +45,7 @@
 										<Sidebar.MenuSubItem>
 											<Sidebar.MenuSubButton isActive={isItemActive(pathname, subItem)}>
 												{#snippet child({ props })}
-													<a href={subItem.path} {...props}>
+									<a href={subItem.path} {...props} onclick={closeMobileSidebar}>
 														<span>{subItem.title}</span>
 													</a>
 												{/snippet}
@@ -55,7 +57,7 @@
 						{:else}
 							<Sidebar.MenuButton isActive={isItemActive(pathname, item)}>
 								{#snippet child({ props })}
-									<a {...props} href={item.path}>
+								<a {...props} href={item.path} onclick={closeMobileSidebar}>
 										<Icon />
 										<span>{item.title}</span>
 									</a>

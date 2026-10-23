@@ -149,9 +149,9 @@ function sanitizeCaptchaToken(token: string): string | null {
 		return null;
 	}
 
-	// Only allow alphanumeric, dashes, underscores, and dots (safe characters)
-	// This covers all major CAPTCHA provider token formats
-	const safePattern = /^[a-zA-Z0-9\-_.]+$/;
+	// Cap redeem tokens use colons; other providers may use padded tokens.
+	// Provider verification, rather than this format check, proves validity.
+	const safePattern = /^[a-zA-Z0-9\-_.=:]+$/;
 	if (!safePattern.test(trimmed)) {
 		return null;
 	}

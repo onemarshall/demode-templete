@@ -70,7 +70,7 @@
 				{#snippet child({ props })}
 					<a {...props} href="/auth/pricing">
 						<SparklesIcon />
-						Upgrade to Pro
+						Compare plans
 					</a>
 				{/snippet}
 			</DropdownMenu.Item>
@@ -79,17 +79,17 @@
 		<DropdownMenu.Group>
 			<DropdownMenu.Item>
 				{#snippet child({ props })}
-					<a {...props} href="/auth/profile">
+					<a {...props} href="/auth/account">
 						<BadgeCheckIcon />
-						Account
+						Account & privacy
 					</a>
 				{/snippet}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item>
 				{#snippet child({ props })}
-					<a {...props} href="/subscribe">
+					<a {...props} href="/auth/billing">
 						<CreditCardIcon />
-						Billing
+						Subscription & billing
 					</a>
 				{/snippet}
 			</DropdownMenu.Item>

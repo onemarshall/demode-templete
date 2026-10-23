@@ -1,10 +1,9 @@
 // src/lib/auth/server/user-context.ts
-import { Pool } from 'pg';
 import type { User as BetterAuthUser } from 'better-auth';
 import { auth } from '#lib/auth.js';
 import { resolveUserImage } from '#lib/auth/server/session-serializer.js';
 import { logger } from '#lib/auth/shared/logger.js';
-import { getServerEnv } from '#lib/auth/shared/env/index.js';
+import { getDB } from '#lib/auth/server/database/db.js';
 
 export interface WalletAddress {
 	id: string;
@@ -28,7 +27,7 @@ export interface OAuthAccount {
  */
 export interface AuthContextUser extends BetterAuthUser {
 	lastLoginMethod: string | null;
-	password: string | null;
+	hasPassword: boolean;
 	walletAddresses: WalletAddress[];
 	connectedProviders: string[];
 	isOAuthUser: boolean;
@@ -55,17 +54,11 @@ export async function loadAuthUserContext(headers: Headers): Promise<AuthUserCon
 	}
 
 	let lastLoginMethod: string | null = null;
-	let password: string | null = null;
+	let hasPassword = false;
 	let walletAddresses: WalletAddress[] = [];
 
 	try {
-		const env = await getServerEnv();
-		const databaseUrl =
-			typeof env.BETTER_DATABASE_URL === 'string' ? env.BETTER_DATABASE_URL : undefined;
-		if (!databaseUrl) {
-			throw new Error('Database not configured');
-		}
-		const pool = new Pool({ connectionString: databaseUrl });
+		const pool = await getDB();
 		const client = await pool.connect();
 		try {
 			const userResult = await client.query(
@@ -77,11 +70,13 @@ export async function loadAuthUserContext(headers: Headers): Promise<AuthUserCon
 			}
 
 			const accountResult = await client.query(
-				'SELECT password FROM "account" WHERE "userId" = $1 AND "providerId" = $2',
-				[session.user.id, 'email']
+				`SELECT EXISTS (SELECT 1 FROM "account"
+				 WHERE "userId" = $1 AND "providerId" = ANY($2::text[])
+				 AND password IS NOT NULL AND password <> '') AS "hasPassword"`,
+				[session.user.id, ['credential', 'email']]
 			);
 			if (accountResult.rows.length > 0) {
-				password = accountResult.rows[0].password;
+				hasPassword = accountResult.rows[0].hasPassword === true;
 			}
 
 			try {
@@ -98,7 +93,6 @@ export async function loadAuthUserContext(headers: Headers): Promise<AuthUserCon
 			}
 		} finally {
 			client.release();
-			await pool.end();
 		}
 	} catch (error) {
 		logger.warn('Failed to fetch user data from database', { error });
@@ -147,7 +141,7 @@ export async function loadAuthUserContext(headers: Headers): Promise<AuthUserCon
 		twoFactorEnabled:
 			'twoFactorEnabled' in sessionUser ? Boolean(sessionUser.twoFactorEnabled) : false,
 		lastLoginMethod,
-		password,
+		hasPassword,
 		walletAddresses,
 		connectedProviders: oauthProviders,
 		isOAuthUser: hasOauthProvider

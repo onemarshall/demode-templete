@@ -54,6 +54,9 @@ export interface SecurityPluginOptions {
 	/** Risk score threshold to require CAPTCHA (default: 40) */
 	captchaThreshold?: number;
 
+	/** Endpoints that can display CAPTCHA (default: email sign-in and sign-up). */
+	captchaPaths?: string[];
+
 	/** Risk score threshold to block request (default: 80) */
 	blockThreshold?: number;
 
@@ -178,9 +181,10 @@ const defaultConfig: SecurityConfig = {
 	enabled: true,
 	skipInDevelopment: true,
 	captchaThreshold: 40,
+	captchaPaths: ['/sign-in/email', '/sign-up/email'],
 	blockThreshold: 80,
 	includePaths: [],
-	excludePaths: ['/get-session', '/ok', '/error', '/security/', '/delete-user/callback'],
+	excludePaths: ['/sign-out', '/get-session', '/ok', '/error', '/security/', '/delete-user/callback'],
 	resilience: {
 		failMode: 'open',
 		circuitBreaker: {
@@ -204,6 +208,7 @@ export function securityPlugin(options: SecurityPluginOptions = {}): BetterAuthP
 		enabled: options.enabled ?? defaultConfig.enabled,
 		skipInDevelopment: options.skipInDevelopment ?? defaultConfig.skipInDevelopment,
 		captchaThreshold: options.captchaThreshold ?? defaultConfig.captchaThreshold,
+		captchaPaths: options.captchaPaths ?? defaultConfig.captchaPaths,
 		blockThreshold: options.blockThreshold ?? defaultConfig.blockThreshold,
 		includePaths: options.includePaths ?? defaultConfig.includePaths,
 		excludePaths: options.excludePaths ?? defaultConfig.excludePaths,

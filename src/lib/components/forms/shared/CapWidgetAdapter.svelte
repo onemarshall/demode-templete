@@ -9,7 +9,10 @@
 
 	let {
 		endpoint,
-		scriptOptions = undefined,
+		scriptOptions = {
+			// This version supports CSP nonces for instrumentation scripts.
+			overrideScriptUrl: 'https://cdn.jsdelivr.net/npm/@cap.js/widget@0.1.58'
+		},
 		onready = undefined,
 		onSolve = undefined,
 		onerror = undefined,

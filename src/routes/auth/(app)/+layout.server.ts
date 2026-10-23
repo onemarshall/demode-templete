@@ -2,6 +2,7 @@
 import { redirect } from '@sveltejs/kit';
 import { auth } from '#lib/auth.js';
 import { resolveUserImage } from '#lib/auth/server/session-serializer.js';
+import { getServerEnv } from '#lib/auth/shared/env/index.js';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ request, url }) => {
@@ -15,6 +16,7 @@ export const load: LayoutServerLoad = async ({ request, url }) => {
 	}
 
 	return {
+		tenancyEnabled: (await getServerEnv()).AUTH_ORGANIZATION_PLUGIN,
 		user: { ...session.user, image: resolveUserImage(session.user.image) },
 		session: session.session
 	};

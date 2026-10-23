@@ -21,7 +21,6 @@
     "AUTH_EMAIL_OTP_PLUGIN": "true",
     "AUTH_GEO_INTELLIGENCE_PLUGIN": "true",
     "AUTH_MAGIC_LINK_PLUGIN": "true",
-    "AUTH_MCP_PLUGIN": "true",
     "AUTH_OAUTH_PROXY_PLUGIN": "true",
     "AUTH_PASSKEYS_PLUGIN": "true",
     "AUTH_RATE_LIMIT_PLUGIN": "true",

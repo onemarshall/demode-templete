@@ -11,9 +11,10 @@
 	import AuthFormFooterLink from "./AuthFormFooterLink.svelte";
 	import AuthEmailField from "./AuthEmailField.svelte";
 	import AuthPasswordField from "./AuthPasswordField.svelte";
-	import PasskeyButton from "./PasskeyButton.svelte";
+	import AuthPasskeyButton from "./AuthPasskeyButton.svelte";
 	import AuthCaptchaPanel from "./AuthCaptchaPanel.svelte";
 	import { verifyCaptchaAndStoreBypass } from "./captcha-endpoint.js";
+	import type { RemoteFormEnhanceInstance } from "$app/server";
 
 	type Mode = "sign-in" | "sign-up";
 
@@ -85,7 +86,14 @@
 	// ---- captcha (risk-based; the server demands it via a 403 captchaRequired) ----
 	let captchaError = $state("");
 	let captchaVerifying = $state(false);
-	let formElement: HTMLFormElement | null = $state(null);
+	const formId = $props.id();
+
+	async function handleSubmit(form: RemoteFormEnhanceInstance) {
+		await form.submit();
+		// A CAPTCHA challenge is a returned result, so the default remote-form
+		// enhancement would reset the credentials before the user can retry.
+		if (form.result?.ok) HTMLFormElement.prototype.reset.call(form.element);
+	}
 
 	async function handleCaptchaSolve(token: string) {
 		captchaError = "";
@@ -93,7 +101,7 @@
 		const outcome = await verifyCaptchaAndStoreBypass(token);
 		captchaVerifying = false;
 		if (outcome.ok) {
-			formElement?.requestSubmit();
+			formAction.element?.requestSubmit();
 		} else {
 			captchaError = outcome.error ?? "Captcha verification failed. Please try again.";
 		}
@@ -233,7 +241,7 @@
 	<AuthFormAlert variant="success" message={successMessage} />
 
 	{#if passkeyEnabled}
-		<PasskeyButton
+		<AuthPasskeyButton
 			mode="signin"
 			text="Sign in with Passkey"
 			loadingText="Signing in..."
@@ -248,7 +256,7 @@
 					<div class="w-full border-t"></div>
 				</div>
 				<div class="relative flex justify-center text-xs uppercase">
-					<span class="bg-background text-muted-foreground px-2">
+					<span class="bg-card text-muted-foreground px-2">
 						{mode === "sign-in" ? "Sign in with" : "Sign up with"}
 					</span>
 				</div>
@@ -266,7 +274,7 @@
 		/>
 	{/if}
 
-	<form bind:this={formElement} {...formAction} class="space-y-4">
+	<form {...formAction.enhance(handleSubmit)} id={formId} class="space-y-4">
 		{#if mode === "sign-up" && formAction.fields.name}
 			{@const nameField = formAction.fields.name}
 			<div class="space-y-2">
@@ -341,6 +349,10 @@
 			/>
 		{/if}
 
+	</form>
+
+		<!-- Cap injects a hidden field that isn't part of the remote-form schema.
+		     Keep the widget outside the form; verification uses its solve event. -->
 		{#if captchaRequired}
 			<AuthCaptchaPanel
 				onSolve={handleCaptchaSolve}
@@ -349,7 +361,7 @@
 			/>
 		{/if}
 
-		<Button type="submit" class="w-full" disabled={formAction.pending || captchaVerifying}>
+		<Button type="submit" form={formId} class="w-full" disabled={formAction.pending || captchaVerifying}>
 			{#if formAction.pending}
 				<Loader class="mr-2 h-4 w-4 animate-spin" />
 				{submitLoadingLabel}
@@ -364,7 +376,6 @@
 				{/if}
 			{/if}
 		</Button>
-	</form>
 
 	{#if mode === "sign-up" && resultOk && submittedEmail}
 		<p class="text-muted-foreground text-center text-sm">

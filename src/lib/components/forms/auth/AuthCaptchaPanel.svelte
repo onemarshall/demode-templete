@@ -27,7 +27,7 @@
 	}
 </script>
 
-<div class="rounded-lg border border-border p-4 {className}">
+<!-- <div class="rounded-lg border border-border p-4 {className}"> -->
 	{#if !endpoint}
 		<p class="text-destructive text-sm">Captcha endpoint is not configured.</p>
 	{:else}
@@ -44,4 +44,4 @@
 			<p class="text-destructive mt-2 text-sm">{error}</p>
 		{/if}
 	{/if}
-</div>
+<!-- </div> -->

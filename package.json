@@ -21,17 +21,13 @@
     "test": "npm run test:unit -- --run"
   },
   "dependencies": {
-    "@better-auth/cimd": "^1.7.12",
     "@better-auth/core": "^1.7.12",
-    "@better-auth/mcp": "^1.7.12",
-    "@better-auth/oauth-provider": "^1.7.12",
     "@better-auth/passkey": "^1.7.12",
     "@better-captcha/svelte": "^0.8.0",
     "@creem_io/better-auth": "^2.0.4",
     "@fontsource-variable/inter": "^5.3.0",
     "@internationalized/date": "^3.12.4",
     "@lucide/svelte": "^1.61.0",
-    "@modelcontextprotocol/server": "^2.3.1",
     "@resvg/resvg-wasm": "^2.6.2",
     "@svelte-put/clickoutside": "^4.0.0",
     "@sveltinio/essentials": "^0.7.9",
@@ -60,7 +56,8 @@
     "tooltip": "^1.6.1",
     "usesend-js": "^1.6.3",
     "vanilla-cookieconsent": "^3.1.0",
-    "viem": "^2.57.7"
+    "viem": "^2.57.7",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@directus/sdk": "^26.0.0",
@@ -112,8 +109,7 @@
     "vite": "^8.3.4",
     "vitest": "^5.0.5",
     "vitest-browser-svelte": "^3.1.0",
-    "wrangler": "^4.151.1",
-    "zod": "^4.6.7"
+    "wrangler": "^4.151.1"
   },
   "overrides": {
     "typebox": "1.0.36"

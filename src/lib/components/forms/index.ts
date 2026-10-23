@@ -5,8 +5,8 @@
  */
 
 // Auth-specific forms
-export { default as PasskeyButton } from './auth/PasskeyButton.svelte';
-export { default as SocialButton } from './auth/SocialButton.svelte';
+export { default as PasskeyButton } from './auth/AuthPasskeyButton.svelte';
+export { default as SocialButton } from './auth/AuthSocialButton.svelte';
 
 // Shared form components
 export { default as MockCaptchaWidget } from './shared/MockCaptchaWidget.svelte';

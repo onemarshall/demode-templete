@@ -10,6 +10,7 @@
 	import { RefreshCcw } from '@lucide/svelte';
 	import type { PageData, ActionData } from './$types';
 	import ActionReviewSheet from '#lib/components/admin-security/ActionReviewSheet.svelte';
+	import AdminAuditHistory from '#lib/components/admin-security/AdminAuditHistory.svelte';
 	import { dashboardHref, readDashboardView, investigationForAction, type SecurityMode, type InvestigationView } from '#lib/components/admin-security/dashboard-view.js';
 	import {
 		OverviewStats, RiskDistributionChart, HourlyActivityChart, TopRiskFactors,
@@ -142,10 +143,10 @@
 	const actionFeedback = $derived(form && typeof form === 'object' ? { success: 'success' in form && Boolean(form.success), error: 'error' in form && typeof form.error === 'string' ? form.error : '', message: 'message' in form && typeof form.message === 'string' ? form.message : 'action' in form && typeof form.action === 'string' ? `${form.action} completed.` : '' } : null);
 </script>
 
-<svelte:head><title>Security | Admin</title></svelte:head>
+<svelte:head><title>Security activity | Admin</title></svelte:head>
 
 <div class="flex min-w-0 flex-col gap-5">
-	<PageHeader title="Security" description="What needs attention, why it matters, and what to do next.">
+	<PageHeader title="Security activity" description="What needs attention, why it matters, and what to do next.">
 		{#snippet actions()}<DashboardHeader {form} />{/snippet}
 	</PageHeader>
 	<div class="flex flex-wrap items-center justify-between gap-3">
@@ -227,6 +228,7 @@
 			<Alert.Root><Alert.Title>Activity charts are unavailable</Alert.Title><Alert.Description>Connect the event source or refresh to load observations. There is no history to chart yet.</Alert.Description></Alert.Root>
 		{/if}
 	</main>
+	<AdminAuditHistory entries={data.auditHistory ?? []} available={data.auditAvailable ?? false} next={data.auditNext ?? null} />
 	{#if dev}<Button variant="link" href="/admin/security-test">Open test scenarios</Button>{/if}
 </div>
 

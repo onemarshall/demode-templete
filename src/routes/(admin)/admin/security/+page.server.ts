@@ -16,6 +16,7 @@ import {
   clearMetricsCache as clearLocalMetricsCache,
 } from "#lib/auth/security/analytics/index.js";
 import { clearInfrastructureHealthCache } from "#lib/monitoring/infrastructure-health.js";
+import { encodeHistoryCursor, listAdminHistory, type HistoryEntry } from "#lib/auth/server/history.js";
 
 async function requireAdmin(request: Request): Promise<SessionUser> {
   const session = await auth.api.getSession({ headers: request.headers });
@@ -26,7 +27,7 @@ async function requireAdmin(request: Request): Promise<SessionUser> {
   return user;
 }
 
-export const load: PageServerLoad = async ({ request }) => {
+export const load: PageServerLoad = async ({ request, url }) => {
   const pageLoadStart = Date.now();
 
   enhancedLogger.section("Security Page Load");
@@ -49,6 +50,15 @@ export const load: PageServerLoad = async ({ request }) => {
   }
 
   try {
+    let auditHistory: HistoryEntry[] = [];
+    let auditAvailable = true;
+    let auditNext: string | null = null;
+    try {
+      auditHistory = await listAdminHistory(url.searchParams.get("auditBefore") ?? undefined, 50);
+      auditNext = auditHistory.length === 50 ? encodeHistoryCursor(auditHistory[auditHistory.length - 1]!) : null;
+    } catch {
+      auditAvailable = false;
+    }
     const dashboardStart = Date.now();
     const dashboard = await getSecurityDashboard({});
     enhancedLogger.info(`[Security Page] Dashboard call took ${Date.now() - dashboardStart}ms`);
@@ -61,6 +71,9 @@ export const load: PageServerLoad = async ({ request }) => {
 
     return {
       user: session.user,
+      auditHistory,
+      auditAvailable,
+      auditNext,
       dataVersion,
       metrics: dashboard.metrics,
       coverage: dashboard.coverage,

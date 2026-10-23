@@ -4,18 +4,19 @@ import {
 	MonitorSmartphoneIcon,
 	LockKeyholeIcon,
 	CreditCardIcon,
-	SparklesIcon,
+	SettingsIcon,
 	UsersIcon,
 	ShieldCheckIcon
 } from "@lucide/svelte";
 import type { Component } from "svelte";
+import { isAdminUser } from "#lib/auth/shared/roles.js";
 
 export type ShellUser = {
 	id: string;
 	email: string;
 	name?: string | null;
 	image?: string | null;
-	role?: string | null;
+	role?: string | string[] | null;
 };
 
 export type SidebarNavItem = {
@@ -50,7 +51,7 @@ export const navGroups: SidebarNavGroup[] = [
 				icon: UserRoundIcon
 			},
 			{
-				title: "Security",
+				title: "Sign-in & security",
 				path: "/auth/security",
 				icon: LockKeyholeIcon
 			},
@@ -58,6 +59,16 @@ export const navGroups: SidebarNavGroup[] = [
 				title: "Sessions & devices",
 				path: "/auth/sessions",
 				icon: MonitorSmartphoneIcon
+			},
+			{
+				title: "Security activity",
+				path: "/auth/activity",
+				icon: ShieldCheckIcon
+			},
+			{
+				title: "Account & privacy",
+				path: "/auth/account",
+				icon: SettingsIcon
 			}
 		]
 	},
@@ -65,14 +76,9 @@ export const navGroups: SidebarNavGroup[] = [
 		label: "Billing",
 		items: [
 			{
-				title: "Subscription",
+				title: "Subscription & billing",
 				path: "/auth/billing",
 				icon: CreditCardIcon
-			},
-			{
-				title: "Pricing",
-				path: "/auth/pricing",
-				icon: SparklesIcon
 			}
 		]
 	}
@@ -82,12 +88,12 @@ export const adminNavGroup: SidebarNavGroup = {
 	label: "Administration",
 	items: [
 		{
-			title: "Users",
+			title: "Users & access",
 			path: "/admin/users",
 			icon: UsersIcon
 		},
 		{
-			title: "Security",
+			title: "Security activity",
 			path: "/admin/security",
 			icon: ShieldCheckIcon
 		}
@@ -95,7 +101,7 @@ export const adminNavGroup: SidebarNavGroup = {
 };
 
 export function getNavGroups(user: ShellUser | null | undefined): SidebarNavGroup[] {
-	return user?.role === "admin" ? [...navGroups, adminNavGroup] : navGroups;
+	return user && isAdminUser(user) ? [...navGroups, adminNavGroup] : navGroups;
 }
 
 export function getNavLinks(user: ShellUser | null | undefined): SidebarNavItem[] {

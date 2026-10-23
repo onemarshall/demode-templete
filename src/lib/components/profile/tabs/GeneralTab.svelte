@@ -57,13 +57,17 @@
 				const newName = submitData.get("name") as string;
 
 				// Only update name - don't touch image (it's managed separately via avatar upload/delete)
-				await authClient.updateUser({
+				const result = await authClient.updateUser({
 					name: newName,
 				});
+				if (result.error) throw new Error(result.error.message || "Unable to update your profile.");
 
 				// Update form store to match the new values
 				$formStore.name = newName;
 				initialUser = { ...initialUser, name: newName };
+				toast.success("Profile updated.");
+			} catch (error) {
+				toast.error(error instanceof Error ? error.message : "Unable to update your profile.");
 			} finally {
 				isUpdating = false;
 			}
@@ -261,9 +265,9 @@
 								/>
 							{/snippet}
 						</Form.Control>
-						<Form.Description
-							>Email cannot be changed here.</Form.Description
-						>
+						<Form.Description>
+							Change your email in <a href="/auth/security" class="underline underline-offset-4">Sign-in &amp; security</a>.
+						</Form.Description>
 						<Form.FieldErrors />
 					</Form.Field>
 				{/if}

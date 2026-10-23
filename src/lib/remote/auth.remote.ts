@@ -49,6 +49,12 @@ export const login = form(loginRemoteSchema, async (data) => {
       password: data.password
     },
     headers: request.headers,
+    // Security hooks need a Request with the auth endpoint path, rather than
+    // the SvelteKit remote-function URL. The parsed body is supplied above.
+    request: new Request(new URL('/api/auth/sign-in/email', request.url), {
+      method: 'POST',
+      headers: request.headers
+    }),
     asResponse: true
   });
 
@@ -93,6 +99,10 @@ export const signup = form(signupRemoteSchema, async (data) => {
       name: data.name
     },
     headers: request.headers,
+    request: new Request(new URL('/api/auth/sign-up/email', request.url), {
+      method: 'POST',
+      headers: request.headers
+    }),
     asResponse: true
   });
 

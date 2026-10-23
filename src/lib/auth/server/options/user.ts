@@ -6,7 +6,7 @@
 
 import type { User as BetterAuthBaseUser } from 'better-auth';
 import { publicEnv } from '#lib/auth/shared/env/index.js';
-import { isAdminUser } from '../../shared/roles';
+import { assertCanDeleteAccount } from '../deletion-policy';
 const env = publicEnv;
 
 import { sendTemplateEmail, type DeleteAccountEmailData } from '../email';
@@ -51,6 +51,9 @@ export const getUserOptions = () => ({
 	deleteUser: {
 		enabled: true,
 		async sendDeleteAccountVerification({ user, url }: EmailHookArgs) {
+			// Better Auth calls beforeDelete only when deletion is confirmed, not
+			// when the verification email is requested. Enforce the policy at both steps.
+			await assertCanDeleteAccount(user);
 			const appName =
 				typeof env.PUBLIC_APP_NAME === 'string' && env.PUBLIC_APP_NAME.length > 0
 					? env.PUBLIC_APP_NAME
@@ -66,16 +69,7 @@ export const getUserOptions = () => ({
 			await sendTemplateEmail('delete-account', payload, appName);
 		},
 		beforeDelete: async (user: BetterAuthBaseUser) => {
-			// Prevent deletion of admin accounts — check the role field,
-			// not the email address (substring checks both false-positive on
-			// emails containing "admin" and miss other privileged roles).
-			const role = (user as { role?: string | string[] }).role;
-			if (isAdminUser({ id: user.id, role })) {
-				throw new Error('Admin accounts cannot be deleted');
-			}
-		},
-		afterDelete: async (_user: BetterAuthBaseUser) => {
-			// Cleanup any additional user data
+			await assertCanDeleteAccount(user);
 		}
 	}
 });

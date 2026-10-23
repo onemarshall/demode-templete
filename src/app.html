@@ -4,7 +4,12 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<script src="https://cdn.jsdelivr.net/npm/@cap.js/widget"></script>
+		<script>
+			// The server adds this page's CSP nonce to inline scripts.
+			// Cap also needs it for its styles and instrumentation iframe.
+			window.CAP_SCRIPT_NONCE = document.currentScript.nonce;
+			window.CAP_CSS_NONCE = document.currentScript.nonce;
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

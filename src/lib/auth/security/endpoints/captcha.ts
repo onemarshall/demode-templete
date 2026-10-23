@@ -34,7 +34,8 @@ const verifyCaptchaSchema = z.object({
 		.string()
 		.min(10, 'Token too short')
 		.max(5000, 'Token too long')
-		.regex(/^[a-zA-Z0-9_\-=.]+$/, 'Invalid token format')
+		// Cap redeem tokens contain colon-separated identifier/secret segments.
+		.regex(/^[a-zA-Z0-9_\-=.:]+$/, 'Invalid token format')
 });
 
 // ============================================
@@ -147,12 +148,28 @@ export async function verifyCapToken(
 			body: JSON.stringify({ secret: secretKey, response: token })
 		});
 
-		if (!response.ok) {
-			return { success: false, error: 'Verification service unavailable' };
-		}
+		const result = (await response.json().catch(() => null)) as
+			| { success?: boolean; error?: string }
+			| null;
 
-		const result = (await response.json()) as { success?: boolean };
-		return { success: Boolean(result.success) };
+		// Cap uses non-2xx statuses for invalid credentials and expired/used
+		// tokens as well as outages. Preserve that distinction for the form.
+		if (!response.ok || result?.success !== true) {
+			if (result?.error === 'Invalid site key or secret') {
+				securityLogger.error('[CAPTCHA] Cap rejected the configured site key or secret');
+				return { success: false, error: 'Captcha is not configured correctly. Please contact support.' };
+			}
+			if (result?.error === 'Token not found' || result?.error === 'Token expired') {
+				return { success: false, error: 'Captcha expired or was already used. Please complete a new challenge.' };
+			}
+			return {
+				success: false,
+				error: response.status >= 500 || !result
+					? 'Verification service unavailable'
+					: 'Captcha verification failed. Please complete a new challenge.'
+			};
+		}
+		return { success: true };
 	} catch (error) {
 		securityLogger.error('[Security] CAPTCHA verification error', { error, provider: 'capjs' });
 		return { success: false, error: 'Verification error' };

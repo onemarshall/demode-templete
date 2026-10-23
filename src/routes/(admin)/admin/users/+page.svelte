@@ -150,12 +150,12 @@
 </script>
 
 <svelte:head>
-	<title>Admin · Users</title>
+	<title>Admin · Users &amp; access</title>
 </svelte:head>
 
 <div class="space-y-6">
 	<!-- Header -->
-	<PageHeader title="Users" description="Manage accounts, roles and access across the application.">
+	<PageHeader title="Users & access" description="Manage accounts, roles and access across the application.">
 		{#snippet actions()}
 			{#if hasUsers}
 				<span class="text-muted-foreground text-sm">{data.users.length} users</span>

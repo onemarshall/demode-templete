@@ -6,7 +6,8 @@
 import {
 	createDirectusSync,
 	type DirectusSyncClient,
-	type DirectusSyncUser
+	type DirectusSyncUser,
+	type SyncLogger
 } from 'better-auth-directus';
 import type { CMSProvider, CMSUser, CMSFile, CMSConfig } from '#lib/auth/server/cms/types.js';
 import { createProviderLogger } from '#lib/auth/shared/logger.js';
@@ -36,7 +37,15 @@ export class DirectusCMSProvider implements CMSProvider {
 		}
 
 		const providerConfig = config.providerSpecificConfig as DirectusCMSConfig | undefined;
-		const logger = createProviderLogger('CMS', 'directus');
+		const scopedLogger = createProviderLogger('CMS', 'directus');
+		// Consola methods can return a boolean, but the SDK validates that logger
+		// callbacks return void. Do not leak the logging library's return value.
+		const logger: SyncLogger = {
+			info: (message, data) => { scopedLogger.info(message, data); },
+			warn: (message, data) => { scopedLogger.warn(message, data); },
+			error: (message, data) => { scopedLogger.error(message, data); },
+			debug: (message, data) => { scopedLogger.debug(message, data); }
+		};
 
 		this.sync = createDirectusSync({
 			directusUrl: config.url,
@@ -47,7 +56,7 @@ export class DirectusCMSProvider implements CMSProvider {
 			rateLimit: providerConfig?.rateLimit
 		});
 
-		logger.debug('Provider initialized via SDK');
+		scopedLogger.debug('Provider initialized via SDK');
 	}
 
 	/**

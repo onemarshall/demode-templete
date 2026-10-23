@@ -16,6 +16,7 @@ import { LastLoginMethodPlugin } from '#lib/auth/modules/lastLoginMethod/index.j
 import { MagicLinkPlugin } from '#lib/auth/modules/magicLink/index.js';
 import { OAuthProxyPlugin } from '#lib/auth/modules/oauthProxy/index.js';
 import { OneTimeTokenPlugin } from '#lib/auth/modules/oneTimeToken/index.js';
+import { OrganizationPlugin } from '#lib/auth/modules/organization/index.js';
 import { PasskeyPlugin } from '#lib/auth/modules/passkey/index.js';
 import { SIWEPlugin } from '#lib/auth/modules/siwe/plugin.js';
 import { TwoFactorPlugin } from '#lib/auth/modules/twoFactor/index.js';
@@ -39,6 +40,7 @@ interface PluginDefinition {
 const PLUGIN_DEFINITIONS: PluginDefinition[] = [
 	{ name: 'Last Login Method', factory: LastLoginMethodPlugin, alwaysEnabled: true },
 	{ name: 'Admin', factory: AdminPlugin },
+	{ name: 'Organization', factory: OrganizationPlugin },
 	{ name: 'Passkey', factory: PasskeyPlugin },
 	{ name: 'Two-Factor', factory: TwoFactorPlugin },
 	{ name: 'Magic Link', factory: MagicLinkPlugin },
@@ -84,6 +86,7 @@ export { LastLoginMethodPlugin } from '#lib/auth/modules/lastLoginMethod/index.j
 export { MagicLinkPlugin } from '#lib/auth/modules/magicLink/index.js';
 export { OAuthProxyPlugin } from '#lib/auth/modules/oauthProxy/index.js';
 export { OneTimeTokenPlugin } from '#lib/auth/modules/oneTimeToken/index.js';
+export { OrganizationPlugin } from '#lib/auth/modules/organization/index.js';
 export { PasskeyPlugin } from '#lib/auth/modules/passkey/index.js';
 export { SIWEPlugin } from '#lib/auth/modules/siwe/plugin.js';
 export { TwoFactorPlugin } from '#lib/auth/modules/twoFactor/index.js';

@@ -7,7 +7,8 @@
  */
 
 import { createAuthClient } from 'better-auth/svelte';
-import { inferAdditionalFields } from 'better-auth/client/plugins';
+import { ac, owner, admin, member } from '#lib/auth/modules/organization/permissions.js';
+import { organizationClient, inferAdditionalFields } from 'better-auth/client/plugins';
 import { passkeyClient } from '@better-auth/passkey/client';
 import {
 	twoFactorClient,
@@ -74,6 +75,7 @@ export const authClient = createAuthClient({
 	fetchOptions: { customFetchImpl: createFetchWrapper() },
 	plugins: [
 		inferAdditionalFields<typeof auth>(),
+		organizationClient({ ac, roles: { owner, admin, member } }),
 		...(publicEnv.PUBLIC_AUTH_PASSKEYS_PLUGIN ? [passkeyClient()] : []),
 		...(publicEnv.PUBLIC_AUTH_LAST_LOGIN_METHOD_PLUGIN ? [lastLoginMethodClient()] : []),
 		...(publicEnv.PUBLIC_AUTH_SIWE_PLUGIN ? [siweClient()] : []),

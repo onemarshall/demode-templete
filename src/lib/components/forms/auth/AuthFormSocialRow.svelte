@@ -108,7 +108,7 @@
 			<Separator class="w-full" />
 		</div>
 		<div class="relative flex justify-center text-xs uppercase">
-			<span class="bg-background text-muted-foreground px-2"
+			<span class="bg-card text-muted-foreground px-2"
 				>{separatorLabel}</span
 			>
 		</div>

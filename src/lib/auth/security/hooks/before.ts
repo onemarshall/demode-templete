@@ -24,6 +24,7 @@ import {
 } from '../core/risk-engine';
 import {
 	getEnabledFeatures,
+	isFeatureEnabled,
 	type SecurityConfig,
 	type SecurityFeature,
 	type FeatureResult
@@ -285,14 +286,22 @@ export function createBeforeHook(options: CreateBeforeHookOptions) {
 					// Session resolution is best-effort — proceed unauthenticated
 				}
 
-				const executionResult = await runFeatures(features, securityCtx, config);
+				// Only issue challenges on endpoints whose forms can present and
+				// complete them. Keep other security features on all matched paths.
+				const captchaApplies = isFeatureEnabled('captcha', config) &&
+					(config.captchaPaths === undefined || config.captchaPaths.includes(ctx.path ?? ''));
+				const requestFeatures = captchaApplies
+					? features
+					: features.filter((feature) => feature.configKey !== 'captcha');
+				const executionResult = await runFeatures(requestFeatures, securityCtx, config);
 
 				if (executionResult.blocked) {
 					const response =
 						executionResult.blockResponse ??
 						createBlockedResponse(securityCtx, securityCtx.blockReason);
 
-					return { context: ctx, response };
+					// A context update does not stop Better Auth's endpoint dispatch.
+					return response;
 				}
 
 				securityCtx.riskScore = calculateRiskScore(securityCtx.riskFactors);
@@ -323,13 +332,10 @@ export function createBeforeHook(options: CreateBeforeHookOptions) {
 						factors: securityCtx.riskFactors.map((f) => f.factor)
 					});
 
-					return {
-						context: ctx,
-						response: createBlockedResponse(securityCtx, 'high_risk_score')
-					};
+					return createBlockedResponse(securityCtx, 'high_risk_score');
 				}
 
-				if (shouldRequireCaptcha(securityCtx.riskScore, thresholds) && !securityCtx.captchaPassed) {
+				if (captchaApplies && shouldRequireCaptcha(securityCtx.riskScore, thresholds) && !securityCtx.captchaPassed) {
 					securityCtx.captchaRequired = true;
 
 					securityCtx.emit('captcha_required', {
@@ -343,10 +349,7 @@ export function createBeforeHook(options: CreateBeforeHookOptions) {
 						riskLevel: securityCtx.riskLevel
 					});
 
-					return {
-						context: ctx,
-						response: createCaptchaRequiredResponse()
-					};
+					return createCaptchaRequiredResponse();
 				}
 
 				if (securityCtx.rateLimited && securityCtx.rateLimitInfo) {
@@ -354,10 +357,7 @@ export function createBeforeHook(options: CreateBeforeHookOptions) {
 						retryAfter: securityCtx.rateLimitInfo.retryAfter
 					});
 
-					return {
-						context: ctx,
-						response: createRateLimitedResponse(securityCtx.rateLimitInfo.retryAfter ?? 60)
-					};
+					return createRateLimitedResponse(securityCtx.rateLimitInfo.retryAfter ?? 60);
 				}
 
 				attachSecurityContext(ctx, securityCtx);

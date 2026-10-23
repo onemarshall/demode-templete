@@ -9,6 +9,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { betterAuth } from 'better-auth';
+import { createAuthEndpoint } from 'better-auth/api';
 import { createBeforeHook } from '../../hooks/before';
 import { createTestSecurityContext } from '../../core/context';
 import type { SecurityFeature, SecurityConfig, FeatureResult } from '../../core/feature';
@@ -193,8 +195,8 @@ describe('createBeforeHook', () => {
 			const result = await hooks[0]!.handler(mockCtx as never);
 
 			expect(executionOrder).toEqual(['blocking']);
-			expect(result).toHaveProperty('response');
-			expect(result.response?.status).toBe(403);
+			expect(result).toBeInstanceOf(Response);
+			expect((result as Response).status).toBe(403);
 		});
 
 		it('blocks when risk score exceeds block threshold', async () => {
@@ -221,15 +223,44 @@ describe('createBeforeHook', () => {
 
 			const result = await hooks[0]!.handler(mockCtx as never);
 
-			expect(result).toHaveProperty('response');
-			expect(result.response?.status).toBe(403);
+			expect(result).toBeInstanceOf(Response);
+			expect((result as Response).status).toBe(403);
 
-			const body = await result.response?.json();
+			const body = await (result as Response).json();
 			expect(body.code).toBe('BLOCKED');
 		});
 	});
 
 	describe('CAPTCHA requirement', () => {
+		it('stops the actual Better Auth dispatcher at a zero threshold', async () => {
+			const endpointHandler = vi.fn(async () => ({ reachedEndpoint: true }));
+			const auth = betterAuth({
+				baseURL: 'http://localhost',
+				secret: 'captcha-regression-test-secret-at-least-32-characters',
+				plugins: [{
+					id: 'captcha-regression',
+					hooks: {
+						before: createBeforeHook({
+							config: createMockConfig({ captchaThreshold: 0 }),
+							features: []
+						})
+					},
+					endpoints: {
+						captchaProbe: createAuthEndpoint('/captcha-probe', { method: 'POST' }, endpointHandler)
+					}
+				}]
+			});
+
+			const response = await auth.api.captchaProbe({
+				request: createMockRequest('/api/auth/captcha-probe'),
+				asResponse: true
+			});
+
+			expect(response.status).toBe(428);
+			expect(await response.json()).toMatchObject({ code: 'CAPTCHA_REQUIRED', captchaRequired: true });
+			expect(endpointHandler).not.toHaveBeenCalled();
+		});
+
 		it('requires CAPTCHA when risk score is between thresholds', async () => {
 			const mediumRiskFeature = createMockFeature('geo', FEATURE_PRIORITY.GEO, async () => {
 				return {
@@ -255,10 +286,10 @@ describe('createBeforeHook', () => {
 
 			const result = await hooks[0]!.handler(mockCtx as never);
 
-			expect(result).toHaveProperty('response');
-			expect(result.response?.status).toBe(428);
+			expect(result).toBeInstanceOf(Response);
+			expect((result as Response).status).toBe(428);
 
-			const body = await result.response?.json();
+			const body = await (result as Response).json();
 			expect(body.code).toBe('CAPTCHA_REQUIRED');
 			expect(body.captchaRequired).toBe(true);
 		});
@@ -288,7 +319,7 @@ describe('createBeforeHook', () => {
 
 			const result = await hooks[0]!.handler(mockCtx as never);
 
-			expect(result.response).toBeUndefined();
+			expect(result).not.toBeInstanceOf(Response);
 		});
 	});
 
@@ -324,7 +355,7 @@ describe('createBeforeHook', () => {
 			const result = await hooks[0]!.handler(mockCtx as never);
 
 			expect(executionOrder).toEqual(['failing', 'working']);
-			expect(result.response).toBeUndefined();
+			expect(result).not.toBeInstanceOf(Response);
 		});
 
 		it('adds risk score when feature throws in fail-closed mode', async () => {
@@ -351,7 +382,7 @@ describe('createBeforeHook', () => {
 
 			const result = await hooks[0]!.handler(mockCtx as never);
 
-			expect(result.response?.status).toBe(428);
+			expect((result as Response).status).toBe(428);
 		});
 	});
 
@@ -387,7 +418,7 @@ describe('createBeforeHook', () => {
 
 			const result = await hooks[0]!.handler(mockCtx as never);
 
-			expect(result.response?.status).toBe(428);
+			expect((result as Response).status).toBe(428);
 		});
 	});
 
