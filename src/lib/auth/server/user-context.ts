@@ -1,6 +1,6 @@
 // src/lib/auth/server/user-context.ts
 import type { User as BetterAuthUser } from 'better-auth';
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { resolveUserImage } from '#lib/auth/server/session-serializer.js';
 import { logger } from '#lib/auth/shared/logger.js';
 import { getDB } from '#lib/auth/server/database/db.js';

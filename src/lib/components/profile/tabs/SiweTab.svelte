@@ -6,7 +6,7 @@
 	import { Separator } from '#lib/components/ui/separator/index.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Copy, Check, Boxes, ExternalLink } from '@lucide/svelte';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 	import type { User } from 'better-auth';
 

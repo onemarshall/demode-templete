@@ -6,7 +6,7 @@
 import {
   uploadAvatar as uploadAvatarRemote,
   deleteAvatar as deleteAvatarRemote,
-} from "#lib/remote/avatar.remote.js";
+} from "#lib/remote/auth/avatar.remote.js";
 
 export interface AvatarServiceResult {
   ok: boolean;

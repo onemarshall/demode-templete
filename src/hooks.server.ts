@@ -10,7 +10,7 @@
 //   5. Temp-block check + abuse detection → 429 when blocked
 //   6. resolve() with CSP nonce injection + security headers on the way out
 
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 import {
 	DEFAULT_OPTIONS as ABUSE_PROTECTION_DEFAULTS,

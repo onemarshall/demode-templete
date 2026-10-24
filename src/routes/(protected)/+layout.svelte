@@ -1,7 +1,7 @@
 <!-- src/routes/(protected)/+layout.svelte -->
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import AuthError from '#lib/components/auth/AuthError.svelte';
 	import SessionSkeleton from '#lib/components/auth/SessionSkeleton.svelte';
 	import type { LayoutData } from './$types';

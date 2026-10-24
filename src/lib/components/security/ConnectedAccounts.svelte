@@ -3,7 +3,7 @@
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Spinner } from '#lib/components/ui/spinner/index.js';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { publicEnv } from '#lib/auth/shared/env/index.js';
 	import { invalidateAll } from '$app/navigation';
 	let { accounts, hasPassword = false }: { accounts: { id: string; providerId: string }[]; hasPassword?: boolean } = $props();

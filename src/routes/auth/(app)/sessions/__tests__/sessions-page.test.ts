@@ -26,7 +26,7 @@ const {
 	loggerDebugMock: vi.fn()
 }));
 
-vi.mock('#lib/auth.js', () => ({
+vi.mock('#lib/auth/index.js', () => ({
 	auth: {
 		api: {
 			getSession: getSessionMock,
@@ -36,7 +36,7 @@ vi.mock('#lib/auth.js', () => ({
 	}
 }));
 
-vi.mock('#lib/auth-client.js', () => ({
+vi.mock('#lib/auth/auth-client.js', () => ({
 	authClient: {
 		useSession: vi.fn(() => ({
 			data: null,

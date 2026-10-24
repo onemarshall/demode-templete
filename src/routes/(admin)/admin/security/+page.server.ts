@@ -10,7 +10,7 @@ import {
   blockIp as blockIpCommand,
   unblockIp as unblockIpCommand,
   clearMetricsCache as clearRemoteMetricsCache,
-} from "#lib/remote/index.js";
+} from "#lib/remote/admin/index.js";
 import {
   getDefaultCollector,
   clearMetricsCache as clearLocalMetricsCache,

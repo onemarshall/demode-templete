@@ -1,6 +1,6 @@
 // src/routes/(protected)/+layout.server.ts
 import { redirect } from '@sveltejs/kit';
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { resolveUserImage } from '#lib/auth/server/session-serializer.js';
 import type { LayoutServerLoad } from './$types';
 

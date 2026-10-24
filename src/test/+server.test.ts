@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getInfrastructureHealth } from "#lib/remote/monitoring.remote.js";
+import { getInfrastructureHealth } from "#lib/remote/monitoring/monitoring.remote.js";
 
 const { mockQuery, mockPing, mockFetch } = vi.hoisted(() => ({
   mockQuery: vi.fn(),

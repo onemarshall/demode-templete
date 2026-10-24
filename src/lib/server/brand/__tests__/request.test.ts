@@ -8,7 +8,7 @@ const { getSession, getServerEnv, requireBrandAccess, resolveRouteBrand } = vi.h
 	resolveRouteBrand: vi.fn()
 }));
 
-vi.mock('#lib/auth.js', () => ({ auth: { api: { getSession } } }));
+vi.mock('#lib/auth/index.js', () => ({ auth: { api: { getSession } } }));
 vi.mock('#lib/auth/shared/env/index.js', () => ({ getServerEnv }));
 vi.mock('../context.js', () => ({ requireBrandAccess }));
 vi.mock('../resolution.js', () => ({ resolveRouteBrand }));

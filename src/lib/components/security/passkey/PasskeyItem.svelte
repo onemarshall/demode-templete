@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { KeyRound, Trash2, Loader } from '@lucide/svelte';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { toast } from 'svelte-sonner';
 	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 	import type { Passkey } from '@better-auth/passkey';

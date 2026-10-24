@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
   db: vi.fn(),
   health: vi.fn(),
 }));
-vi.mock("#lib/auth.js", () => ({ auth: { api: {} } }));
+vi.mock("#lib/auth/index.js", () => ({ auth: { api: {} } }));
 vi.mock("#lib/auth/server/database/index.js", () => ({ getDB: mocks.db }));
 vi.mock("#lib/monitoring/infrastructure-health.js", () => ({
   getDashboardSystemHealth: mocks.health,

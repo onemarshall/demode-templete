@@ -14,7 +14,7 @@
  * importers see no breaking change.
  */
 
-import { auth } from "#lib/auth.js";
+import { auth } from "#lib/auth/index.js";
 import { securityLogger as logger, enhancedLogger } from "#lib/auth/shared/logger.js";
 import { getDB } from "#lib/auth/server/database/index.js";
 import { getDashboardSystemHealth } from "#lib/monitoring/infrastructure-health.js";

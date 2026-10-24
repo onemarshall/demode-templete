@@ -15,7 +15,7 @@ const {
   countOrganisationMembersMock: vi.fn(),
   authGetSession: vi.fn(),
 }));
-vi.mock("#lib/auth.js", () => ({ auth: { api: { getSession: authGetSession } } }));
+vi.mock("#lib/auth/index.js", () => ({ auth: { api: { getSession: authGetSession } } }));
 vi.mock("#lib/auth/server/database/db.js", () => ({
   getDB: async () => ({ query }),
   withTransaction,

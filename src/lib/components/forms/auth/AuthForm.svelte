@@ -34,7 +34,7 @@
 		/**
 		 * SvelteKit remote `form()` action that owns server-side submission,
 		 * cookie setting, and (for sign-in) the 303 redirect. Pages import
-		 * either `login` or `signup` from `#lib/remote/auth.remote.js` and pass it
+		 * either `login` or `signup` from `#lib/remote/auth/auth.remote.js` and pass it
 		 * here.
 		 */
 		formAction: RemoteFormAction;

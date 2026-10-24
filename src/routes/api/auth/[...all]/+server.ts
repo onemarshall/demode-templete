@@ -1,5 +1,5 @@
 //src/routes/api/auth/[...all]/+server.ts
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { toSvelteKitHandler } from 'better-auth/svelte-kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { isAuthDebugMode } from '#lib/auth/shared/env/index.js';

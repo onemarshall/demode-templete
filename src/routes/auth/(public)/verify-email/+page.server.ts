@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { logger } from '#lib/auth/shared/logger.js';
 
 export const load = async ({ url, request }) => {

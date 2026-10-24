@@ -14,7 +14,7 @@
 		Activity,
 		Clock
 	} from '@lucide/svelte';
-	import { runSecurityTestScenario } from '#lib/remote/security/testing.remote.js';
+	import { runSecurityTestScenario } from '#lib/remote/admin/security/testing.remote.js';
 
 	const testScenarios = [
 		{

@@ -9,11 +9,11 @@
 	import { Input } from "#lib/components/ui/input/index.js";
 	import { Badge } from "#lib/components/ui/badge/index.js";
 	import { Separator } from "#lib/components/ui/separator/index.js";
-	import { authClient } from "#lib/auth-client.js";
+	import { authClient } from "#lib/auth/auth-client.js";
 	import { toast } from "svelte-sonner";
 	import * as ImageCropper from "#lib/components/ui/image-cropper/index.js";
 	import { getAvatarInitials } from "#lib/components/profile/utils/avatar.js";
-	import { uploadAvatar, deleteAvatar } from "#lib/avatar/avatarService.js";
+	import { uploadAvatar, deleteAvatar } from "#lib/auth/avatar/avatarService.js";
 	import { logger } from "#lib/auth/shared/logger.js";
 	import type { GeneralTabProps } from "./types";
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { authClient } from "#lib/auth-client.js";
+	import { authClient } from "#lib/auth/auth-client.js";
 	import { goto } from "$app/navigation";
 	import { PLANS as plans } from "#lib/billing/plans.js";
-	import { createGuestCheckout } from "#lib/remote/checkout.remote.js";
+	import { createGuestCheckout } from "#lib/remote/billing/checkout.remote.js";
 
 	const session = authClient.useSession();
 	const isAuthed = $derived(!!$session.data?.user);

@@ -1,6 +1,6 @@
 // src/routes/auth/delete-user/+page.server.ts
 import { redirect, fail } from '@sveltejs/kit';
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { logger } from '#lib/auth/shared/logger.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';

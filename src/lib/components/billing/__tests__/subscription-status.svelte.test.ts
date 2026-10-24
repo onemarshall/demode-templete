@@ -3,7 +3,7 @@ import { render } from 'vitest-browser-svelte';
 import { page } from 'vitest/browser';
 
 const billing = vi.hoisted(() => ({ createPortal: vi.fn() }));
-vi.mock('#lib/auth-client.js', () => ({ authClient: {
+vi.mock('#lib/auth/auth-client.js', () => ({ authClient: {
 	useSession: () => ({ subscribe(run: (value: unknown) => void) {
 		run({ data: { user: { id: 'test-user' } }, isPending: false });
 		return () => {};

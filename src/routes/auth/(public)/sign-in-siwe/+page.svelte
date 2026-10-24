@@ -3,7 +3,7 @@
 	import { Button } from "#lib/components/ui/button/index.js";
 	import { Separator } from "#lib/components/ui/separator/index.js";
 	import { ArrowLeft } from "@lucide/svelte";
-	import { authClient } from "#lib/auth-client.js";
+	import { authClient } from "#lib/auth/auth-client.js";
 	import { WalletConnect, SignMessage } from "#lib/components/auth/siwe/index.js";
 	import { generateSIWEMessage } from "#lib/auth/modules/siwe/client.js";
 	import { logger, securityLogger } from "#lib/auth/shared/logger.js";

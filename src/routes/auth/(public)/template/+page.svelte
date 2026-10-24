@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { signInSchema } from '#lib/components/forms/schema.js';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { goto } from '$app/navigation';
 	import { createSpaForm, handleSubmitFlow, scheduleMessageClear } from '#lib/components/forms/auth-forms.js';
 	import * as Card from '#lib/components/ui/card/index.js';

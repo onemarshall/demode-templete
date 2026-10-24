@@ -4,7 +4,7 @@ import { page } from "vitest/browser";
 import type { PageData } from "../$types";
 
 const mocks = vi.hoisted(() => ({ deleteUser: vi.fn() }));
-vi.mock("#lib/auth-client.js", () => ({ authClient: { deleteUser: mocks.deleteUser } }));
+vi.mock("#lib/auth/auth-client.js", () => ({ authClient: { deleteUser: mocks.deleteUser } }));
 import AccountPage from "../+page.svelte";
 
 function data(allowed = true): PageData {

@@ -1,6 +1,6 @@
 // src/routes/auth/(app)/trusted-devices/+page.server.ts
 import { fail, redirect } from "@sveltejs/kit";
-import { auth } from "#lib/auth.js";
+import { auth } from "#lib/auth/index.js";
 import { logger } from "#lib/auth/shared/logger.js";
 import type { Actions, PageServerLoad } from "./$types";
 

@@ -20,7 +20,7 @@ import type { User, Session } from "better-auth";
 // Type-only import of the concrete client instance avoids a runtime cycle
 // ($lib/auth-client imports helpers at runtime) while keeping the full
 // plugin-inferred session/user types (e.g. twoFactorEnabled) in sync.
-import type { authClient } from "#lib/auth-client.js";
+import type { authClient } from "#lib/auth/auth-client.js";
 
 type AuthClient = typeof authClient;
 

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ session: vi.fn(), accounts: vi.fn(), query: vi.fn(), release: vi.fn(), connect: vi.fn() }));
-vi.mock('#lib/auth.js', () => ({ auth: { api: { getSession: mocks.session, listUserAccounts: mocks.accounts } } }));
+vi.mock('#lib/auth/index.js', () => ({ auth: { api: { getSession: mocks.session, listUserAccounts: mocks.accounts } } }));
 vi.mock('#lib/auth/server/database/db.js', () => ({ getDB: async () => ({ connect: mocks.connect }) }));
 vi.mock('#lib/auth/server/session-serializer.js', () => ({ resolveUserImage: () => null }));
 

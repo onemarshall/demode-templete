@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authClient } from "#lib/auth-client.js";
+	import { authClient } from "#lib/auth/auth-client.js";
 	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
 

@@ -29,7 +29,7 @@ vi.mock('#lib/auth/server/database/db.js', () => ({
 	}
 }));
 
-vi.mock('#lib/auth.js', () => ({ auth: { api: { getSession: mocks.getSession } } }));
+vi.mock('#lib/auth/index.js', () => ({ auth: { api: { getSession: mocks.getSession } } }));
 vi.mock('#lib/auth/shared/logger.js', () => ({ logger: { error: mocks.loggerError } }));
 
 import { requireBrandAccess } from '../context.js';

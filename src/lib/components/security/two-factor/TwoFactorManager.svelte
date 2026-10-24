@@ -7,7 +7,7 @@
 	import BackupCodesDialog from "#lib/components/security/two-factor/BackupCodesDialog.svelte";
 
 	import { useTwoFactorState } from "#lib/auth/client/stores/two-factor.svelte.js";
-	import { authClient } from "#lib/auth-client.js";
+	import { authClient } from "#lib/auth/auth-client.js";
 	import { logger } from "#lib/auth/shared/logger.js";
 	import type { User } from "better-auth";
 

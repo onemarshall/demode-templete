@@ -1,7 +1,7 @@
 import { error, redirect, fail, isRedirect, isHttpError } from "@sveltejs/kit";
 import type { RequestEvent } from "@sveltejs/kit";
 import { APIError } from "better-auth/api";
-import { auth } from "#lib/auth.js";
+import { auth } from "#lib/auth/index.js";
 import { getServerEnv } from "#lib/auth/shared/env/index.js";
 import { requireBrandAccess, type BrandAction } from "./context.js";
 import { resolveRouteBrand } from "./resolution.js";

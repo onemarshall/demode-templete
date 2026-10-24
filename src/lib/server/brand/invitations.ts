@@ -10,7 +10,7 @@
  */
 
 import { APIError } from 'better-auth/api';
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { organizationApi } from './organization-api.js';
 import { publicEnv } from '#lib/auth/shared/env/index.js';
 import { sendTemplateEmail } from '#lib/auth/server/email/index.js';

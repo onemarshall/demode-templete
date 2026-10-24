@@ -9,7 +9,7 @@
 	import PasskeyManager from '#lib/components/security/passkey/PasskeyManager.svelte';
 	import ConnectedAccounts from '#lib/components/security/ConnectedAccounts.svelte';
 	import SiweTab from '#lib/components/profile/tabs/SiweTab.svelte';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { publicEnv } from '#lib/auth/shared/env/index.js';
 	import { invalidateAll } from '$app/navigation';
 	import type { User, Session } from 'better-auth';

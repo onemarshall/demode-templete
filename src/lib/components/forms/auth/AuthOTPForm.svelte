@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { authClient } from "#lib/auth-client.js";
+	import { authClient } from "#lib/auth/auth-client.js";
 	import { publicEnv } from "#lib/auth/shared/env/index.js";
 	import { logger, securityLogger } from "#lib/auth/shared/logger.js";
 	import { scheduleMessageClear } from "#lib/components/forms/auth-forms.js";

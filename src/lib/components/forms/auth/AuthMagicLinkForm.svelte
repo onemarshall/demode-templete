@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authClient } from "#lib/auth-client.js";
+	import { authClient } from "#lib/auth/auth-client.js";
 	import { publicEnv } from "#lib/auth/shared/env/index.js";
 	import { securityLogger } from "#lib/auth/shared/logger.js";
 	import { scheduleMessageClear } from "#lib/components/forms/auth-forms.js";

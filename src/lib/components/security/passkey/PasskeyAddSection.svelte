@@ -4,7 +4,7 @@
 	import { Input } from '#lib/components/ui/input/index.js';
 	import * as Form from '#lib/components/ui/form/index.js';
 	import { Plus, KeyRound, Loader } from '@lucide/svelte';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';

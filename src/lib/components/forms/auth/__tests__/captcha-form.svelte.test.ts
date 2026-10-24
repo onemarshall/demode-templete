@@ -6,7 +6,7 @@ import type { RemoteFormEnhanceInstance } from '$app/server';
 import CapWidgetStub from '$test/mocks/CapWidgetAdapter.svelte';
 
 vi.mock('#lib/components/forms/shared/CapWidgetAdapter.svelte', () => ({ default: CapWidgetStub }));
-vi.mock('#lib/auth-client.js', () => ({ authClient: {} }));
+vi.mock('#lib/auth/auth-client.js', () => ({ authClient: {} }));
 vi.mock('#lib/auth/shared/env/index.js', () => ({ publicEnv: {
 	PUBLIC_CAP_ENDPOINT: 'https://captcha.test', PUBLIC_CAP_KEY: 'test-site'
 } }));

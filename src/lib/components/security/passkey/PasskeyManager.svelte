@@ -2,7 +2,7 @@
 <script lang="ts">
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { KeyRound } from '@lucide/svelte';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { logger } from '#lib/auth/shared/logger.js';
 	import {
 		PasskeyWebAuthnCheck,

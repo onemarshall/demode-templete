@@ -2,7 +2,7 @@
  * Canonical auth client entry point.
  *
  * This is the single source of truth for the Better Auth client instance,
- * its plugins, and initialization lifecycle. Import from `#lib/auth-client.js`
+ * its plugins, and initialization lifecycle. Import from `#lib/auth/auth-client.js`
  * throughout the app.
  */
 

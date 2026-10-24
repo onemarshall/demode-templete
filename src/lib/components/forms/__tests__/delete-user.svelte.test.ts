@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { page } from 'vitest/browser';
 const mocks = vi.hoisted(() => ({ deleteUser: vi.fn() }));
-vi.mock('#lib/auth-client.js', () => ({ authClient: { deleteUser: mocks.deleteUser } }));
+vi.mock('#lib/auth/auth-client.js', () => ({ authClient: { deleteUser: mocks.deleteUser } }));
 import DeleteUserForm from '../DeleteUserForm.svelte';
 const eligible = { user: { id: 'user', email: 'user@example.com' }, hasPassword: true, deletionEligibility: { allowed: true, reason: null, message: null } };
 

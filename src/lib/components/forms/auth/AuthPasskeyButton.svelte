@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from "#lib/components/ui/button/index.js";
 	import { KeyRound, Plus, Loader } from "@lucide/svelte";
-	import { authClient } from "#lib/auth-client.js";
+	import { authClient } from "#lib/auth/auth-client.js";
 	import { goto, invalidateAll } from "$app/navigation";
 	import { page } from "$app/state";
 	import { dev } from "$app/env";

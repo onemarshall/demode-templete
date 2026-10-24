@@ -1,5 +1,5 @@
 //lib/client/stores/two-factor.svelte.ts
-import { authClient } from '#lib/auth-client.js';
+import { authClient } from '#lib/auth/auth-client.js';
 import { toast } from 'svelte-sonner';
 import { logger, securityLogger } from '#lib/auth/shared/logger.js';
 import QRCode from 'qrcode';

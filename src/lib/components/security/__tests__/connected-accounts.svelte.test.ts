@@ -3,7 +3,7 @@ import { render } from 'vitest-browser-svelte';
 import { page } from 'vitest/browser';
 
 const auth = vi.hoisted(() => ({ linkSocial: vi.fn(), unlinkAccount: vi.fn(), invalidateAll: vi.fn() }));
-vi.mock('#lib/auth-client.js', () => ({ authClient: auth }));
+vi.mock('#lib/auth/auth-client.js', () => ({ authClient: auth }));
 vi.mock('$app/navigation', () => ({ invalidateAll: auth.invalidateAll }));
 vi.mock('#lib/auth/shared/env/index.js', () => ({ publicEnv: { PUBLIC_AUTH_GOOGLE_ENABLED: true, PUBLIC_AUTH_GITHUB_ENABLED: false } }));
 import ConnectedAccounts from '../ConnectedAccounts.svelte';

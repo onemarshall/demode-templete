@@ -16,7 +16,7 @@
 		getResizedAvatarUrl,
 		getAvatarInitials,
 	} from "#lib/components/profile/utils/avatar.js";
-	import { createAvatarState } from "#lib/avatar/avatarStore.js";
+	import { createAvatarState } from "#lib/auth/avatar/avatarStore.js";
 	import AvatarSourceDialog, {
 		type Props as AvatarSourceDialogProps,
 	} from "#lib/components/profile/AvatarSourceDialog.svelte";

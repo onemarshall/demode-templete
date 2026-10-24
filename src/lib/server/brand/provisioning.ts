@@ -11,7 +11,7 @@
  */
 
 import { APIError } from "better-auth/api";
-import { auth } from "#lib/auth.js";
+import { auth } from "#lib/auth/index.js";
 import { getDB, withTransaction } from "#lib/auth/server/database/db.js";
 import { logger } from "#lib/auth/shared/logger.js";
 import { randomUUID } from "crypto";

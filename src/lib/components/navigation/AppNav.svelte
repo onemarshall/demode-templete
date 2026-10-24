@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { publicEnv } from '#lib/auth/shared/env/index.js';
 	import { logger } from '#lib/auth/shared/logger.js';

@@ -1,6 +1,6 @@
 // src/routes/auth/(app)/billing/+page.server.ts
 import { redirect } from '@sveltejs/kit';
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { loadActiveSubscription } from '#lib/billing/subscription.js';
 import type { PageServerLoad } from './$types';
 

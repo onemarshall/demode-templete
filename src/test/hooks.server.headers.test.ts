@@ -24,7 +24,7 @@ vi.mock('#lib/auth/shared/env/index.js', () => ({
 	getServerEnv: mocks.getServerEnv
 }));
 
-vi.mock('#lib/auth.js', () => ({
+vi.mock('#lib/auth/index.js', () => ({
 	auth: {
 		api: {
 			getSession: mocks.getSession

@@ -50,7 +50,7 @@
 
 	onMount(() => {
 		// Fire and forget the async init, store cleanup reference
-		import('#lib/auth-client.js').then(async ({ initializeAuth, cleanupAuth }) => {
+		import('#lib/auth/auth-client.js').then(async ({ initializeAuth, cleanupAuth }) => {
 			await initializeAuth();
 			cleanup = cleanupAuth;
 		});

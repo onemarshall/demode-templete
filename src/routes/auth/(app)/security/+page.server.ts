@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { loadAuthUserContext } from '#lib/auth/server/user-context.js';
 import type { PageServerLoad } from './$types';
 

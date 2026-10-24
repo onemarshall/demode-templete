@@ -7,7 +7,7 @@
 	import { AuthFormAlert } from '#lib/components/forms/auth/index.js';
 	import { Shield, Mail, ArrowLeft, Loader2 } from '@lucide/svelte';
 	import { goto } from '$app/navigation';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { emailSchema } from '#lib/components/forms/schema.js';
 	import { createSpaForm, handleSubmitFlow, scheduleMessageClear } from '#lib/components/forms/auth-forms.js';
 

@@ -9,7 +9,7 @@
 		revokeSession,
 		revokeAllSessions,
 		removeUser
-	} from '#lib/remote/admin.remote.js';
+	} from '#lib/remote/admin/admin.remote.js';
 	import * as Dialog from '#lib/components/ui/dialog/index.js';
 	import * as Tabs from '#lib/components/ui/tabs/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';

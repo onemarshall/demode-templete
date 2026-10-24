@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { twoFactorVerificationSchema } from '#lib/components/forms/schema.js';
 	import { createSpaForm, handleSubmitFlow, scheduleMessageClear } from '#lib/components/forms/auth-forms.js';
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 	import { goto, invalidate } from '$app/navigation';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Form from '#lib/components/ui/form/index.js';

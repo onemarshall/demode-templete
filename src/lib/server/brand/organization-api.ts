@@ -1,7 +1,7 @@
 import { APIError } from "better-auth/api";
 import { organization } from "better-auth/plugins";
 import { betterAuth } from "better-auth";
-import { auth } from "#lib/auth.js";
+import { auth } from "#lib/auth/index.js";
 
 // Core's feature-selected plugin registry erases endpoint inference. Recover
 // only the installed organisation plugin API, after checking runtime presence.

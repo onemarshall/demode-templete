@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authClient } from '#lib/auth-client.js';
+	import { authClient } from '#lib/auth/auth-client.js';
 
 	interface Props {
 		productId: string;

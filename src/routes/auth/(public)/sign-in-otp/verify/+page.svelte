@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import { page } from '$app/state'
-	import { authClient } from '#lib/auth-client.js'
+	import { authClient } from '#lib/auth/auth-client.js'
 	import { Button } from '#lib/components/ui/button/index.js'
 	import { Input } from '#lib/components/ui/input/index.js'
 	import { Card } from '#lib/components/ui/card/index.js'

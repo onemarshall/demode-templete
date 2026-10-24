@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
 	setBrandPreference: vi.fn()
 }));
 
-vi.mock('#lib/auth.js', () => ({ auth: { api: { getSession: vi.fn() } } }));
+vi.mock('#lib/auth/index.js', () => ({ auth: { api: { getSession: vi.fn() } } }));
 vi.mock('#lib/auth/shared/env/index.js', () => ({ getServerEnv: vi.fn(async () => ({ AUTH_ORGANIZATION_PLUGIN: true })) }));
 vi.mock('#lib/server/brand/request.js', () => ({
 	brandRequest: mocks.brandRequest,

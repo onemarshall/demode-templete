@@ -2,7 +2,7 @@
  * Auth module — public barrel entry point.
  *
  * Re-exports server, client, security, shared utilities, and feature modules.
- * Import from `#lib/auth.js` for the canonical surface area.
+ * Import from `#lib/auth/index.js` for the canonical surface area.
  */
 
 // Server exports

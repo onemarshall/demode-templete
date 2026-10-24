@@ -4,7 +4,7 @@
  * Measures the auth stack's real dependencies (database, Redis, geo
  * intelligence, CMS sync) instead of asserting their health. Shared by:
  * - `getInfrastructureHealth` remote query (fresh probes per request,
- *   see `src/lib/remote/monitoring.remote.ts`)
+ *   see `src/lib/remote/monitoring/monitoring.remote.ts`)
  * - the admin security dashboard SDK (cached, see `getDashboardSystemHealth`)
  */
 

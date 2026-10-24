@@ -1,4 +1,4 @@
-import { auth } from "#lib/auth.js";
+import { auth } from "#lib/auth/index.js";
 import { getDB } from "#lib/auth/server/database/db.js";
 import { getPublicEnv } from "#lib/auth/shared/env/index.js";
 

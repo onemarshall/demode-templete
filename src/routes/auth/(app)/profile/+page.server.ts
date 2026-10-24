@@ -2,7 +2,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { auth } from '#lib/auth.js';
+import { auth } from '#lib/auth/index.js';
 import { profileSchema } from '#lib/components/forms/schema.js';
 import { logger } from '#lib/auth/shared/logger.js';
 import { getCMSProvider } from '#lib/auth/server/cms/index.js';
