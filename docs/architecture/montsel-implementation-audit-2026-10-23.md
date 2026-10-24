@@ -14,7 +14,7 @@ Cleanup verification: the package manifest and lockfile no longer contain the fo
 
 ## Overall assessment
 
-**Phase 1 is partially written, not release-ready.** There is substantial backend scaffolding, but no integrated organisation/workspace user journey or tenancy gate test suite. The current working tree also fails static checks. Two backend failures were reproduced with mocked dependencies, without connecting to the database.
+**Phase 1 is partially written, not release-ready.** There is substantial backend scaffolding, but no integrated organisation/brand user journey or tenancy gate test suite. The current working tree also fails static checks. Two backend failures were reproduced with mocked dependencies, without connecting to the database.
 
 The MCP packages were already present in the committed baseline. There is no evidence in the package or lockfile diff that implementing organisations installed new MCP packages. The package change moves the existing Zod dependency from development to runtime dependencies.
 
@@ -36,7 +36,7 @@ These changes mix several streams of work. Git alone does not establish authorsh
 | Domain migrations | `database/migrations/0001_montsel_tenancy.sql`, `0002_backfill_personal_organisations.sql` | Six tenancy tables and personal-organisation backfill are written; their expected tables and ledger are absent from the inspected local database. |
 | Migration runner | `scripts/database/migrate.ts` | Version/checksum ledger and per-file transactions implemented; inspection modes write DDL and concurrent-run locking is absent. |
 | Organisation plugin | Three files under `src/lib/auth/modules/organization/`; core builder and environment schema changed | Server plugin and custom roles are written and feature-gated; client plugin integration and complete lifecycle policy are missing. |
-| Workspace backend | Fourteen files under `src/lib/server/workspace/` | Access checks, repositories, provisioning, audit, onboarding, limits and switching queries are written. Several are broken or unsafe to expose as currently implemented. |
+| Brand backend | Fourteen files under `src/lib/server/brand/` | Access checks, repositories, provisioning, audit, onboarding, limits and switching queries are written. Several are broken or unsafe to expose as currently implemented. |
 | Account/security/billing | Earlier CAPTCHA, password, deletion, provider, history, export and billing changes | Separate workstream. Existing account functionality does not establish completion of Montsel tenancy. |
 | Auth component rename | Old `PasskeyButton.svelte` / `SocialButton.svelte` deleted; `AuthPasskeyButton.svelte` / `AuthSocialButton.svelte` added | One barrel export still points at deleted files, causing two static errors. |
 | Route error UI | Shared `RouteError.svelte`, authenticated and admin error pages | Additional UI work; not evidence of tenant routing or access enforcement. |
@@ -76,16 +76,16 @@ Continue the MCP cross-check in a chat where the native Directus tools are expos
 
 The Better Auth schema step must supply `user`, `organization`, `member`, `invitation` and the required session field(s). Domain migration `0001` assumes those prerequisites and creates:
 
-- `workspace`
-- `workspace_member`
-- `user_workspace_preference`
+- `brand`
+- `brand_member`
+- `user_brand_preference`
 - `invitation_provisioning`
-- `invitation_workspace_grant`
+- `invitation_brand_grant`
 - `audit_event`
 
-Useful constraints already written include workspace/organisation foreign keys, workspace slug uniqueness within an organisation, unique workspace/user assignment, role and lifecycle checks, provisioning idempotency, and an audit-event composite foreign key requiring the workspace to belong to the stated organisation.
+Useful constraints already written include brand/organisation foreign keys, brand slug uniqueness within an organisation, unique brand/user assignment, role and lifecycle checks, provisioning idempotency, and an audit-event composite foreign key requiring the brand to belong to the stated organisation.
 
-Migration `0002` intends to give each existing user a deterministic personal organisation, owner membership, default workspace, workspace-admin assignment, preference and audit event. It has not been exercised against PostgreSQL in this audit. Clean first-run, repeat-run, pre-existing-record reconciliation and interruption recovery require an isolated PostgreSQL test before application.
+Migration `0002` intends to give each existing user a deterministic personal organisation, owner membership, default brand, brand-admin assignment, preference and audit event. It has not been exercised against PostgreSQL in this audit. Clean first-run, repeat-run, pre-existing-record reconciliation and interruption recovery require an isolated PostgreSQL test before application.
 
 The expected domain tables and Montsel ledger are absent, so there is no evidence of successful tenancy schema application to this local database. The organisation prerequisite is absent too: the domain migration cannot be applied successfully to this state until the Better Auth organisation schema step is repaired and completed. This does not establish whether a migration was attempted and rolled back previously, or applied to a different environment.
 
@@ -95,13 +95,13 @@ The expected domain tables and Montsel ledger are absent, so there is no evidenc
 
 ## 3. Confirmed blockers and permission gaps
 
-The organisation feature is disabled in the fresh local configuration inspected here, and the workspace services have no product-route callers. Security findings below describe unsafe code paths to repair **before enabling or exposing them**, not evidence of an exploited production tenant breach.
+The organisation feature is disabled in the fresh local configuration inspected here, and the brand services have no product-route callers. Security findings below describe unsafe code paths to repair **before enabling or exposing them**, not evidence of an exploited production tenant breach.
 
-### A1 — Valid workspace access throws at runtime
+### A1 — Valid brand access throws at runtime
 
-**Release blocker.** [context.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/workspace/context.ts:42) declares `operationContextBrand` with TypeScript `declare const`, which emits no runtime value. The successful return path evaluates `[operationContextBrand]` as an object key at line 107.
+**Release blocker.** [context.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/brand/context.ts:42) declares `operationContextBrand` with TypeScript `declare const`, which emits no runtime value. The successful return path evaluates `[operationContextBrand]` as an object key at line 107.
 
-An isolated execution of the transpiled function with successful mocked workspace, membership and assignment lookups produced:
+An isolated execution of the transpiled function with successful mocked brand, membership and assignment lookups produced:
 
 ```text
 ReferenceError: operationContextBrand is not defined
@@ -111,15 +111,15 @@ Use a real runtime symbol or another deliberate context-minting mechanism, and t
 
 ### A2 — Provisioning rows are mapped with the wrong column names
 
-**Release blocker.** [provisioning.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/workspace/provisioning.ts:65) reads camelCase fields such as `organisationId`, `createdBy` and `maxAttempts`, but the queries use `SELECT *` from a table defined with snake_case columns.
+**Release blocker.** [provisioning.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/brand/provisioning.ts:65) reads camelCase fields such as `organisationId`, `createdBy` and `maxAttempts`, but the queries use `SELECT *` from a table defined with snake_case columns.
 
 A database-shaped fixture confirmed that organisation ID, invitation ID, creator and maximum-attempt count are all lost. Grant attachment rejects the record, and activation/retry logic cannot work correctly. Add explicit SQL aliases or map the actual column names, with realistic row-shape tests.
 
-### A3 — Invitation assignment bypasses workspace administration rights
+### A3 — Invitation assignment bypasses brand administration rights
 
-**Permission blocker before exposure.** [invitations.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/workspace/invitations.ts:42) accepts any organisation admin/owner, then checks only that each requested workspace belongs to the organisation. Provisioning repeats those organisation-level checks, without requiring the inviter's `workspace_members:manage` permission in each workspace or an owner-authorised administrative grant.
+**Permission blocker before exposure.** [invitations.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/brand/invitations.ts:42) accepts any organisation admin/owner, then checks only that each requested brand belongs to the organisation. Provisioning repeats those organisation-level checks, without requiring the inviter's `brand_members:manage` permission in each brand or an owner-authorised administrative grant.
 
-An organisation admin with no assignment to Brand B could invite a controlled second account as `workspace_admin` of B. That account could then grant access back to the administrator. This violates the specification's separation between organisation administration and content access. Revalidate authority for every requested workspace role at creation and activation.
+An organisation admin with no assignment to Brand B could invite a controlled second account as `brand_admin` of B. That account could then grant access back to the administrator. This violates the specification's separation between organisation administration and content access. Revalidate authority for every requested brand role at creation and activation.
 
 ### A4 — Native Better Auth invitations can still create organisation admins
 
@@ -129,7 +129,7 @@ The Montsel wrapper hardcodes organisation role `member`, but callers can use th
 
 ### A5 — Provisioning recovery is incomplete and unsafe to publish
 
-[retryProvisioning](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/workspace/provisioning.ts:387) accepts `actorUserId` without checking it, does not enforce `nextRetryAt`, and requires `recipientUserId` even though the recipient is persisted only after successful activation. A failed first activation cannot recover as intended, even after fixing A2.
+[retryProvisioning](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/brand/provisioning.ts:387) accepts `actorUserId` without checking it, does not enforce `nextRetryAt`, and requires `recipientUserId` even though the recipient is persisted only after successful activation. A failed first activation cannot recover as intended, even after fixing A2.
 
 `reconcileAcceptedInvitation` does not verify that the plugin invitation is accepted or that the supplied user is its intended recipient. Activation also needs renewed invitation-expiry/cancellation checks. Retry updates can overwrite newer state, and activation upserts can replace an existing role/expiry without an explicit policy for independently authorised grants. The membership cleanup path logs failure but has no durable retry worker behind its retry claims.
 
@@ -137,9 +137,9 @@ These helpers currently have no public status/recovery route. Add recipient/acto
 
 ### A6 — Audit readers do not enforce the permission matrix
 
-[audit.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/workspace/audit.ts:75) accepts a workspace context but does not require `audit:read`. A context obtained by an editor for ordinary reading is therefore sufficient to call the audit reader.
+[audit.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/brand/audit.ts:75) accepts a brand context but does not require `audit:read`. A context obtained by an editor for ordinary reading is therefore sufficient to call the audit reader.
 
-The organisation audit reader accepts raw user/organisation IDs, exposes organisation-only events without an organisation permission check, and checks workspace assignment status without expiry or current organisation membership. Centralise its authorisation and test revoked users, expired assignments, non-admin workspace roles and cross-organisation requests.
+The organisation audit reader accepts raw user/organisation IDs, exposes organisation-only events without an organisation permission check, and checks brand assignment status without expiry or current organisation membership. Centralise its authorisation and test revoked users, expired assignments, non-admin brand roles and cross-organisation requests.
 
 ### A7 — Schema helper and current application checks fail
 
@@ -156,15 +156,15 @@ The installed plugin does expose the invitation methods. The typing error does n
 
 The existing [deletion policy](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/auth/server/deletion-policy.ts:28) still checks global administrator status and personal subscriptions, without organisation ownership or membership disposition. The new `assertNotLastOwner` helper has no callers. There is no transactional Montsel ownership-transfer flow.
 
-If the new schema/backfill is applied, restrictive user foreign keys in workspace creation, assignments, grants, provisioning and audit can prevent deleting the identity. Better Auth's installed internal deletion path deletes sessions and accounts before deleting the user; a later foreign-key failure can therefore leave a partially dismantled sign-in account. This consequence is conditional on applying the schema and reaching that path; it was not attempted on real data.
+If the new schema/backfill is applied, restrictive user foreign keys in brand creation, assignments, grants, provisioning and audit can prevent deleting the identity. Better Auth's installed internal deletion path deletes sessions and accounts before deleting the user; a later foreign-key failure can therefore leave a partially dismantled sign-in account. This consequence is conditional on applying the schema and reaching that path; it was not attempted on real data.
 
 Implement foreground ownership/deletion guards across self and administrator removal, explicit attribution/retention handling, and transactional ownership tests before enabling tenancy. Do not use a database foreign-key error as the user-facing lifecycle policy.
 
 ### A9 — Limits and entitlements are not yet authoritative
 
-Workspace creation checks the workspace count before its transaction, without serialising concurrent creation. Managed/administrative assignment paths do not consistently apply seat limits. Provisioning's organisation ceiling uses `MEMBERS_PER_WORKSPACE * 100` (2,500), while the declared organisation limit is 100.
+Brand creation checks the brand count before its transaction, without serialising concurrent creation. Managed/administrative assignment paths do not consistently apply seat limits. Provisioning's organisation ceiling uses `MEMBERS_PER_BRAND * 100` (2,500), while the declared organisation limit is 100.
 
-[entitlements.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/workspace/entitlements.ts:24) copies deletion-prevention semantics: every subscription status except `canceled`/`expired` is treated as live. That can grant entitlements for unpaid, paused or unknown statuses. A conservative deletion block is not proof of paid access. Define a positive entitlement policy and make personal-organisation classification an authoritative association rather than trusting freely editable metadata. This helper is optional in the current access call and is not evidence that paid generation has been enabled.
+[entitlements.ts](/Users/rob/Sites/_static/_sveltekit/_live/auth/auth/src/lib/server/brand/entitlements.ts:24) copies deletion-prevention semantics: every subscription status except `canceled`/`expired` is treated as live. That can grant entitlements for unpaid, paused or unknown statuses. A conservative deletion block is not proof of paid access. Define a positive entitlement policy and make personal-organisation classification an authoritative association rather than trusting freely editable metadata. This helper is optional in the current access call and is not evidence that paid generation has been enabled.
 
 ## 4. Integration and release status
 
@@ -172,16 +172,16 @@ Workspace creation checks the workspace count before its transaction, without se
 | --- | --- |
 | Organisation plugin/configuration | Written, server-registered and feature-gated; not enabled in the inspected fresh local environment. |
 | Organisation client integration | No `organizationClient()` integration found. |
-| Workspace schema and backfill | Written; expected tables and ledger are absent from the verified local database. |
+| Brand schema and backfill | Written; expected tables and ledger are absent from the verified local database. |
 | Access service and repositories | Written, with runtime and authorisation blockers above. |
 | Invitation provisioning | Written but nonfunctional; no complete acceptance/recovery journey. |
 | Invitation delivery | Wrapper sends a link to `/invite/:id`, but no corresponding route exists. Native plugin delivery is intentionally a no-op. |
-| Workspace routing and header switcher | Query/resolution helpers exist; no `/o/.../w/...` routes or integrated selector found. |
+| Brand routing and header switcher | Query/resolution helpers exist; no `/o/.../:brandSlug` routes or integrated selector found. |
 | Onboarding | Helper written; no application caller found. |
 | Ownership transfer and account deletion | Not integrated with tenancy. |
 | Durable retries/operational recovery | No complete worker/outbox/status surface found. |
 | Schema-drift and repository-convention enforcement | Claimed in comments/specification; corresponding tests/CI enforcement not found. |
-| Tenant-isolation/lifecycle tests | No tests found for the new workspace layer or organisation module. |
+| Tenant-isolation/lifecycle tests | No tests found for the new brand layer or organisation module. |
 | Foundation/Strategy, source versions and generation | Not implemented; later-phase scope. |
 | Teams, guests and shared libraries | Not implemented; intentionally deferred. |
 | Organisation billing and migration | Not implemented; personal subscriptions remain the current model. |
@@ -196,7 +196,7 @@ Three different concerns must remain separate:
 | --- | --- | --- |
 | Better Auth organisation plugin | Included in the existing Better Auth package; no separate MCP installation is needed for tenancy. | Keep and repair this integration for Phase 1. |
 | Application MCP runtime | `@better-auth/mcp`, `@better-auth/cimd`, `@modelcontextprotocol/server`, JWT/MCP/CIMD plugin setup, protected echo endpoint and consent page all predate this diff. | Superseded by owner decision: remove the unwanted application server functionality. |
-| Developer documentation/tooling MCP | `@sveltejs/mcp` is an existing development dependency. Inspected Codex configuration contains a disabled Svelte server and an enabled Directus-auth connector; no Better Auth documentation server entry was identified there. | Developer tooling is not the app's tenant authorisation mechanism. Installing documentation MCP does not implement organisations or workspaces. |
+| Developer documentation/tooling MCP | `@sveltejs/mcp` is an existing development dependency. Inspected Codex configuration contains a disabled Svelte server and an enabled Directus-auth connector; no Better Auth documentation server entry was identified there. | Developer tooling is not the app's tenant authorisation mechanism. Installing documentation MCP does not implement organisations or brands. |
 
 The inspected local environment has `AUTH_MCP_PLUGIN=true`. `AUTH_ORGANIZATION_PLUGIN` is absent and resolves to the schema default `false` for a fresh process. Deployed settings and already-running process values were not independently inspected.
 
@@ -204,7 +204,7 @@ The package/lockfile diff only promotes existing Zod to runtime dependencies, co
 
 The owner has now excluded the application MCP/OAuth provider from scope. Remove its runtime implementation and direct dependencies; do not treat it as Phase 3 work. Existing database tables require a separate reviewed cleanup and are not dropped by the application removal.
 
-Official distinction: the [organisation plugin](https://better-auth.com/docs/plugins/organization) handles membership and organisations; the [Better Auth documentation MCP](https://better-auth.com/docs/introduction#ai-resources) supports coding assistants. Neither replaces Montsel workspace authorisation.
+Official distinction: the [organisation plugin](https://better-auth.com/docs/plugins/organization) handles membership and organisations; the [Better Auth documentation MCP](https://better-auth.com/docs/introduction#ai-resources) supports coding assistants. Neither replaces Montsel brand authorisation.
 
 ## 6. Specification and stress-review reconciliation
 
@@ -218,10 +218,10 @@ Other spec-to-code gaps include unenforced schema-drift/repository convention te
 
 1. **Reconcile environments and complete the Directus Auth MCP cross-check.** The configured local database is now verified and has no tenancy schema or Montsel ledger. Use the confirmed working native MCP connection for the user-requested cross-check and establish whether its remote instance and the running/deployed app use this same database. Do not run the current runner's write-capable inspection modes merely to inspect status.
 2. **Repair static/runtime blockers without expanding scope.** Fix the CLI import collision, stale component exports, organisation API typing, runtime context brand and provisioning mapping. Add reproducing tests first.
-3. **Close permission gaps before enabling organisations.** Enforce workspace authority for invitation assignments, owner-only organisation-role grants at native endpoints, authenticated actor/recipient binding and audit permissions.
+3. **Close permission gaps before enabling organisations.** Enforce brand authority for invitation assignments, owner-only organisation-role grants at native endpoints, authenticated actor/recipient binding and audit permissions.
 4. **Complete lifecycle safety.** Add recoverable acceptance/retries/cancellation, ownership transfer and deletion handling; use consistent locking and limits. Resolve retention/user-FK disposition before backfill reaches real users.
 5. **Prove migrations on isolated PostgreSQL.** Verify prerequisites, first/second run, checksum drift, concurrent runner behaviour and backfill reconciliation. Reconcile specification facts with the installed SDK.
-6. **Connect the first complete tenancy journey.** Add client plugin, onboarding, organisation/workspace selection, explicit routes, invitation acceptance and recovery UI, keeping user identity derived from the session.
+6. **Connect the first complete tenancy journey.** Add client plugin, onboarding, organisation/brand selection, explicit routes, invitation acceptance and recovery UI, keeping user identity derived from the session.
 7. **Pass the Phase 1 gate.** Negative access, mid-session revocation, two-tab context, invitation failure/recovery, native endpoint bypass, owner concurrency, file-authorisation and job-publication contracts must have evidence.
 8. **Remove the unwanted application MCP/OAuth provider.** The owner has resolved this scope decision. Remove its runtime, routes, CLI schema registrations, flags and direct dependencies while preserving social sign-in and developer connectors. This cleanup does not resolve the tenancy blockers above.
 
@@ -312,20 +312,20 @@ M   src/lib/components/ui/password-input/password-input.svelte
 ??  src/lib/remote/__tests__/auth-captcha.test.ts
 M   src/lib/remote/auth.remote.ts
 ??  src/lib/remote/security/history.remote.ts
-??  src/lib/server/workspace/audit.ts
-??  src/lib/server/workspace/better-auth-adapter.ts
-??  src/lib/server/workspace/cascade.ts
-??  src/lib/server/workspace/context.ts
-??  src/lib/server/workspace/entitlements.ts
-??  src/lib/server/workspace/errors.ts
-??  src/lib/server/workspace/index.ts
-??  src/lib/server/workspace/invitations.ts
-??  src/lib/server/workspace/limits.ts
-??  src/lib/server/workspace/onboarding.ts
-??  src/lib/server/workspace/provisioning.ts
-??  src/lib/server/workspace/repositories.ts
-??  src/lib/server/workspace/resolution.ts
-??  src/lib/server/workspace/workspaces.ts
+??  src/lib/server/brand/audit.ts
+??  src/lib/server/brand/better-auth-adapter.ts
+??  src/lib/server/brand/cascade.ts
+??  src/lib/server/brand/context.ts
+??  src/lib/server/brand/entitlements.ts
+??  src/lib/server/brand/errors.ts
+??  src/lib/server/brand/index.ts
+??  src/lib/server/brand/invitations.ts
+??  src/lib/server/brand/limits.ts
+??  src/lib/server/brand/onboarding.ts
+??  src/lib/server/brand/provisioning.ts
+??  src/lib/server/brand/repositories.ts
+??  src/lib/server/brand/resolution.ts
+??  src/lib/server/brand/brands.ts
 ??  src/routes/(admin)/+error.svelte
 M   src/routes/(admin)/admin/security/+page.server.ts
 M   src/routes/(admin)/admin/security/+page.svelte

@@ -221,16 +221,16 @@ async function main(): Promise<void> {
     const counts = await pool.query<{
       users: string;
       personal_orgs: string;
-      workspaces: string;
+      brands: string;
       assignments: string;
       preferences: string;
     }>(`
 			SELECT
 				(SELECT count(*) FROM "user") AS users,
 				(SELECT count(*) FROM "personal_organisation_owner") AS personal_orgs,
-				(SELECT count(*) FROM "workspace") AS workspaces,
-				(SELECT count(*) FROM "workspace_member" WHERE "grant_source" = 'backfill') AS assignments,
-				(SELECT count(*) FROM "user_workspace_preference") AS preferences
+				(SELECT count(*) FROM "brand") AS brands,
+				(SELECT count(*) FROM "brand_member" WHERE "grant_source" = 'backfill') AS assignments,
+				(SELECT count(*) FROM "user_brand_preference") AS preferences
 		`);
     const result = counts.rows[0]!;
     for (const [key, value] of Object.entries(result)) {
@@ -247,7 +247,7 @@ async function main(): Promise<void> {
     console.log("Better Auth getMigrations reports no remaining schema changes.");
     console.log("Montsel migrations 1 and 2 applied in order; repeat run is up to date.");
     console.log(
-      "Backfill verified: 2 users, 2 personal-owner links, 2 workspaces, 2 active assignments, 2 preferences.",
+      "Backfill verified: 2 users, 2 personal-owner links, 2 brands, 2 active assignments, 2 preferences.",
     );
   } finally {
     await pool.end();

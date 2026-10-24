@@ -3,7 +3,7 @@ import type { BetterAuthPlugin } from 'better-auth';
 import type { AdminOptions } from 'better-auth/plugins/admin';
 import { defaultRoles } from 'better-auth/plugins/admin/access';
 import { getDB } from './database/db';
-import { assertNoRetainedMemberships } from '#lib/server/workspace/lifecycle.js';
+import { assertNoRetainedMemberships } from '#lib/server/brand/lifecycle.js';
 import { publicEnv } from '#lib/auth/shared/env/index.js';
 import { isAdminUser, type UserWithRoles } from '../shared/roles';
 import { logger } from '#lib/auth/shared/logger.js';

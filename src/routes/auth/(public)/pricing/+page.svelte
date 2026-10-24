@@ -2,6 +2,7 @@
 	import { authClient } from "#lib/auth-client.js";
 	import { goto } from "$app/navigation";
 	import { PLANS as plans } from "#lib/billing/plans.js";
+	import { createGuestCheckout } from "#lib/remote/checkout.remote.js";
 
 	const session = authClient.useSession();
 	const isAuthed = $derived(!!$session.data?.user);
@@ -88,33 +89,21 @@
 		error = null;
 
 		try {
-			const res = await fetch("/api/checkout/guest", {
-				method: "POST",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify({
-					productId: planId,
-					email: guestEmail,
-					successUrl: "/auth/profile?subscription=success",
-					cancelUrl: "/pricing?subscription=canceled",
-				}),
+			const data = await createGuestCheckout({
+				productId: planId,
+				email: guestEmail,
+				successUrl: "/auth/profile?subscription=success",
+				cancelUrl: "/pricing?subscription=canceled",
 			});
-
-			const data = (await res.json().catch(() => ({}))) as {
-				url?: string;
-				message?: string;
-			};
-
-			if (!res.ok || !data.url) {
-				error = data.message ?? "Failed to start checkout";
-				return;
-			}
 
 			window.location.href = data.url;
 		} catch (err) {
 			error =
-				err instanceof Error
-					? err.message
-					: "An unexpected error occurred";
+				err && typeof err === "object" && "body" in err
+					? String((err.body as { message?: string }).message ?? "Failed to start checkout")
+					: err instanceof Error
+						? err.message
+						: "An unexpected error occurred";
 		} finally {
 			loading = null;
 		}

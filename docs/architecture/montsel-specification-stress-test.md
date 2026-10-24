@@ -1,6 +1,6 @@
 # Montsel Specification v1.1 — Coherence & Stress Review
 
-> **Historical scope correction — 23 October 2026:** References below to an application MCP/OAuth provider describe the reviewed snapshot. The owner has confirmed this functionality was imported by mistake and is outside product scope. It has been removed from application code; it is not a prerequisite for organisations, workspaces or integrations. Developer MCP connectors remain separate tooling.
+> **Historical scope correction — 23 October 2026:** References below to an application MCP/OAuth provider describe the reviewed snapshot. The owner has confirmed this functionality was imported by mistake and is outside product scope. It has been removed from application code; it is not a prerequisite for organisations, brands or integrations. Developer MCP connectors remain separate tooling.
 
 **Target:** `docs/architecture/montsel-specification.md` — Version 1.1, 23 October 2026
 **Method:** Coherence test (logical structure, nine questions) + adversarial stress review (strongest sincere objections from implementers, security reviewers, product ownership, operations).
@@ -14,7 +14,7 @@
 
 The document predicts two outcomes and mostly keeps them distinct:
 
-- **Outcome A — tenancy safety:** with these rules, data-model invariants, lifecycle state machines and the shared authorisation service, no principal can read or mutate another workspace's data, and revocation is immediate and reliable.
+- **Outcome A — tenancy safety:** with these rules, data-model invariants, lifecycle state machines and the shared authorisation service, no principal can read or mutate another brand's data, and revocation is immediate and reliable.
 - **Outcome B — provenance integrity:** with immutable versions and exact source references, every derived artefact remains explainable against the approved inputs that produced it.
 
 Grain-size: per-operation and per-lifecycle-event, not statistical. The phase gates decompose the two outcomes correctly (Phase 1 gate = A; Phase 2 = B). No grain-size drift found.
@@ -40,18 +40,18 @@ The relationship between the variables producing Outcome A is **multiplicative**
 
 **S1 — The hot path is unspecified: per-operation validation vs immediate revocation, with no resolution design.**
 *Surfaced by Q4/Q8 (load-bearing variable with unexamined practical range) and by an inconsistency with the document's own decision-forcing pattern.*
-`requireWorkspaceAccess` (§6.3) is the most-executed code path in the system and must reflect revocation immediately (§2 rule 7; §5 "regardless of retained rows"). The document forces implementation-critical decisions elsewhere (migration runner, §4; billing mapping, §11.2) but never records how permission resolution executes: does Montsel read Better Auth's organisation tables directly (schema/version coupling the spec elsewhere warns about), call the Better Auth server API (latency/availability coupling on every protected operation), or cache with invalidation (where revocation bugs live)? "Immediate invalidation" + "validate on every operation" + no stated caching position is either slow by design or subtly wrong by default.
+`requireBrandAccess` (§6.3) is the most-executed code path in the system and must reflect revocation immediately (§2 rule 7; §5 "regardless of retained rows"). The document forces implementation-critical decisions elsewhere (migration runner, §4; billing mapping, §11.2) but never records how permission resolution executes: does Montsel read Better Auth's organisation tables directly (schema/version coupling the spec elsewhere warns about), call the Better Auth server API (latency/availability coupling on every protected operation), or cache with invalidation (where revocation bugs live)? "Immediate invalidation" + "validate on every operation" + no stated caching position is either slow by design or subtly wrong by default.
 **Fix:** one subsection recording the resolution design — either never-cache with an explicit cost acceptance (three indexed lookups is likely fine), or cache with explicit invalidation tied to the membership/assignment/grant change events the audit trail already records. Also record the membership-check mechanism (direct read vs server API) and its version-coupling consequence.
 
 **S2 — "Everywhere" is currently a disciplinary invariant, not a structural one.**
 *Surfaced by Q3 (the multiplicative claim's weakest joint).*
 The security claim is multiplicative over every surface (§2 rule 2), but nothing in the document makes skipping the check structurally difficult. The real erosion mechanism in systems like this is a new endpoint six months later that queries directly and forgets the service. The document contains the structural answer — context-carrying repositories (§6.3: "Repositories and downstream services use that context") — but does not name it as the enforcement mechanism, and prescribes no CI/test convention that fails a repository call lacking an operation context.
-**Fix:** elevate the repository rule to the named mechanism: all workspace-scoped data access goes through context-required repositories; no endpoint constructs tenant queries directly; add a lint/test convention that fails any repository call without a validated operation context. This converts the most fragile invariant from discipline to structure.
+**Fix:** elevate the repository rule to the named mechanism: all brand-scoped data access goes through context-required repositories; no endpoint constructs tenant queries directly; add a lint/test convention that fails any repository call without a validated operation context. This converts the most fragile invariant from discipline to structure.
 
 **S3 — The Phase 1 permission matrix content is deferred to code.**
 *Surfaced by Q5 (the compound variable is the matrix itself).*
 §6.2 mandates "a versioned action-permission matrix in code" and names twelve actions, but the role→action mapping that Phase 1 actually ships with appears nowhere in the document. The matrix is the single most security-critical artefact in the system; its first version will be written by whoever implements Phase 1, under schedule pressure, without gate-level review.
-**Fix:** require the initial matrix (for the Phase 1 action set — at minimum `workspace:read`, `workspace:update`, `workspace_members:manage`, `audit:read`) to be written into the specification or a reviewed appendix as part of the Phase 1 definition of done, with the same evidence status as schema.
+**Fix:** require the initial matrix (for the Phase 1 action set — at minimum `brand:read`, `brand:update`, `brand_members:manage`, `audit:read`) to be written into the specification or a reviewed appendix as part of the Phase 1 definition of done, with the same evidence status as schema.
 
 **S4 — The existing-user migration experience is unspecified.**
 *Surfaced by Q6 (the exception every current customer personally hits on day one).*
@@ -60,7 +60,7 @@ Backfill mechanics are specified (quarantine, default-deny, §4) and new-user on
 
 **S5 — The Directus containment is asserted, not verified.**
 *Surfaced by Q6 (exception unaccounted for).*
-§1 and §10.1 contain the right decision ("Initially an identity/profile mirror"), but nothing requires verifying that the current Directus integration actually is only that. If today's integration serves files, assets or any tenant-adjacent surface, that surface becomes a leak route on the day workspaces exist — before any "reviewed arrangement" is made.
+§1 and §10.1 contain the right decision ("Initially an identity/profile mirror"), but nothing requires verifying that the current Directus integration actually is only that. If today's integration serves files, assets or any tenant-adjacent surface, that surface becomes a leak route on the day brands exist — before any "reviewed arrangement" is made.
 **Fix:** add to Phase 1 step 2 (§14): inventory the existing Directus surface (what is stored, served, synced; which credentials/URLs reach it) and confirm or remediate before tenancy ships.
 
 **S6 — Mid-session removal UX is unspecified.** *(minor-to-significant)*
@@ -114,7 +114,7 @@ Verified against the repository on 23 October 2026. Every §4 baseline claim che
 | Per-user Creem subscriptions | `@creem_io/better-auth` plugin, `persistSubscriptions: true`; `creem_subscription` rows keyed by `referenceId` = user.id | Confirmed |
 | Directus profile synchronisation | Local `better-auth-directus` package; Better Auth → Directus via `user.create/update` after-hooks (`src/lib/auth/server/database/hooks.ts`); profile page reads back via `findUser` + avatar asset URLs | Confirmed |
 | Account security history | `auth_history` table (`src/lib/auth/server/history.ts`), categories `security/account/admin`, `RETENTION_DAYS = 90` — exactly the §12 claim | Confirmed |
-| No organisations or workspace membership configured | No organisation plugin in the 10-plugin core list (`src/lib/auth/modules/core.ts`); zero workspace/membership code; the only `organization` matches are geo-IP fields and billing copy | Confirmed |
+| No organisations or brand membership configured | No organisation plugin in the 10-plugin core list (`src/lib/auth/modules/core.ts`); zero brand/membership code; the only `organization` matches are geo-IP fields and billing copy | Confirmed |
 | §11.2: deletion/export queries use user IDs for subscription references | `deletion-policy.ts`: `SELECT status, "periodEnd" FROM creem_subscription WHERE "referenceId" = $1` with `user.id`; `account-export.ts`: same pattern | Confirmed verbatim |
 
 ### Additional facts the open decisions should absorb
@@ -124,6 +124,6 @@ Verified against the repository on 23 October 2026. Every §4 baseline claim che
 3. **Directus sync uses after-hooks, fire-and-forget** — errors logged, not blocking; circuit-breaker boundary in the SDK (`better-auth-directus/src/plugin.ts`). Correct for profile sync; exactly the pattern §7.1 prohibits for provisioning ("An after-hook alone is not evidence that operations share a transaction").
 4. **MCP layer is auth plumbing only** — `plugins/mcp/transport.ts` (CIMD transport) plus `jwt`/`mcp`/`cimd` in the CLI schema; no domain tools registered anywhere. §10's warning about echo tools is forward-looking; no tenant risk exists today.
 5. **Redis is security analytics, not auth-critical** — session analytics, geo intelligence, trust scores, captcha bypass; failures skipped silently. Better Auth `secondaryStorage` is deliberately disabled (comment in `config.ts`) so Directus sync reflects immediately rather than serving stale cached sessions.
-6. **The codebase has already made one cache-vs-immediacy trade-off** — disabling `secondaryStorage` to make Directus sync reflect immediately. This is direct precedent for S1: the team has hit the immediate-reflection-vs-cache tension once and resolved it by removing the cache. S1's decision (never-cache vs cache-with-invalidation for `requireWorkspaceAccess`) should be made with this precedent in view.
+6. **The codebase has already made one cache-vs-immediacy trade-off** — disabling `secondaryStorage` to make Directus sync reflect immediately. This is direct precedent for S1: the team has hit the immediate-reflection-vs-cache tension once and resolved it by removing the cache. S1's decision (never-cache vs cache-with-invalidation for `requireBrandAccess`) should be made with this precedent in view.
 7. **`withTransaction` already exists** (`database/db.ts`) — the PostgreSQL transaction machinery §7.1 needs for atomic provisioning is present and reusable.
 8. **Deployment target is Cloudflare Workers** (`@sveltejs/adapter-cloudflare`, wrangler). A raw `pg` Pool over TCP in Workers implies Hyperdrive or an equivalent — worth confirming as part of the Phase 1 deployment-sequence documentation (§4), since connection behaviour affects transaction semantics.

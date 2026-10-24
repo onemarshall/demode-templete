@@ -5,13 +5,13 @@
  */
 
 // Main auth client (canonical location: src/lib/auth-client.ts)
-export { authClient } from '#lib/auth-client.js';
+export { authClient } from "#lib/auth-client.js";
 
 // Client helpers
-export * from './helpers';
+export * from "./helpers";
 
 // Client plugins
-export { securityHeadersPlugin, csrfProtectionPlugin } from './plugins/security';
+export { securityHeadersPlugin, csrfProtectionPlugin } from "./plugins/security";
 
 // Client types
-export * from './types';
+export * from "./types";

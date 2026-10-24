@@ -28,7 +28,7 @@ Product definitions for Creem integration. Use these `productId` values when cre
 ### Features
 
 - Core authentication (email/password, social login)
-- 1 project/workspace
+- 1 brand
 - Community support
 - Basic security analytics
 - 1,000 monthly active users
@@ -53,7 +53,7 @@ Individual developers testing the platform or building small personal projects.
 ### Features
 
 - Everything in Free, plus:
-- 3 projects/workspaces
+- 3 brands
 - Email support (48h response)
 - Advanced security analytics
 - 10,000 monthly active users
@@ -81,7 +81,7 @@ Freelancers and small startups needing professional auth with moderate scale.
 ### Features
 
 - Everything in Basic, plus:
-- Unlimited projects/workspaces
+- Unlimited brands
 - Priority email support (24h response)
 - Real-time security analytics
 - 100,000 monthly active users

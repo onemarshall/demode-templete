@@ -23,7 +23,7 @@ export const PLANS: Plan[] = [
 		description: 'Get started with core features',
 		features: [
 			'Core authentication (email/password, social)',
-			'1 project/workspace',
+			'1 brand',
 			'Community support',
 			'Basic security analytics',
 			'1,000 monthly active users',
@@ -42,7 +42,7 @@ export const PLANS: Plan[] = [
 		description: 'Essential tools for individuals',
 		trial: '7 days free',
 		features: [
-			'3 projects/workspaces',
+			'3 brands',
 			'Email support (48h response)',
 			'Advanced security analytics',
 			'10,000 monthly active users',
@@ -64,7 +64,7 @@ export const PLANS: Plan[] = [
 		description: 'Advanced features for professionals',
 		trial: '14 days free',
 		features: [
-			'Unlimited projects',
+			'Unlimited brands',
 			'Priority support (24h)',
 			'Real-time analytics',
 			'100,000 monthly active users',

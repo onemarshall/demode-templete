@@ -8,6 +8,6 @@
 </script>
 
 <AppShell user={data.user}>
-	{#if data.tenancyEnabled}<div class="px-4 py-3"><Button href="/organisations" variant="outline">Organisations & workspaces</Button></div>{/if}
+	{#if data.tenancyEnabled}<div class="px-4 py-3"><Button href="/organisations" variant="outline">Organisations & brands</Button></div>{/if}
 	{@render children()}
 </AppShell>

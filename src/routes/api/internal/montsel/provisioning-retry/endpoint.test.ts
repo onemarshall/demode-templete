@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
   process: vi.fn(),
 }));
 vi.mock("#lib/auth/shared/env/index.js", () => ({ getServerEnv: async () => mocks.env }));
-vi.mock("#lib/server/workspace/provisioning.js", () => ({
+vi.mock("#lib/server/brand/provisioning.js", () => ({
   processDueProvisioningRetries: mocks.process,
 }));
 import { POST } from "./+server";

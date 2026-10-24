@@ -8,7 +8,7 @@ import { join, resolve } from 'path';
 const DATABASE_NAME = 'montsel_phase1_integration';
 const DATABASE_URL = process.env.MONTSEL_PHASE1_TEST_DATABASE_URL;
 const PROJECT_ROOT = resolve(import.meta.dir, '..', '..');
-const TEST_FILE = resolve(PROJECT_ROOT, 'src/lib/server/workspace/__tests__/phase1-postgres.integration.test.ts');
+const TEST_FILE = resolve(PROJECT_ROOT, 'src/lib/server/brand/__tests__/phase1-postgres.integration.test.ts');
 
 function validateDatabaseUrl(value: string | undefined): string {
 	if (!value) throw new Error(`Set MONTSEL_PHASE1_TEST_DATABASE_URL to a loopback database named ${DATABASE_NAME}.`);

@@ -4,7 +4,7 @@
  * Type definitions specific to client-side auth operations.
  */
 
-import type { User, Session } from 'better-auth';
+import type { User, Session } from "better-auth";
 
 // ============================================
 // Client State Types
@@ -14,21 +14,21 @@ import type { User, Session } from 'better-auth';
  * Client session state
  */
 export interface ClientSessionState {
-	readonly user: User | null;
-	readonly session: Session | null;
-	readonly isAuthenticated: boolean;
-	readonly isLoading: boolean;
-	readonly error: string | null;
+  readonly user: User | null;
+  readonly session: Session | null;
+  readonly isAuthenticated: boolean;
+  readonly isLoading: boolean;
+  readonly error: string | null;
 }
 
 /**
  * Auth client configuration
  */
 export interface AuthClientConfig {
-	readonly baseUrl?: string;
-	readonly plugins?: unknown[];
-	readonly fetchOptions?: RequestInit;
-	readonly headers?: Record<string, string>;
+  readonly baseUrl?: string;
+  readonly plugins?: unknown[];
+  readonly fetchOptions?: RequestInit;
+  readonly headers?: Record<string, string>;
 }
 
 // ============================================
@@ -39,21 +39,21 @@ export interface AuthClientConfig {
  * Auth event types
  */
 export type AuthEventType =
-	| 'sign_in'
-	| 'sign_out'
-	| 'sign_up'
-	| 'session_updated'
-	| 'error'
-	| 'loading';
+  | "sign_in"
+  | "sign_out"
+  | "sign_up"
+  | "session_updated"
+  | "error"
+  | "loading";
 
 /**
  * Auth event payload
  */
 export interface AuthEvent {
-	readonly type: AuthEventType;
-	readonly data?: unknown;
-	readonly error?: string;
-	readonly timestamp: number;
+  readonly type: AuthEventType;
+  readonly data?: unknown;
+  readonly error?: string;
+  readonly timestamp: number;
 }
 
 // ============================================
@@ -64,17 +64,17 @@ export interface AuthEvent {
  * Custom hook return type for auth state
  */
 export interface UseAuthReturn {
-	readonly user: User | null;
-	readonly session: Session | null;
-	readonly isAuthenticated: boolean;
-	readonly isLoading: boolean;
-	readonly error: string | null;
-	readonly actions: {
-		readonly signIn: (credentials: Record<string, unknown>) => Promise<void>;
-		readonly signOut: () => Promise<void>;
-		readonly signUp: (data: Record<string, unknown>) => Promise<void>;
-		readonly updateProfile: (data: Partial<User>) => Promise<void>;
-	};
+  readonly user: User | null;
+  readonly session: Session | null;
+  readonly isAuthenticated: boolean;
+  readonly isLoading: boolean;
+  readonly error: string | null;
+  readonly actions: {
+    readonly signIn: (credentials: Record<string, unknown>) => Promise<void>;
+    readonly signOut: () => Promise<void>;
+    readonly signUp: (data: Record<string, unknown>) => Promise<void>;
+    readonly updateProfile: (data: Partial<User>) => Promise<void>;
+  };
 }
 
 // ============================================
@@ -85,24 +85,24 @@ export interface UseAuthReturn {
  * Auth error types
  */
 export type AuthErrorType =
-	| 'network_error'
-	| 'invalid_credentials'
-	| 'session_expired'
-	| 'user_not_found'
-	| 'email_already_exists'
-	| 'weak_password'
-	| 'rate_limit_exceeded'
-	| 'server_error'
-	| 'unknown_error';
+  | "network_error"
+  | "invalid_credentials"
+  | "session_expired"
+  | "user_not_found"
+  | "email_already_exists"
+  | "weak_password"
+  | "rate_limit_exceeded"
+  | "server_error"
+  | "unknown_error";
 
 /**
  * Auth error interface
  */
 export interface AuthError {
-	readonly type: AuthErrorType;
-	readonly message: string;
-	readonly code?: string;
-	readonly details?: Record<string, unknown>;
+  readonly type: AuthErrorType;
+  readonly message: string;
+  readonly code?: string;
+  readonly details?: Record<string, unknown>;
 }
 
 // ============================================
@@ -113,32 +113,32 @@ export interface AuthError {
  * Result type for async operations
  */
 export type AuthResult<T = void> =
-	| { readonly success: true; readonly data: T }
-	| { readonly success: false; readonly error: AuthError };
+  | { readonly success: true; readonly data: T }
+  | { readonly success: false; readonly error: AuthError };
 
 /**
  * Pagination parameters
  */
 export interface PaginationParams {
-	readonly page?: number;
-	readonly limit?: number;
-	readonly offset?: number;
+  readonly page?: number;
+  readonly limit?: number;
+  readonly offset?: number;
 }
 
 /**
  * Sort options
  */
 export interface SortOptions {
-	readonly sortBy?: string;
-	readonly sortOrder?: 'asc' | 'desc';
+  readonly sortBy?: string;
+  readonly sortOrder?: "asc" | "desc";
 }
 
 /**
  * Filter options
  */
 export interface FilterOptions {
-	readonly search?: string;
-	readonly status?: string;
-	readonly dateFrom?: Date;
-	readonly dateTo?: Date;
+  readonly search?: string;
+  readonly status?: string;
+  readonly dateFrom?: Date;
+  readonly dateTo?: Date;
 }

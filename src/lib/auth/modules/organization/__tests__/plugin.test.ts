@@ -13,17 +13,17 @@ const mocks = vi.hoisted(() => ({
   cascadeMembershipRemoval: vi.fn(),
   auditMembershipChange: vi.fn(),
 }));
-vi.mock("#lib/server/workspace/better-auth-adapter.js", () => ({
+vi.mock("#lib/server/brand/better-auth-adapter.js", () => ({
   findMembership: mocks.findMembership,
   membershipHasRole: mocks.membershipHasRole,
 }));
-vi.mock("#lib/server/workspace/provisioning.js", () => ({
+vi.mock("#lib/server/brand/provisioning.js", () => ({
   onInvitationCreated: mocks.onInvitationCreated,
   guardInvitationAcceptance: mocks.guardInvitationAcceptance,
   onInvitationAccepted: mocks.onInvitationAccepted,
   cancelProvisioning: mocks.cancelProvisioning,
 }));
-vi.mock("#lib/server/workspace/cascade.js", () => ({
+vi.mock("#lib/server/brand/cascade.js", () => ({
   cascadeMembershipRemoval: mocks.cascadeMembershipRemoval,
   auditMembershipChange: mocks.auditMembershipChange,
 }));

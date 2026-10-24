@@ -1,10 +1,10 @@
 import { json, error } from "@sveltejs/kit";
 import { timingSafeEqual } from "node:crypto";
 import { getServerEnv } from "#lib/auth/shared/env/index.js";
-import { processDueProvisioningRetries } from "#lib/server/workspace/provisioning.js";
+import { processDueProvisioningRetries } from "#lib/server/brand/provisioning.js";
 import type { RequestHandler } from "./$types";
 
-/** Bounded system recovery; the caller cannot choose a user or workspace. */
+/** Bounded system recovery; the caller cannot choose a user or brand. */
 export const POST: RequestHandler = async ({ request }) => {
   const env = await getServerEnv();
   if (!env.AUTH_ORGANIZATION_PLUGIN || !env.MONTSEL_RECOVERY_TOKEN) error(404, "Unavailable");

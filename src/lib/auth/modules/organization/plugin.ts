@@ -15,7 +15,7 @@
 import { organization as betterAuthOrganization } from "better-auth/plugins";
 import type { BetterAuthPlugin } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
-import { findMembership, membershipHasRole } from "#lib/server/workspace/better-auth-adapter.js";
+import { findMembership, membershipHasRole } from "#lib/server/brand/better-auth-adapter.js";
 import { logger } from "#lib/auth/shared/logger.js";
 import { ac, owner, admin, member } from "./permissions.js";
 import {
@@ -23,8 +23,8 @@ import {
   guardInvitationAcceptance,
   onInvitationAccepted,
   cancelProvisioning,
-} from "#lib/server/workspace/provisioning.js";
-import { cascadeMembershipRemoval, auditMembershipChange } from "#lib/server/workspace/cascade.js";
+} from "#lib/server/brand/provisioning.js";
+import { cascadeMembershipRemoval, auditMembershipChange } from "#lib/server/brand/cascade.js";
 
 interface OrganizationEnv {
   AUTH_ORGANIZATION_PLUGIN?: boolean;

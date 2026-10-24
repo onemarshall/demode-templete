@@ -14,6 +14,7 @@
 		Activity,
 		Clock
 	} from '@lucide/svelte';
+	import { runSecurityTestScenario } from '#lib/remote/security/testing.remote.js';
 
 	const testScenarios = [
 		{
@@ -121,12 +122,6 @@
 		timestamp: string;
 	}
 
-	interface ScenarioInjectResponse {
-		success: boolean;
-		injected: number;
-		error?: string;
-	}
-
 	let loadingScenarios = $state<Set<string>>(new Set());
 	let results = $state<ScenarioTestResult[]>([]);
 	let error = $state<string>('');
@@ -145,26 +140,15 @@
 
 		try {
 			// First inject the actual security events
-			const injectResponse = await fetch(
-				`/api/admin/security/scenarios?scenario=${scenarioId}&action=inject`,
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				}
-			);
-
-			const injectResult: ScenarioInjectResponse = await injectResponse.json();
-
-			if (!injectResponse.ok) {
-				throw new Error(injectResult.error || 'Failed to inject scenario');
-			}
+			const injectResult = await runSecurityTestScenario({
+				scenario: scenarioId,
+				action: 'inject'
+			});
 
 			results.unshift({
 				scenario: scenarioId,
 				success: injectResult.success,
-				data: { injected: injectResult.injected },
+				data: { injected: injectResult.injected ?? 0 },
 				timestamp: new Date().toLocaleTimeString()
 			});
 
@@ -239,7 +223,7 @@
 			</Card.Header>
 			<Card.Content>
 				<div class="space-y-2">
-					{#each results as result}
+					{#each results as result (result.scenario + result.timestamp)}
 						<div class="flex items-center justify-between rounded border p-3">
 							<div class="flex items-center gap-3">
 								<Badge variant={result.success ? 'success' : 'destructive'}>
@@ -261,7 +245,7 @@
 	{/if}
 
 	<!-- Test Categories -->
-	{#each testScenarios as category}
+	{#each testScenarios as category (category.category)}
 		{@const CategoryIcon = category.icon}
 		<Card.Root>
 			<Card.Header>
@@ -275,7 +259,7 @@
 			</Card.Header>
 			<Card.Content>
 				<div class="grid gap-3 md:grid-cols-2">
-					{#each category.scenarios as scenario}
+					{#each category.scenarios as scenario (scenario.id)}
 						<div class="flex items-center justify-between rounded-lg border p-4">
 							<div class="flex-1">
 								<div class="mb-1 flex items-center gap-2">
