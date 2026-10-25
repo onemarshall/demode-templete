@@ -4,7 +4,6 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
 	// Use the same feature flag as SvelteKit's client-side preloader.
-	declare const __SVELTEKIT_FORK_PRELOADS__: boolean;
 
 	let showAccount = $state(false);
 	let pending: Fork | undefined;
