@@ -89,7 +89,10 @@ export default defineConfig({
       }),
       experimental: {
         remoteFunctions: true,
-        forkPreloads: true,
+        // Speculative component rendering leaks uninitialised derived values
+        // into Bits UI avatar/menu props with the current Svelte runtime.
+        // Keep normal data preloading, but render components on navigation.
+        forkPreloads: false,
       },
       csp: {
         mode: "auto",
@@ -141,7 +144,7 @@ export default defineConfig({
       $lib: path.resolve(cwd, "./src/lib"),
       $test: path.resolve(cwd, "./src/test"),
       css: path.resolve(cwd, "./src/assets/css"),
-      "@vinejs/vine": path.resolve(cwd, "./src/lib/utils/stub-vine.ts"),
+      "@vinejs/vine": path.resolve(cwd, "./src/lib/platform/compat/stub-vine.ts"),
     },
   },
   test: {

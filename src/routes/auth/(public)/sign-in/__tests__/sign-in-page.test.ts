@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { signInSchema } from '#lib/components/forms/schema.js';
+import { signInSchema } from '#lib/modules/auth/components/forms/schema.js';
 
 describe('SignIn schema', () => {
 	const valid = {

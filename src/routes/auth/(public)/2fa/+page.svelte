@@ -1,8 +1,8 @@
 <!-- src/routes/auth/2fa-verify/+page.svelte -->
 <script lang="ts">
-	import { twoFactorVerificationSchema } from '#lib/components/forms/schema.js';
-	import { createSpaForm, handleSubmitFlow, scheduleMessageClear } from '#lib/components/forms/auth-forms.js';
-	import { authClient } from '#lib/auth/auth-client.js';
+	import { twoFactorVerificationSchema } from '#lib/modules/auth/components/forms/schema.js';
+	import { createSpaForm, handleSubmitFlow, scheduleMessageClear } from '#lib/modules/auth/components/forms/auth-forms.js';
+	import { authClient } from '#lib/modules/auth/client/client.js';
 	import { goto, invalidate } from '$app/navigation';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Form from '#lib/components/ui/form/index.js';
@@ -12,14 +12,14 @@
 	import { Alert, AlertDescription } from '#lib/components/ui/alert/index.js';
 	import { Separator } from '#lib/components/ui/separator/index.js';
 	import { Activity, Loader, ArrowLeft, Shield } from '@lucide/svelte';
-	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
-	import { refreshSession } from '#lib/auth/client/helpers.js';
+	import { logger, securityLogger } from '#lib/platform/logger.js';
+	import { refreshSession } from '#lib/modules/auth/client/helpers.js';
 
 	// Import our new components
-	import VerificationMethodSelector from '#lib/components/security/two-factor/MethodSelector.svelte';
-	import CodeInput from '#lib/components/security/two-factor/CodeInput.svelte';
-	import EmailCodeRequest from '#lib/components/security/two-factor/EmailCodeRequest.svelte';
-	import StatusMessage from '#lib/components/security/two-factor/StatusMessage.svelte';
+	import VerificationMethodSelector from '#lib/modules/auth/features/two-factor/components/MethodSelector.svelte';
+	import CodeInput from '#lib/modules/auth/features/two-factor/components/CodeInput.svelte';
+	import EmailCodeRequest from '#lib/modules/auth/features/two-factor/components/EmailCodeRequest.svelte';
+	import StatusMessage from '#lib/modules/auth/features/two-factor/components/StatusMessage.svelte';
 
 	let { data } = $props();
 	const reason = $derived(data?.reason ?? 'pending');

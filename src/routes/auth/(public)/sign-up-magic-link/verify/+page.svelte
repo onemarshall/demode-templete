@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import { page } from '$app/state'
-	import { authClient } from '#lib/auth/client/index.js'
+	import { authClient } from '#lib/modules/auth/client/index.js'
 	import { Button } from '#lib/components/ui/button/index.js'
 	import { Input } from '#lib/components/ui/input/index.js'
 	import { Card } from '#lib/components/ui/card/index.js'
 	import { Alert, AlertDescription } from '#lib/components/ui/alert/index.js'
 	import { CircleCheck, CircleAlert, Loader, Copy, Check } from '@lucide/svelte'
-	import { logger } from '#lib/auth/shared/logger.js'
+	import { logger } from '#lib/platform/logger.js'
 
 	let token = $state('')
 	let isLoading = $state(false)

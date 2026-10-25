@@ -4,11 +4,11 @@ import { render, screen } from '@testing-library/svelte';
 
 import CapWidgetAdapterStub from '../../../../../test/mocks/CapWidgetAdapter.svelte';
 
-vi.mock('#lib/components/forms/shared/CapWidgetAdapter.svelte', () => ({
+vi.mock('#lib/modules/auth/components/forms/shared/CapWidgetAdapter.svelte', () => ({
 	default: CapWidgetAdapterStub
 }));
 
-vi.mock('#lib/auth/shared/env/index.js', () => ({
+vi.mock('#lib/platform/config/index.js', () => ({
 	publicEnv: {
 		PUBLIC_CAP_ENDPOINT: '',
 		PUBLIC_CAP_KEY: '',
@@ -16,8 +16,8 @@ vi.mock('#lib/auth/shared/env/index.js', () => ({
 	}
 }));
 
-import AuthCaptchaPanel from '#lib/components/forms/auth/AuthCaptchaPanel.svelte';
-import { publicEnv } from '#lib/auth/shared/env/index.js';
+import AuthCaptchaPanel from '#lib/modules/auth/components/forms/auth/AuthCaptchaPanel.svelte';
+import { publicEnv } from '#lib/platform/config/index.js';
 
 describe('AuthCaptchaPanel - Captcha widget', () => {
 	beforeEach(() => {

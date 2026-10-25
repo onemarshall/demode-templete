@@ -2,13 +2,13 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import type { PageData, ActionData } from './$types';
 	import type { SubmitFunction } from '$app/forms';
-	import UserTable from '#lib/components/users/UserTable.svelte';
-	import UserModal from '#lib/components/users/UserModal.svelte';
+	import UserTable from '#lib/modules/auth/features/admin/components/UserTable.svelte';
+	import UserModal from '#lib/modules/auth/features/admin/components/UserModal.svelte';
 	import * as Dialog from '#lib/components/ui/dialog/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Select from '#lib/components/ui/select/index.js';
-	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
-	import type { UserListItem } from '#lib/components/users/types.js';
+	import PageHeader from '#lib/app/shell/page-header.svelte';
+	import type { UserListItem } from '#lib/modules/auth/features/admin/shared/types.js';
 
 	interface Props {
 		data: PageData;

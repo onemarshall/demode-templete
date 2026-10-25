@@ -1,5 +1,5 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
-import { createAccountExport } from "#lib/auth/server/account-export.js";
+import { createAccountExport } from "#lib/modules/auth/server/account-export.js";
 
 export const GET: RequestHandler = async ({ request }) => {
   try {

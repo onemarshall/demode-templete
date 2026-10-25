@@ -2,12 +2,12 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { auth } from '#lib/auth/index.js';
-import { profileSchema } from '#lib/components/forms/schema.js';
-import { logger } from '#lib/auth/shared/logger.js';
-import { getCMSProvider } from '#lib/auth/server/cms/index.js';
-import { loadAuthUserContext } from '#lib/auth/server/user-context.js';
-import type { DirectusCMSProviderType } from '#lib/auth/server/cms/providers/directus/index.js';
+import { auth } from '#lib/modules/auth/server/config.js';
+import { profileSchema } from '#lib/modules/auth/components/forms/schema.js';
+import { logger } from '#lib/platform/logger.js';
+import { getCMSProvider } from '#lib/platform/cms/server.server.js';
+import { loadAuthUserContext } from '#lib/modules/auth/server/user-context.js';
+import type { DirectusCMSProviderType } from '#lib/platform/cms/providers/directus/index.js';
 import type { Actions } from '@sveltejs/kit';
 
 export const load = async ({ request, depends, locals }) => {

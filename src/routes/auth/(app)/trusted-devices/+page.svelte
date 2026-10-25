@@ -3,7 +3,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
-	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
+	import PageHeader from '#lib/app/shell/page-header.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { enhance, type SubmitFunction } from '$app/forms';
 	import type { PageData } from './$types';

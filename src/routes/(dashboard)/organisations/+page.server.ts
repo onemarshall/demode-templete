@@ -1,10 +1,10 @@
 import { redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
-import { requireTenancySession, formText, actionFailure } from "#lib/server/brand/request.js";
-import { listSwitcherContext, getBrandPreference } from "#lib/server/brand/resolution.js";
-import { organizationApi } from "#lib/server/brand/organization-api.js";
-import { ensurePersonalOrganisation } from "#lib/server/brand/onboarding.js";
-import { createBrand } from "#lib/server/brand/brands.js";
+import { requireTenancySession, formText, actionFailure } from "#lib/modules/tenancy/server/request.js";
+import { listSwitcherContext, getBrandPreference } from "#lib/modules/tenancy/server/resolution.js";
+import { organizationApi } from "#lib/modules/tenancy/server/organization-api.js";
+import { ensurePersonalOrganisation } from "#lib/modules/tenancy/server/onboarding.js";
+import { createBrand } from "#lib/modules/tenancy/server/brands.js";
 
 export const load: PageServerLoad = async (event) => {
   const { user } = await requireTenancySession(event);

@@ -20,11 +20,18 @@ const mocks = vi.hoisted(() => {
 	};
 });
 
-vi.mock('#lib/auth/shared/env/index.js', () => ({
+vi.mock('#lib/platform/config/server.server.js', () => ({
+	getServerEnv: mocks.getServerEnv
+}));
+vi.mock('#lib/platform/config/index.js', () => ({
 	getServerEnv: mocks.getServerEnv
 }));
 
-vi.mock('#lib/auth/index.js', () => ({
+vi.mock('#lib/app/setup.server.js', () => ({
+	auth: { api: { getSession: mocks.getSession } }
+}));
+
+vi.mock('#lib/modules/auth/server/config.js', () => ({
 	auth: {
 		api: {
 			getSession: mocks.getSession
@@ -34,15 +41,16 @@ vi.mock('#lib/auth/index.js', () => ({
 
 // The security storage is selected from the environment at import time, so it
 // is mocked here to keep the temp-block checks deterministic.
-vi.mock('#lib/auth/server/security-storage.js', () => ({
+vi.mock('#lib/modules/auth/server/security-storage.js', () => ({
 	getSecurityStorage: vi.fn(async () => mocks.storage)
 }));
 
-vi.mock('#lib/auth/shared/redis/index.js', () => ({
+vi.mock('#lib/platform/redis/index.js', () => ({
 	getSharedRedisClient: vi.fn().mockResolvedValue(mocks.redis)
 }));
 
-vi.mock('#lib/auth/security/plugins/abuse-protection/services/detection', () => ({
+vi.mock('#lib/modules/auth/security/services/abuse-detection.js', async (importOriginal) => ({
+	...(await importOriginal<typeof import('#lib/modules/auth/security/services/abuse-detection.js')>()),
 	detectSuspiciousActivity: mocks.detectSuspiciousActivity
 }));
 

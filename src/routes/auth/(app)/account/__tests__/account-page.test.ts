@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ context: vi.fn(), eligibility: vi.fn() }));
-vi.mock('#lib/auth/server/user-context.js', () => ({ loadAuthUserContext: mocks.context }));
-vi.mock('#lib/auth/server/deletion-policy.js', () => ({ loadDeletionEligibility: mocks.eligibility }));
+vi.mock('#lib/modules/auth/server/user-context.js', () => ({ loadAuthUserContext: mocks.context }));
+vi.mock('#lib/modules/auth/server/deletion-policy.js', () => ({ loadDeletionEligibility: mocks.eligibility }));
 
 import { load } from '../+page.server';
 

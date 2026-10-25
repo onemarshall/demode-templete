@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resetPasswordSchema } from '#lib/components/forms/schema.js';
+import { resetPasswordSchema } from '#lib/modules/auth/components/forms/schema.js';
 
 describe('ResetPassword schema', () => {
 	const valid = {

@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
-import { auth } from '#lib/auth/index.js';
-import { loadAuthUserContext } from '#lib/auth/server/user-context.js';
+import { auth } from '#lib/modules/auth/server/config.js';
+import { loadAuthUserContext } from '#lib/modules/auth/server/user-context.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, depends }) => {

@@ -4,12 +4,12 @@
 	import * as Form from '#lib/components/ui/form/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
-	import { AuthFormAlert } from '#lib/components/forms/auth/index.js';
+	import { AuthFormAlert } from '#lib/modules/auth/components/forms/auth/index.js';
 	import { Shield, Mail, ArrowLeft, Loader2 } from '@lucide/svelte';
 	import { goto } from '$app/navigation';
-	import { authClient } from '#lib/auth/auth-client.js';
-	import { emailSchema } from '#lib/components/forms/schema.js';
-	import { createSpaForm, handleSubmitFlow, scheduleMessageClear } from '#lib/components/forms/auth-forms.js';
+	import { authClient } from '#lib/modules/auth/client/client.js';
+	import { emailSchema } from '#lib/modules/auth/components/forms/schema.js';
+	import { createSpaForm, handleSubmitFlow, scheduleMessageClear } from '#lib/modules/auth/components/forms/auth-forms.js';
 
 	// State
 	let isSubmitting = $state(false);

@@ -1,9 +1,9 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { requireTenancySession, actionFailure } from '#lib/server/brand/request.js';
-import { recipientInvitation } from '#lib/server/brand/management.js';
-import { organizationApi } from '#lib/server/brand/organization-api.js';
-import { reconcileAcceptedInvitation, retryProvisioning } from '#lib/server/brand/provisioning.js';
+import { requireTenancySession, actionFailure } from '#lib/modules/tenancy/server/request.js';
+import { recipientInvitation } from '#lib/modules/tenancy/server/management.js';
+import { organizationApi } from '#lib/modules/tenancy/server/organization-api.js';
+import { reconcileAcceptedInvitation, retryProvisioning } from '#lib/modules/tenancy/server/provisioning.js';
 export const load: PageServerLoad = async (event) => {
 	const { user } = await requireTenancySession(event);
 	try { return { invitation: await recipientInvitation(user, event.params.invitationId), emailVerified: user.emailVerified }; }

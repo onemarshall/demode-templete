@@ -1,7 +1,7 @@
 // src/routes/(admin)/+layout.server.ts
 import { redirect } from '@sveltejs/kit';
-import { auth } from '#lib/auth/server/config.js';
-import { resolveUserImage } from '#lib/auth/server/session-serializer.js';
+import { auth } from '#lib/modules/auth/server/config.js';
+import { resolveUserImage } from '#lib/modules/auth/server/session-serializer.js';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ request }) => {

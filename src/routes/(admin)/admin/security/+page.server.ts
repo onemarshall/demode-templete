@@ -2,21 +2,21 @@
 
 import { redirect, error } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
-import { auth } from "#lib/auth/server/config.js";
-import { isAdminUser, type SessionUser } from "#lib/auth/server/auth-helpers.js";
-import { logger, enhancedLogger } from "#lib/auth/shared/logger.js";
+import { auth } from "#lib/modules/auth/server/config.js";
+import { isAdminUser, type SessionUser } from "#lib/modules/auth/server/auth-helpers.js";
+import { logger, enhancedLogger } from "#lib/platform/logger.js";
 import {
   getSecurityDashboard,
   blockIp as blockIpCommand,
   unblockIp as unblockIpCommand,
   clearMetricsCache as clearRemoteMetricsCache,
-} from "#lib/remote/admin/index.js";
+} from "#lib/modules/auth/features/admin/remote/index.js";
 import {
   getDefaultCollector,
   clearMetricsCache as clearLocalMetricsCache,
-} from "#lib/auth/security/analytics/index.js";
-import { clearInfrastructureHealthCache } from "#lib/monitoring/infrastructure-health.js";
-import { encodeHistoryCursor, listAdminHistory, type HistoryEntry } from "#lib/auth/server/history.js";
+} from "#lib/modules/auth/security/analytics/index.js";
+import { clearInfrastructureHealthCache } from "#lib/modules/monitoring/server/infrastructure-health.js";
+import { encodeHistoryCursor, listAdminHistory, type HistoryEntry } from "#lib/modules/auth/server/history.js";
 
 async function requireAdmin(request: Request): Promise<SessionUser> {
   const session = await auth.api.getSession({ headers: request.headers });

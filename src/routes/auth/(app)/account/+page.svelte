@@ -1,9 +1,9 @@
 <script lang="ts">
-	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
+	import PageHeader from '#lib/app/shell/page-header.svelte';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
-	import DeleteUserForm from '#lib/components/forms/DeleteUserForm.svelte';
+	import DeleteUserForm from '#lib/modules/auth/components/forms/DeleteUserForm.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

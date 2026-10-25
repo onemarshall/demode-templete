@@ -1,7 +1,7 @@
 // src/routes/auth/reset-password/+page.server.ts
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { resetPasswordSchema } from '#lib/components/forms/schema.js';
+import { resetPasswordSchema } from '#lib/modules/auth/components/forms/schema.js';
 
 export const load = async () => {
 	return {

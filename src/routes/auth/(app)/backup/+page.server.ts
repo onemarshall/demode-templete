@@ -1,10 +1,10 @@
 // src/routes/auth/delete-user/+page.server.ts
 import { redirect, fail } from '@sveltejs/kit';
-import { auth } from '#lib/auth/index.js';
-import { logger } from '#lib/auth/shared/logger.js';
+import { auth } from '#lib/modules/auth/server/config.js';
+import { logger } from '#lib/platform/logger.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { passwordSchema } from '#lib/components/forms/schema.js';
+import { passwordSchema } from '#lib/modules/auth/components/forms/schema.js';
 
 export const load = async ({ request, getClientAddress, depends }) => {
 	logger.info('Delete user page load attempt', {

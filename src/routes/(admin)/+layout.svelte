@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AppShell from '#lib/components/efferd/app-shell/app-shell-2/app-shell.svelte';
+	import AppShell from '#lib/app/shell/app-shell.svelte';
 	import type { LayoutData } from './$types';
 	import type { Snippet } from 'svelte';
 

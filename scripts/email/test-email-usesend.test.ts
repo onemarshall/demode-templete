@@ -9,8 +9,8 @@ import {
 	initializeEmail,
 	resetEmail,
 	type EmailConfig
-} from '../../src/lib/auth/server/email';
-import type { EmailProvider } from '../../src/lib/auth/server/email/types';
+} from '../../src/lib/modules/auth/server/email';
+import type { EmailProvider } from '../../src/lib/modules/auth/server/email/types';
 
 // Mock fetch for network requests with proper typing
 const mockFetch = vi.fn();

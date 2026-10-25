@@ -1,12 +1,12 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { requireTenancySession, formText, actionFailure } from '#lib/server/brand/request.js';
-import { organisationSettings } from '#lib/server/brand/management.js';
-import { createBrand, archiveBrand } from '#lib/server/brand/brands.js';
-import { grantAdministrativeAssignment } from '#lib/server/brand/repositories.js';
-import { transferOwnership, removeOrganisationMember } from '#lib/server/brand/lifecycle.js';
-import { resendInvitationEmail, cancelBrandInvitation } from '#lib/server/brand/invitations.js';
-import { retryProvisioning } from '#lib/server/brand/provisioning.js';
+import { requireTenancySession, formText, actionFailure } from '#lib/modules/tenancy/server/request.js';
+import { organisationSettings } from '#lib/modules/tenancy/server/management.js';
+import { createBrand, archiveBrand } from '#lib/modules/tenancy/server/brands.js';
+import { grantAdministrativeAssignment } from '#lib/modules/tenancy/server/repositories.js';
+import { transferOwnership, removeOrganisationMember } from '#lib/modules/tenancy/server/lifecycle.js';
+import { resendInvitationEmail, cancelBrandInvitation } from '#lib/modules/tenancy/server/invitations.js';
+import { retryProvisioning } from '#lib/modules/tenancy/server/provisioning.js';
 const roles = ['brand_admin', 'editor', 'contributor', 'viewer'] as const;
 export const load: PageServerLoad = async (event) => {
 	const { user } = await requireTenancySession(event);

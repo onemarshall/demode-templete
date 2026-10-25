@@ -2,16 +2,16 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 		import { Button } from '#lib/components/ui/button/index.js';
-	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
+	import PageHeader from '#lib/app/shell/page-header.svelte';
 	import { dev } from '$app/env';
 	import { page } from '$app/state';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { onMount, tick } from 'svelte';
 	import { RefreshCcw } from '@lucide/svelte';
 	import type { PageData, ActionData } from './$types';
-	import ActionReviewSheet from '#lib/components/admin-security/ActionReviewSheet.svelte';
-	import AdminAuditHistory from '#lib/components/admin-security/AdminAuditHistory.svelte';
-	import { dashboardHref, readDashboardView, investigationForAction, type SecurityMode, type InvestigationView } from '#lib/components/admin-security/dashboard-view.js';
+	import ActionReviewSheet from '#lib/modules/auth/security/components/ActionReviewSheet.svelte';
+	import AdminAuditHistory from '#lib/modules/auth/security/components/AdminAuditHistory.svelte';
+	import { dashboardHref, readDashboardView, investigationForAction, type SecurityMode, type InvestigationView } from '#lib/modules/auth/security/components/dashboard-view.js';
 	import {
 		OverviewStats, RiskDistributionChart, HourlyActivityChart, TopRiskFactors,
 		FlaggedSessionsList, DashboardHeader, SystemHealthPanel, AuthMetricsPanel,
@@ -21,7 +21,7 @@
 		deriveSecurityStatus, ALL_ACTION_SOURCES, ALL_ACTION_STATUSES,
 		deriveIncidentCounts, deriveRecommendedActions, filterActions,
 		type RecommendedActionItem, type ActionsFilterState,
-	} from '#lib/components/admin-security/index.js';
+	} from '#lib/modules/auth/security/components/index.js';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let refreshError = $state('');

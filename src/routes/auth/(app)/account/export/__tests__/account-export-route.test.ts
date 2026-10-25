@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockCreateExport = vi.hoisted(() => vi.fn());
-vi.mock("#lib/auth/server/account-export.js", () => ({ createAccountExport: mockCreateExport }));
+vi.mock("#lib/modules/auth/server/account-export.js", () => ({ createAccountExport: mockCreateExport }));
 
 import { GET } from "../+server";
 

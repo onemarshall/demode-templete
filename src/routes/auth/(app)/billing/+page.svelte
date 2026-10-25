@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '#lib/components/ui/button/index.js';
-	import SubscriptionStatus from '#lib/components/billing/SubscriptionStatus.svelte';
-	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
+	import SubscriptionStatus from '#lib/modules/billing/components/SubscriptionStatus.svelte';
+	import PageHeader from '#lib/app/shell/page-header.svelte';
 
 	let { data } = $props();
 </script>

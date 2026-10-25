@@ -11,25 +11,25 @@ const mocks = vi.hoisted(() => ({
 	retryProvisioning: vi.fn()
 }));
 
-vi.mock('#lib/server/brand/request.js', () => ({
+vi.mock('#lib/modules/tenancy/server/request.js', () => ({
 	requireTenancySession: mocks.requireTenancySession,
 	formText: mocks.formText,
 	actionFailure: mocks.actionFailure
 }));
-vi.mock('#lib/server/brand/management.js', () => ({ organisationSettings: mocks.organisationSettings }));
-vi.mock('#lib/server/brand/brands.js', () => ({ createBrand: vi.fn(), archiveBrand: vi.fn() }));
-vi.mock('#lib/server/brand/repositories.js', () => ({
+vi.mock('#lib/modules/tenancy/server/management.js', () => ({ organisationSettings: mocks.organisationSettings }));
+vi.mock('#lib/modules/tenancy/server/brands.js', () => ({ createBrand: vi.fn(), archiveBrand: vi.fn() }));
+vi.mock('#lib/modules/tenancy/server/repositories.js', () => ({
 	grantAdministrativeAssignment: mocks.grantAdministrativeAssignment,
 	listBrandMembers: vi.fn(),
 	revokeBrandAssignment: vi.fn(),
 	updateBrandMetadata: vi.fn()
 }));
-vi.mock('#lib/server/brand/lifecycle.js', () => ({
+vi.mock('#lib/modules/tenancy/server/lifecycle.js', () => ({
 	transferOwnership: mocks.transferOwnership,
 	removeOrganisationMember: mocks.removeOrganisationMember
 }));
-vi.mock('#lib/server/brand/invitations.js', () => ({ resendInvitationEmail: vi.fn(), cancelBrandInvitation: vi.fn() }));
-vi.mock('#lib/server/brand/provisioning.js', () => ({ retryProvisioning: mocks.retryProvisioning }));
+vi.mock('#lib/modules/tenancy/server/invitations.js', () => ({ resendInvitationEmail: vi.fn(), cancelBrandInvitation: vi.fn() }));
+vi.mock('#lib/modules/tenancy/server/provisioning.js', () => ({ retryProvisioning: mocks.retryProvisioning }));
 
 import { actions } from '../+page.server';
 

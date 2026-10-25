@@ -1,10 +1,12 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 import type { User as BetterAuthUser } from 'better-auth';
-import type { FraudAnalysis } from '#lib/auth/security/types.js';
-import type { SerializedSession, SerializedUser } from '#lib/auth/shared/types/serialized-auth.js';
+import type { FraudAnalysis } from '#lib/modules/auth/security/types.js';
+import type { SerializedSession, SerializedUser } from '#lib/modules/auth/shared/types/serialized-auth.js';
 
 // Global type declarations for the application
 declare global {
+	const __SVELTEKIT_FORK_PRELOADS__: boolean;
+
 	namespace App {
 		interface User extends BetterAuthUser {
 			hasPassword: boolean;

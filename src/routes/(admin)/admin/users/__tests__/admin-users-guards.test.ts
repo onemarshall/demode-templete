@@ -21,7 +21,7 @@ const mocks = vi.hoisted(() => {
 	};
 });
 
-vi.mock('#lib/auth/server/config.js', () => ({
+vi.mock('#lib/modules/auth/server/config.js', () => ({
 	auth: {
 		api: {
 			getSession: mocks.getSession
@@ -29,11 +29,14 @@ vi.mock('#lib/auth/server/config.js', () => ({
 	}
 }));
 
-vi.mock('#lib/auth/shared/env/index.js', () => ({
+vi.mock('#lib/platform/config/server.server.js', () => ({
+	getServerEnv: mocks.getServerEnv
+}));
+vi.mock('#lib/platform/config/index.js', () => ({
 	getServerEnv: mocks.getServerEnv
 }));
 
-vi.mock('#lib/auth/server/admin-helpers.js', () => ({
+vi.mock('#lib/modules/auth/server/admin-helpers.js', () => ({
 	getAdminApi: () => mocks.admin
 }));
 

@@ -11,23 +11,24 @@ const mocks = vi.hoisted(() => ({
 	setBrandPreference: vi.fn()
 }));
 
-vi.mock('#lib/auth/index.js', () => ({ auth: { api: { getSession: vi.fn() } } }));
-vi.mock('#lib/auth/shared/env/index.js', () => ({ getServerEnv: vi.fn(async () => ({ AUTH_ORGANIZATION_PLUGIN: true })) }));
-vi.mock('#lib/server/brand/request.js', () => ({
+vi.mock('#lib/modules/auth/server/config.js', () => ({ auth: { api: { getSession: vi.fn() } } }));
+vi.mock('#lib/platform/config/server.server.js', () => ({ getServerEnv: vi.fn(async () => ({ AUTH_ORGANIZATION_PLUGIN: true })) }));
+vi.mock('#lib/platform/config/index.js', () => ({ getServerEnv: vi.fn(async () => ({ AUTH_ORGANIZATION_PLUGIN: true })) }));
+vi.mock('#lib/modules/tenancy/server/request.js', () => ({
 	brandRequest: mocks.brandRequest,
 	formText: mocks.formText,
 	actionFailure: mocks.actionFailure
 }));
-vi.mock('#lib/server/brand/repositories.js', () => ({
+vi.mock('#lib/modules/tenancy/server/repositories.js', () => ({
 	listBrandMembers: vi.fn(),
 	grantBrandAssignment: mocks.grantBrandAssignment,
 	revokeBrandAssignment: mocks.revokeBrandAssignment,
 	updateBrandMetadata: mocks.updateBrandMetadata
 }));
-vi.mock('#lib/server/brand/invitations.js', () => ({ createBrandInvitation: mocks.createBrandInvitation }));
-vi.mock('#lib/server/brand/audit.js', () => ({ listBrandAuditEvents: vi.fn() }));
-vi.mock('#lib/server/brand/context.js', () => ({ requireBrandAccess: vi.fn() }));
-vi.mock('#lib/server/brand/resolution.js', () => ({ setBrandPreference: mocks.setBrandPreference }));
+vi.mock('#lib/modules/tenancy/server/invitations.js', () => ({ createBrandInvitation: mocks.createBrandInvitation }));
+vi.mock('#lib/modules/tenancy/server/audit.js', () => ({ listBrandAuditEvents: vi.fn() }));
+vi.mock('#lib/modules/tenancy/server/context.js', () => ({ requireBrandAccess: vi.fn() }));
+vi.mock('#lib/modules/tenancy/server/resolution.js', () => ({ setBrandPreference: mocks.setBrandPreference }));
 
 import { actions } from '../+page.server';
 

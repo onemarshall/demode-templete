@@ -3,11 +3,11 @@
 	import { Button } from "#lib/components/ui/button/index.js";
 	import { Separator } from "#lib/components/ui/separator/index.js";
 	import { ArrowLeft } from "@lucide/svelte";
-	import { authClient } from "#lib/auth/auth-client.js";
-	import { WalletConnect, SignMessage } from "#lib/components/auth/siwe/index.js";
-	import { generateSIWEMessage } from "#lib/auth/modules/siwe/client.js";
-	import { logger, securityLogger } from "#lib/auth/shared/logger.js";
-	import { AuthFormCard, AuthFormAlert } from "#lib/components/forms/auth/index.js";
+	import { authClient } from "#lib/modules/auth/client/client.js";
+	import { WalletConnect, SignMessage } from "#lib/modules/auth/features/siwe/components/index.js";
+	import { generateSIWEMessage } from "#lib/modules/auth/features/siwe/client.js";
+	import { logger, securityLogger } from "#lib/platform/logger.js";
+	import { AuthFormCard, AuthFormAlert } from "#lib/modules/auth/components/forms/auth/index.js";
 
 	interface EthereumProvider {
 		request(args: { method: string; params?: unknown[] }): Promise<unknown>;

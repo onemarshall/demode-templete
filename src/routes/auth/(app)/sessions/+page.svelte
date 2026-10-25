@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { authClient } from '#lib/auth/auth-client.js';
+	import { authClient } from '#lib/modules/auth/client/client.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
-	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
+	import PageHeader from '#lib/app/shell/page-header.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import type { PageData } from './$types';
 

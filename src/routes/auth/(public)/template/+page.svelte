@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { signInSchema } from '#lib/components/forms/schema.js';
-	import { authClient } from '#lib/auth/auth-client.js';
+	import { signInSchema } from '#lib/modules/auth/components/forms/schema.js';
+	import { authClient } from '#lib/modules/auth/client/client.js';
 	import { goto } from '$app/navigation';
-	import { createSpaForm, handleSubmitFlow, scheduleMessageClear } from '#lib/components/forms/auth-forms.js';
+	import { createSpaForm, handleSubmitFlow, scheduleMessageClear } from '#lib/modules/auth/components/forms/auth-forms.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Form from '#lib/components/ui/form/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
@@ -10,7 +10,7 @@
 	import { PasswordInput } from '#lib/components/ui/password-input/index.js';
 	import { Alert, AlertDescription } from '#lib/components/ui/alert/index.js';
 	import { Loader, ArrowLeft, Mail } from '@lucide/svelte';
-	import { logger, securityLogger } from '#lib/auth/shared/logger.js';
+	import { logger, securityLogger } from '#lib/platform/logger.js';
 
 	let { data } = $props();
 	let isLoading = $state(false);

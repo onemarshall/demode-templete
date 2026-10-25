@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ session: vi.fn(), revoke: vi.fn(), cookie: vi.fn() }));
-vi.mock("#lib/auth/index.js", () => ({
+vi.mock("#lib/modules/auth/server/config.js", () => ({
   auth: {
     api: { getSession: mocks.session, revokeOtherSessions: mocks.revoke },
     $context: Promise.resolve({ createAuthCookie: mocks.cookie }),

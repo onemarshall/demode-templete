@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
-import { auth } from '#lib/auth/server/config.js';
-import { encodeHistoryCursor, listOwnHistory } from '#lib/auth/server/history.js';
+import { auth } from '#lib/modules/auth/server/config.js';
+import { encodeHistoryCursor, listOwnHistory } from '#lib/modules/auth/server/history.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, url }) => {

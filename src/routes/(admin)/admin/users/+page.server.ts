@@ -1,11 +1,11 @@
 import { redirect, error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { auth } from '#lib/auth/server/config.js';
-import { isAdminUser } from '#lib/auth/server/auth-helpers.js';
-import { getServerEnv } from '#lib/auth/shared/env/index.js';
-import { getAdminApi } from '#lib/auth/server/admin-helpers.js';
-import { logger } from '#lib/auth/shared/logger.js';
-import type { SessionItem, UserDetail, UserListItem } from '#lib/components/users/types.js';
+import { auth } from '#lib/modules/auth/server/config.js';
+import { isAdminUser } from '#lib/modules/auth/server/auth-helpers.js';
+import { getServerEnv } from '#lib/platform/config/server.server.js';
+import { getAdminApi } from '#lib/modules/auth/server/admin-helpers.js';
+import { logger } from '#lib/platform/logger.js';
+import type { SessionItem, UserDetail, UserListItem } from '#lib/modules/auth/features/admin/shared/types.js';
 
 // ================================
 // Types

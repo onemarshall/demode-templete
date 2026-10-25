@@ -1,7 +1,7 @@
 // src/routes/auth/(app)/billing/+page.server.ts
 import { redirect } from '@sveltejs/kit';
-import { auth } from '#lib/auth/index.js';
-import { loadActiveSubscription } from '#lib/billing/subscription.js';
+import { auth } from '#lib/modules/auth/server/config.js';
+import { loadActiveSubscription } from '#lib/modules/billing/server/subscription.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, depends }) => {

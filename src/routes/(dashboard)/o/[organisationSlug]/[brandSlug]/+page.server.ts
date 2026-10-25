@@ -1,12 +1,12 @@
 import type { Actions, PageServerLoad } from './$types';
-import { brandRequest, formText, actionFailure } from '#lib/server/brand/request.js';
-import { listBrandMembers, grantBrandAssignment, revokeBrandAssignment, updateBrandMetadata } from '#lib/server/brand/repositories.js';
-import { assignableMembers } from '#lib/server/brand/management.js';
-import { findMembership, membershipIsAdminOrOwner } from '#lib/server/brand/better-auth-adapter.js';
-import { createBrandInvitation } from '#lib/server/brand/invitations.js';
-import { listBrandAuditEvents } from '#lib/server/brand/audit.js';
-import { requireBrandAccess } from '#lib/server/brand/context.js';
-import { setBrandPreference } from '#lib/server/brand/resolution.js';
+import { brandRequest, formText, actionFailure } from '#lib/modules/tenancy/server/request.js';
+import { listBrandMembers, grantBrandAssignment, revokeBrandAssignment, updateBrandMetadata } from '#lib/modules/tenancy/server/repositories.js';
+import { assignableMembers } from '#lib/modules/tenancy/server/management.js';
+import { findMembership, membershipIsAdminOrOwner } from '#lib/modules/tenancy/server/better-auth-adapter.js';
+import { createBrandInvitation } from '#lib/modules/tenancy/server/invitations.js';
+import { listBrandAuditEvents } from '#lib/modules/tenancy/server/audit.js';
+import { requireBrandAccess } from '#lib/modules/tenancy/server/context.js';
+import { setBrandPreference } from '#lib/modules/tenancy/server/resolution.js';
 const roles = ['brand_admin', 'editor', 'contributor', 'viewer'] as const;
 export const load: PageServerLoad = async (event) => {
 	const { session, route, ctx } = await brandRequest(event, 'brand:read');

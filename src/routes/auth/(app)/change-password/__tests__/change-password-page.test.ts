@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { changePasswordSchema } from '#lib/components/forms/schema.js';
+import { changePasswordSchema } from '#lib/modules/auth/components/forms/schema.js';
 
 describe('ChangePassword schema', () => {
 	const valid = {

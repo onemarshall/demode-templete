@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
+	import PageHeader from '#lib/app/shell/page-header.svelte';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { page } from '$app/state';
 import type { PageData } from './$types';

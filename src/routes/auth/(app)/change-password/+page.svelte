@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AuthPasswordSetForm from '#lib/components/forms/auth/AuthPasswordSetForm.svelte';
+	import AuthPasswordSetForm from '#lib/modules/auth/components/forms/auth/AuthPasswordSetForm.svelte';
 </script>
 
 <AuthPasswordSetForm mode="change" />

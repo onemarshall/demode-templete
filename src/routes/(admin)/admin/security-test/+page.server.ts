@@ -1,8 +1,8 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { auth } from '#lib/auth/server/config.js';
-import { isAdminUser, type SessionUser } from '#lib/auth/server/auth-helpers.js';
-import { isDevelopment } from '#lib/auth/shared/env/index.js';
+import { auth } from '#lib/modules/auth/server/config.js';
+import { isAdminUser, type SessionUser } from '#lib/modules/auth/server/auth-helpers.js';
+import { isDevelopment } from '#lib/platform/config/index.js';
 
 export const load: PageServerLoad = async ({ request }) => {
 	const isTestRuntime = process.env.NODE_ENV === 'test';

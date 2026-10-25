@@ -13,7 +13,7 @@ process.env.REDIS_URL ??= 'redis://localhost:6379';
 process.env.REDIS_PASSWORD ??= 'test-redis-password';
 
 // Mock the analytics.remote module globally to avoid SSR evaluation issues
-vi.mock('#lib/remote/admin/security/analytics.remote.js', () => ({
+vi.mock('#lib/modules/auth/security/remote/analytics.remote.js', () => ({
 	getDashboardMetrics: vi.fn(),
 	getSecuritySessions: vi.fn(),
 	getTrustedDevices: vi.fn(),

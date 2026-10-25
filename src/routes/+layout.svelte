@@ -2,7 +2,7 @@
 	import '../app.css';
 	import { dev } from '$app/env';
 	import { onMount, onDestroy } from 'svelte';
-	import { publicEnv, isDevelopment } from '#lib/auth/shared/env/index.js';
+	import { publicEnv, isDevelopment } from '#lib/platform/config/index.js';
 	import { Toaster } from 'svelte-sonner';
 	import { ModeWatcher } from "mode-watcher";
 	import type { LayoutData } from './$types';
@@ -50,7 +50,7 @@
 
 	onMount(() => {
 		// Fire and forget the async init, store cleanup reference
-		import('#lib/auth/auth-client.js').then(async ({ initializeAuth, cleanupAuth }) => {
+		import('#lib/modules/auth/client/client.js').then(async ({ initializeAuth, cleanupAuth }) => {
 			await initializeAuth();
 			cleanup = cleanupAuth;
 		});

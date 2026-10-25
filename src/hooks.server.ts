@@ -10,17 +10,17 @@
 //   5. Temp-block check + abuse detection → 429 when blocked
 //   6. resolve() with CSP nonce injection + security headers on the way out
 
-import { auth } from '#lib/auth/index.js';
-import { logger, securityLogger } from '#lib/auth/shared/logger.js';
+import { auth } from '#lib/app/setup.server.js';
+import { logger, securityLogger } from '#lib/platform/logger.js';
 import {
 	DEFAULT_OPTIONS as ABUSE_PROTECTION_DEFAULTS,
 	detectSuspiciousActivity,
 	isPrivateIp
-} from '#lib/auth/security/services/index.js';
-import { getClientIp } from '#lib/auth/security/shared/client-ip.js';
-import { getServerEnv } from '#lib/auth/shared/env/index.js';
-import { getSecurityStorage } from '#lib/auth/server/security-storage.js';
-import { serializeUser, serializeSession } from '#lib/auth/server/session-serializer.js';
+} from '#lib/modules/auth/security/services/abuse-detection.js';
+import { getClientIp } from '#lib/modules/auth/security/shared/client-ip.js';
+import { getServerEnv } from '#lib/platform/config/server.server.js';
+import { getSecurityStorage } from '#lib/modules/auth/server/security-storage.js';
+import { serializeUser, serializeSession } from '#lib/modules/auth/server/session-serializer.js';
 import { createSecurityHeaders, createCSPDirectives } from '../csp.config.mjs';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit/hooks';
@@ -509,8 +509,8 @@ if (!globalThis.cleanupRegistered) {
 		// Dynamic imports keep the DB/Redis driver code out of this module's
 		// startup graph; they only load if shutdown actually happens.
 		const [{ closeAllRedisClients }, { closeDB }] = await Promise.all([
-			import('#lib/auth/shared/redis/index.js'),
-			import('#lib/auth/server/database/db.js')
+			import('#lib/platform/redis/index.js'),
+			import('#lib/platform/database/db.js')
 		]);
 		await Promise.allSettled([closeAllRedisClients(), closeDB()]);
 		logger.info('[Cleanup] All connections closed successfully');

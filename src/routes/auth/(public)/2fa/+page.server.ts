@@ -2,7 +2,7 @@
 import { redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { twoFactorVerificationSchema } from '#lib/components/forms/schema.js';
+import { twoFactorVerificationSchema } from '#lib/modules/auth/components/forms/schema.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, cookies }) => {

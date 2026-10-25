@@ -1,6 +1,6 @@
 <script lang="ts">
-	import SecurityTab from '#lib/components/profile/tabs/SecurityTab.svelte';
-	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
+	import SecurityTab from '#lib/modules/auth/features/profile/components/tabs/SecurityTab.svelte';
+	import PageHeader from '#lib/app/shell/page-header.svelte';
 	let { data } = $props();
 </script>
 

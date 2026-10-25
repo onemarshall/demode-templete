@@ -1,7 +1,7 @@
 import { json, error } from "@sveltejs/kit";
 import { timingSafeEqual } from "node:crypto";
-import { getServerEnv } from "#lib/auth/shared/env/index.js";
-import { processDueProvisioningRetries } from "#lib/server/brand/provisioning.js";
+import { getServerEnv } from '#lib/platform/config/server.server.js';
+import { processDueProvisioningRetries } from "#lib/modules/tenancy/server/provisioning.js";
 import type { RequestHandler } from "./$types";
 
 /** Bounded system recovery; the caller cannot choose a user or brand. */

@@ -1,7 +1,7 @@
 // src/routes/auth/sessions/+page.server.ts
 import { redirect } from '@sveltejs/kit';
-import { auth } from '#lib/auth/index.js';
-import { logger } from '#lib/auth/shared/logger.js';
+import { auth } from '#lib/modules/auth/server/config.js';
+import { logger } from '#lib/platform/logger.js';
 import type { PageServerLoad } from './$types';
 
 interface Session {

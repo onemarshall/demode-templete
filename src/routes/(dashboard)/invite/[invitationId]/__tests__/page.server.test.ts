@@ -10,15 +10,15 @@ const mocks = vi.hoisted(() => ({
 	actionFailure: vi.fn((cause: unknown) => ({ failure: cause }))
 }));
 
-vi.mock('#lib/server/brand/request.js', () => ({
+vi.mock('#lib/modules/tenancy/server/request.js', () => ({
 	requireTenancySession: mocks.requireTenancySession,
 	actionFailure: mocks.actionFailure
 }));
-vi.mock('#lib/server/brand/management.js', () => ({ recipientInvitation: mocks.recipientInvitation }));
-vi.mock('#lib/server/brand/organization-api.js', () => ({
+vi.mock('#lib/modules/tenancy/server/management.js', () => ({ recipientInvitation: mocks.recipientInvitation }));
+vi.mock('#lib/modules/tenancy/server/organization-api.js', () => ({
 	organizationApi: () => ({ acceptInvitation: mocks.acceptInvitation, rejectInvitation: mocks.rejectInvitation })
 }));
-vi.mock('#lib/server/brand/provisioning.js', () => ({
+vi.mock('#lib/modules/tenancy/server/provisioning.js', () => ({
 	reconcileAcceptedInvitation: mocks.reconcileAcceptedInvitation,
 	retryProvisioning: mocks.retryProvisioning
 }));

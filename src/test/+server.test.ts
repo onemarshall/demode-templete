@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getInfrastructureHealth } from "#lib/remote/monitoring/monitoring.remote.js";
+import { getInfrastructureHealth } from "#lib/modules/monitoring/remote/monitoring.remote.js";
 
 const { mockQuery, mockPing, mockFetch } = vi.hoisted(() => ({
   mockQuery: vi.fn(),
@@ -17,7 +17,7 @@ vi.mock("$app/server", () => ({
   }),
 }));
 
-vi.mock("#lib/auth/shared/env/index.js", async () => {
+vi.mock("#lib/platform/config/server.server.js", async () => {
   // Reuse the shared env mock's full export set ($test → src/test alias),
   // then override getServerEnv to inject the BDC key this test asserts on.
   const actual = await import("$test/mocks/env");
@@ -30,22 +30,22 @@ vi.mock("#lib/auth/shared/env/index.js", async () => {
     })),
   };
 });
-vi.mock("#lib/auth/server/database/db.js", () => ({
+vi.mock("#lib/platform/database/db.js", () => ({
   getDB: vi.fn().mockResolvedValue({ query: mockQuery }),
 }));
 
-vi.mock("#lib/auth/shared/redis/index.js", () => ({
+vi.mock("#lib/platform/redis/index.js", () => ({
   getSharedRedisClient: vi.fn().mockResolvedValue({ ping: mockPing }),
 }));
 
-vi.mock("#lib/monitoring/apm.js", () => ({
+vi.mock("#lib/modules/monitoring/server/apm.js", () => ({
   emitSystemHealth: vi.fn().mockResolvedValue(undefined),
 }));
 
 // The query resolves an optional session for admin-only detail.
 // Mock the config module so the real Better Auth instance (and its
 // Postgres adapter) never initializes in this unit test.
-vi.mock("#lib/auth/server/config.js", () => ({
+vi.mock("#lib/modules/auth/server/config.js", () => ({
   auth: {
     api: {
       getSession: vi.fn().mockResolvedValue(null),

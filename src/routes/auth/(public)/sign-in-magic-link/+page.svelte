@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AuthMagicLinkForm from '#lib/components/forms/auth/AuthMagicLinkForm.svelte';
+	import AuthMagicLinkForm from '#lib/modules/auth/features/magic-link/components/AuthMagicLinkForm.svelte';
 
 	interface PageData {
 		email?: string;

@@ -1,7 +1,7 @@
 // src/routes/auth/(app)/trusted-devices/+page.server.ts
 import { fail, redirect } from "@sveltejs/kit";
-import { auth } from "#lib/auth/index.js";
-import { logger } from "#lib/auth/shared/logger.js";
+import { auth } from "#lib/modules/auth/server/config.js";
+import { logger } from "#lib/platform/logger.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 // Resolve names and attributes from the configured prefix, secure-cookie and domain settings.

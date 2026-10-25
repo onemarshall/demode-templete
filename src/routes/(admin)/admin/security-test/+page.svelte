@@ -3,7 +3,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Alert, AlertDescription } from '#lib/components/ui/alert/index.js';
-	import PageHeader from '#lib/components/efferd/app-shell/app-shell-2/page-header.svelte';
+	import PageHeader from '#lib/app/shell/page-header.svelte';
 	import {
 		Loader2,
 		Play,
@@ -14,7 +14,7 @@
 		Activity,
 		Clock
 	} from '@lucide/svelte';
-	import { runSecurityTestScenario } from '#lib/remote/admin/security/testing.remote.js';
+	import { runSecurityTestScenario } from '#lib/modules/auth/security/remote/testing.remote.js';
 
 	const testScenarios = [
 		{

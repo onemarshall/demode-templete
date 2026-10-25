@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AuthChangeEmailForm from '#lib/components/forms/auth/AuthChangeEmailForm.svelte';
+	import AuthChangeEmailForm from '#lib/modules/auth/components/forms/auth/AuthChangeEmailForm.svelte';
 </script>
 
 <AuthChangeEmailForm />

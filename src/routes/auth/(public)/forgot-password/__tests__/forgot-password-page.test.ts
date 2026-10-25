@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { emailSchema } from '#lib/components/forms/schema.js';
+import { emailSchema } from '#lib/modules/auth/components/forms/schema.js';
 
 describe('ForgotPassword schema (email only)', () => {
 	const valid = { email: 'user@example.com' };

@@ -5,7 +5,7 @@ import { Pool } from 'pg';
 import { twoFactor, admin, magicLink, siwe, lastLoginMethod, organization } from 'better-auth/plugins';
 import { passkey } from '@better-auth/passkey';
 import { creem } from '@creem_io/better-auth';
-import { ac, owner, admin as organizationAdmin, member } from '../src/lib/auth/modules/organization/permissions.js';
+import { ac, owner, admin as organizationAdmin, member } from '../src/lib/modules/auth/features/organization/permissions.js';
 
 const PASSKEY_ENABLED = process.env.PUBLIC_AUTH_PASSKEYS_PLUGIN === 'true';
 const PASSKEY_RPID = process.env.PUBLIC_AUTH_PASSKEY_RPID;

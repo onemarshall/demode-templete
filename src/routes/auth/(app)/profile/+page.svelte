@@ -1,7 +1,7 @@
 <!-- src/routes/auth/profile/+page.svelte -->
 <script lang="ts">
-	import GeneralTab from "#lib/components/profile/tabs/GeneralTab.svelte";
-	import PageHeader from "#lib/components/efferd/app-shell/app-shell-2/page-header.svelte";
+	import GeneralTab from "#lib/modules/auth/features/profile/components/tabs/GeneralTab.svelte";
+	import PageHeader from "#lib/app/shell/page-header.svelte";
 
 	let { data } = $props();
 
