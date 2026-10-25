@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      font-family: system-ui, sans-serif;
+    }
+
+    /* Penpot board: 717 x 491, white fill */
+    .board {
+      position: relative;
+      width: 717px;
+      height: 491px;
+      background: #ffffff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Shapes: 200 x 200, vertically centered (top: 145.5px),
+       evenly spaced: 29.25px margins and gaps */
+    .square,
+    .triangle,
+    .circle {
+      position: absolute;
+      top: 145.5px;
+      width: 200px;
+      height: 200px;
+    }
+
+    /* Yellow Square: left */
+    .square {
+      left: 29.25px;
+      background: #ffd700;
+    }
+
+    /* Orange Triangle: middle */
+    .triangle {
+      left: 258.5px;
+      background: #ffa500;
+      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    }
+
+    /* Red Circle: right */
+    .circle {
+      left: 487.75px;
+      background: #ff0000;
+      border-radius: 50%;
+    }
+
+    /* "design": bold black, 500 x 192 at (108.5, 149.5), on top */
+    .headline {
+      position: absolute;
+      left: 108.5px;
+      top: 149.5px;
+      width: 500px;
+      font-family: 'Inter Tight', system-ui, sans-serif;
+      font-size: 160px;
+      font-weight: 700;
+      line-height: 192px;
+      color: #000000;
+      text-align: center;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="board">
+    <div class="square"></div>
+    <div class="triangle"></div>
+    <div class="circle"></div>
+    <div class="headline">DESIGN</div>
+  </div>
+</body>
+</html>

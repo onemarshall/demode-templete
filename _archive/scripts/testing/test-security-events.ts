@@ -5,8 +5,8 @@
  * Run this script to test if the security collector is working
  */
 
-import { getDefaultCollector } from '#lib/auth/security/analytics/index.js';
-import { createSecurityContext } from '#lib/auth/security/core/context.js';
+import { getDefaultCollector } from '#lib/modules/auth/security/analytics/index.js';
+import { createSecurityContext } from '#lib/modules/auth/security/core/context.js';
 
 async function testSecurityEvents() {
 	console.log('🧪 Testing Security Event Recording...\n');

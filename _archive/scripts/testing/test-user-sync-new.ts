@@ -7,7 +7,7 @@
 import { initializeCMS } from '../src/lib/server/cms';
 import { logger } from '../src/lib/shared/logger';
 import { getServerEnv } from '../src/lib/auth/shared/env';
-import type { BetterAuthUser } from '../src/lib/server/database/types';
+import type { BetterAuthUser } from '../src/lib/modules/auth/shared/types/database';
 import type { DirectusCMSProvider } from '../src/lib/server/cms/providers/directus/types';
 
 // Test user data

@@ -11,7 +11,7 @@ import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import * as dotenv from 'dotenv';
-import { logger } from '../../src/lib/auth/shared/logger';
+import { logger } from '../../src/lib/platform/logger';
 
 // Load environment variables
 dotenv.config();
