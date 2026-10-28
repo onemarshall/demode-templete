@@ -66,8 +66,6 @@ declare global {
 
 // Extend the real browser Window so that `window.Cap` is recognised everywhere
 declare global {
-	const __SVELTEKIT_FORK_PRELOADS__: boolean;
-
 	interface Window {
 		Cap: {
 			new (options: App.CapOptions): App.CapInstance;

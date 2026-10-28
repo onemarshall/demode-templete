@@ -8,6 +8,7 @@
  * design — no separately cached entitlement state.
  */
 
+import type { DatabaseReader } from '#lib/platform/database/db.js';
 import { queryUserSubscriptions, type CreemSubscriptionRow } from '#lib/modules/billing/server/subscription.js';
 import { getPersonalOrganisationOwner } from './better-auth-adapter.js';
 
@@ -21,13 +22,13 @@ function subscriptionIsLive(
 	return Number.isFinite(end) && end > now;
 }
 
-export async function isOrganisationEntitled(organisationId: string): Promise<boolean> {
-	const ownerUserId = await getPersonalOrganisationOwner(organisationId);
+export async function isOrganisationEntitled(organisationId: string, options: { transaction?: DatabaseReader; lock?: boolean } = {}): Promise<boolean> {
+	const ownerUserId = await getPersonalOrganisationOwner(organisationId, options.transaction, {lock:options.lock});
 	if (!ownerUserId) return false; // org-owned billing is Phase 5
 
 	// The personal organisation's owner holds the subscription.
 	const rows = await queryUserSubscriptions(ownerUserId, {
-		columns: ['status', 'periodEnd']
+		columns: ['status', 'periodEnd'], transaction:options.transaction, lock:options.lock
 	});
 	return rows.some((subscription) => subscriptionIsLive(subscription));
 }

@@ -11,6 +11,7 @@
 //   6. resolve() with CSP nonce injection + security headers on the way out
 
 import { auth } from '#lib/app/setup.server.js';
+import { initializeAuthStrategy } from '#lib/app/strategy-auth.server.js';
 import { logger, securityLogger } from '#lib/platform/logger.js';
 import {
 	DEFAULT_OPTIONS as ABUSE_PROTECTION_DEFAULTS,
@@ -209,6 +210,7 @@ function logSlowRequest(
 // ============================================
 
 export const handle: Handle = async ({ event, resolve }) => {
+	await initializeAuthStrategy();
 	const { pathname } = event.url;
 	const startTime = performance.now();
 
@@ -490,6 +492,11 @@ function applySecurityHeaders(response: Response, event: RequestEvent): Response
 	}
 
 	Object.entries(securityHeaders).forEach(([key, value]) => {
+		// A route may narrow Referrer-Policy further (for example, a link that
+		// carries a capability token must not leak it as a Referer). The global
+		// default still applies everywhere else, and a route can only make it
+		// stricter, never remove it.
+		if (key === 'Referrer-Policy' && response.headers.has('Referrer-Policy')) return;
 		response.headers.set(key, value);
 	});
 

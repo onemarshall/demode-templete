@@ -1,8 +1,16 @@
-import { redirect } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
-import { requireTenancySession, formText, actionFailure } from "#lib/modules/tenancy/server/request.js";
+import {
+  requireTenancySession,
+  formText,
+  actionFailure,
+} from "#lib/modules/tenancy/server/request.js";
 import { listSwitcherContext, getBrandPreference } from "#lib/modules/tenancy/server/resolution.js";
 import { organizationApi } from "#lib/modules/tenancy/server/organization-api.js";
+import {
+  uniqueOrganisationSlug,
+  findOrganisationBySlug,
+} from "#lib/modules/tenancy/server/better-auth-adapter.js";
 import { ensurePersonalOrganisation } from "#lib/modules/tenancy/server/onboarding.js";
 import { createBrand } from "#lib/modules/tenancy/server/brands.js";
 
@@ -23,24 +31,51 @@ export const actions: Actions = {
     }
     redirect(303, "/organisations");
   },
+  // Creating an organisation also creates its first brand. The two names are
+  // separate inputs: an organisation owns brands, it is not itself a brand.
   create: async (event) => {
     const { user } = await requireTenancySession(event);
-    let slug: string;
+    let path: string;
     try {
       const form = await event.request.formData();
-      slug = formText(form, "slug", 48);
-      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))
-        return { message: "Use lowercase letters, numbers and hyphens for the address." };
+      const name = formText(form, "name", 120);
+      const brandName = formText(form, "brandName", 120);
+      const slug = await uniqueOrganisationSlug(name);
+      if (!slug)
+        return { message: "That organisation name is already taken. Try a different name." };
       const org = await organizationApi().createOrganization({
         headers: event.request.headers,
-        body: { name: formText(form, "name", 120), slug },
+        body: { name, slug },
       });
       if (!org) throw new Error("Organisation creation failed");
       // If brand setup fails the retained organisation is recoverable in settings.
-      await createBrand({ userId: user.id, organisationId: org.id, name: "Main", slug: "main" });
+      const brand = await createBrand({
+        userId: user.id,
+        organisationId: org.id,
+        name: brandName,
+      });
+      path = `/o/${encodeURIComponent(slug)}/${encodeURIComponent(brand.slug)}`;
     } catch (cause) {
       return actionFailure(cause);
     }
-    redirect(303, `/o/${encodeURIComponent(slug)}/main`);
+    redirect(303, path);
+  },
+  // Adds a brand to an existing organisation. createBrand enforces the
+  // admin/owner membership and the per-organisation limit server-side.
+  createBrand: async (event) => {
+    const { user } = await requireTenancySession(event);
+    try {
+      const form = await event.request.formData();
+      const organisation = await findOrganisationBySlug(formText(form, "organisationSlug"));
+      if (!organisation) error(404, "Organisation unavailable");
+      const brand = await createBrand({
+        userId: user.id,
+        organisationId: organisation.id,
+        name: formText(form, "name", 120),
+      });
+      return { message: `${brand.name} is ready.` };
+    } catch (cause) {
+      return actionFailure(cause);
+    }
   },
 };

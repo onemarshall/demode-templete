@@ -1,8 +1,21 @@
 // src/lib/platform/database/db.ts
 import { Pool, type PoolClient } from 'pg';
-import { getServerEnv } from '../config/server.server.js';
 import { logger } from '../logger.js';
 
+/** A caller-supplied transaction connection; feature code never serializes it. */
+export interface DatabaseReader {
+	query(text: string, values?: unknown[]): Promise<unknown>;
+}
+
+let configuredUrl: string | undefined;
+/** The application supplies private runtime configuration before opening a pool.
+ * Keeping this module free of Svelte imports also supports standalone workers. */
+export function configureDatabase(url: string): void {
+	const parsed = new URL(url);
+	if (!['postgres:', 'postgresql:'].includes(parsed.protocol)) throw new Error('PostgreSQL connection required');
+	if ((pool || poolPromise) && configuredUrl !== url) throw new Error('Cannot replace an active database connection');
+	configuredUrl = url;
+}
 let pool: Pool | null = null;
 let poolPromise: Promise<Pool> | null = null;
 
@@ -20,13 +33,12 @@ async function initializePool(): Promise<Pool> {
 		return poolPromise;
 	}
 
+	if(!configuredUrl)throw new Error('The host must configure its database before requesting a connection');
 	poolPromise = (async () => {
-		const env = await getServerEnv();
-		const databaseUrl =
-			typeof env.BETTER_DATABASE_URL === 'string' ? env.BETTER_DATABASE_URL : undefined;
+		const databaseUrl = configuredUrl;
 
 		if (!databaseUrl) {
-			throw new Error('BETTER_DATABASE_URL is not set in the environment variables');
+			throw new Error('The host must configure its database before requesting a connection');
 		}
 
 		const newPool = new Pool({

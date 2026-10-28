@@ -1,4 +1,4 @@
-import { getDB } from '#lib/platform/database/db.js';
+import { getDB, type DatabaseReader } from '#lib/platform/database/db.js';
 import { logger } from '#lib/platform/logger.js';
 
 /**
@@ -29,6 +29,8 @@ export interface CreemSubscriptionRow {
 type SubscriptionColumn = keyof CreemSubscriptionRow;
 
 interface SubscriptionQuery<K extends SubscriptionColumn> {
+	transaction?: DatabaseReader;
+	lock?: boolean;
 	/** Columns to select. Defaults to the full row — select only what you need. */
 	columns?: readonly K[];
 	/** periodStart: newest-starting first with id tiebreak. periodEnd: longest-paid first. */
@@ -44,7 +46,7 @@ interface SubscriptionQuery<K extends SubscriptionColumn> {
  */
 export async function queryUserSubscriptions<K extends SubscriptionColumn = SubscriptionColumn>(
 	referenceId: string,
-	{ columns, orderBy, limit }: SubscriptionQuery<K> = {}
+	{ columns, orderBy, limit, transaction, lock }: SubscriptionQuery<K> = {}
 ): Promise<Pick<CreemSubscriptionRow, K>[]> {
 	const select = (columns ?? (Object.keys(SUBSCRIPTION_COLUMNS) as K[]))
 		.map((key) => SUBSCRIPTION_COLUMNS[key])
@@ -56,17 +58,19 @@ export async function queryUserSubscriptions<K extends SubscriptionColumn = Subs
 				? ' ORDER BY "periodEnd" DESC NULLS LAST'
 				: '';
 
-	const pool = await getDB();
+	if(lock && !transaction) throw new Error("Entitlement locks require a transaction");
+	const pool = transaction ?? await getDB();
+	const lockClause=lock?" FOR SHARE":"";
 	const result = limit
-		? await pool.query<Pick<CreemSubscriptionRow, K>>(
-				`SELECT ${select} FROM creem_subscription WHERE "referenceId" = $1${orderByClause} LIMIT $2`,
+		? await pool.query(
+				`SELECT ${select} FROM creem_subscription WHERE "referenceId" = $1${orderByClause} LIMIT $2${lockClause}`,
 				[referenceId, limit]
 			)
-		: await pool.query<Pick<CreemSubscriptionRow, K>>(
-				`SELECT ${select} FROM creem_subscription WHERE "referenceId" = $1${orderByClause}`,
+		: await pool.query(
+				`SELECT ${select} FROM creem_subscription WHERE "referenceId" = $1${orderByClause}${lockClause}`,
 				[referenceId]
 			);
-	return result.rows;
+	return (result as { rows: Pick<CreemSubscriptionRow,K>[] }).rows;
 }
 
 export interface UserSubscription {

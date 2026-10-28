@@ -8,7 +8,8 @@
       "$test": ["./src/test"],
       "$test/*": ["./src/test/*"],
       "#scripts/actions": ["./src/assets/scripts/actions/index.ts"],
-      "#scripts/actions/*": ["./src/assets/scripts/actions/*.ts"]
+      "#scripts/actions/*": ["./src/assets/scripts/actions/*.ts"],
+      "vitest": ["./node_modules/vitest"]
     },
     "types": ["$app/types", "bun", "vitest/globals"]
   },

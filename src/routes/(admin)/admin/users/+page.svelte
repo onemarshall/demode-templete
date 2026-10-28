@@ -176,28 +176,28 @@
 	<div class="flex flex-col gap-4">
 		<div class="grid gap-3 sm:grid-cols-3">
 			<div class="bg-card border-muted/60 rounded-lg border p-3 text-sm shadow-sm">
-				<p class="text-muted-foreground text-xs">Total users</p>
-				<p class="text-lg font-semibold">{totalCount}</p>
+				<p class="text-muted-foreground text-xs mb-2">Total users</p>
+				<h3 class="text-5xl font-semibold">{totalCount}</h3>
 			</div>
 			<div class="bg-card border-muted/60 rounded-lg border p-3 text-sm shadow-sm">
-				<p class="text-muted-foreground text-xs">Active</p>
-				<p class="text-lg font-semibold text-emerald-600">{activeCount}</p>
+				<p class="text-muted-foreground text-xs mb-2">Active</p>
+				<h3 class="text-5xl font-semibold text-emerald-600">{activeCount}</h3>
 			</div>
 			<div class="bg-card border-muted/60 rounded-lg border p-3 text-sm shadow-sm">
-				<p class="text-muted-foreground text-xs">Banned</p>
-				<p class="text-destructive text-lg font-semibold">{bannedCount}</p>
+				<p class="text-muted-foreground text-xs mb-2">Banned</p>
+				<h3 class="text-destructive text-5xl font-semibold">{bannedCount}</h3>
 			</div>
 		</div>
 
 		<div class="border-muted/60 bg-card flex flex-col gap-3 rounded-lg border p-3 shadow-sm">
-			<div class="flex flex-col gap-3 md:flex-row md:items-center">
+			<div class="flex flex-row gap-3 md:flex-row md:items-center">
 				<input
 					class="bg-background border-input w-full rounded-md border px-3 py-2 text-sm"
 					placeholder="Search name or email..."
 					value={searchTerm}
 					oninput={(e) => (searchTerm = (e.currentTarget as HTMLInputElement).value)}
 				/>
-				<div class="flex flex-wrap gap-2">
+				<div class="flex gap-2">
 					<Select.Root
 						type="single"
 						value={statusFilter}

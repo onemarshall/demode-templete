@@ -275,6 +275,9 @@
 	{/if}
 
 	<form {...formAction.enhance(handleSubmit)} id={formId} class="space-y-4">
+		<!-- Carried through the remote form so email sign-in lands where the
+		     person was going, not always on the dashboard. -->
+		<input type="hidden" name="redirectTo" value={redirectTo} />
 		{#if mode === "sign-up" && formAction.fields.name}
 			{@const nameField = formAction.fields.name}
 			<div class="space-y-2">

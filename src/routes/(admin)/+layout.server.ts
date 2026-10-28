@@ -1,7 +1,7 @@
 // src/routes/(admin)/+layout.server.ts
 import { redirect } from '@sveltejs/kit';
 import { auth } from '#lib/modules/auth/server/config.js';
-import { resolveUserImage } from '#lib/modules/auth/server/session-serializer.js';
+import { toShellUser } from '#lib/app/shell/shell-user.server.js';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ request }) => {
@@ -14,7 +14,7 @@ export const load: LayoutServerLoad = async ({ request }) => {
 	}
 
 	return {
-		user: { ...session.user, image: resolveUserImage(session.user.image) },
+		user: toShellUser(session.user),
 		session: session.session
 	};
 };

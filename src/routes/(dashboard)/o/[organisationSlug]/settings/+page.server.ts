@@ -20,7 +20,7 @@ export const actions: Actions = {
 		try {
 			const data = await organisationSettings(user.id, event.params.organisationSlug);
 			const form = await event.request.formData();
-			const brand = await createBrand({ userId: user.id, organisationId: data.organisation.id, name: formText(form, 'name', 120), slug: formText(form, 'slug', 48) });
+			const brand = await createBrand({ userId: user.id, organisationId: data.organisation.id, name: formText(form, 'name', 120) });
 			path = `/o/${data.organisation.slug}/${brand.slug}`;
 		} catch (cause) { return actionFailure(cause); }
 		redirect(303, path);

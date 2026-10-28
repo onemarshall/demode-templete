@@ -36,13 +36,14 @@ function normaliseSlug(input: string): string {
   return slug;
 }
 
+const BRAND_SLUG_SUFFIX_LIMIT = 25;
+
 export async function createBrand(params: {
   userId: string;
   organisationId: string;
   name: string;
-  slug: string;
+  slug?: string;
 }): Promise<CreatedBrand> {
-  const slug = normaliseSlug(params.slug);
   const id = randomUUID().replace(/-/g, "");
 
   return withTransaction(async (client) => {
@@ -60,12 +61,20 @@ export async function createBrand(params: {
       throw new APIError("BAD_REQUEST", {
         message: "Enter a brand name of 1 to 120 characters.",
       });
-    const { rows: existing } = await client.query<{ id: string }>(
-      `SELECT "id" FROM "brand" WHERE "organisation_id" = $1 AND "slug" = $2`,
-      [params.organisationId, slug],
-    );
-    if (existing.length > 0) {
-      throw new APIError("BAD_REQUEST", { message: "Brand slug already exists" });
+    const slugBase = normaliseSlug(params.slug ?? params.name);
+    let slug = slugBase;
+    for (let suffix = 0; suffix <= BRAND_SLUG_SUFFIX_LIMIT; suffix++) {
+      const candidate = suffix === 0 ? slugBase : `${slugBase}-${suffix}`;
+      const { rows: existing } = await client.query<{ id: string }>(
+        `SELECT "id" FROM "brand" WHERE "organisation_id" = $1 AND "slug" = $2`,
+        [params.organisationId, candidate],
+      );
+      if (existing.length === 0) {
+        slug = candidate;
+        break;
+      }
+      if (params.slug || suffix === BRAND_SLUG_SUFFIX_LIMIT)
+        throw new APIError("BAD_REQUEST", { message: "Brand slug already exists" });
     }
     await client.query(
       `INSERT INTO "brand" ("id", "organisation_id", "name", "slug", "created_by", "status")

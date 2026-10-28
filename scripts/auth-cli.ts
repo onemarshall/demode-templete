@@ -1,3 +1,4 @@
+import {AUTH_USER_FIELDS} from "../src/lib/modules/auth/server/options/user-fields.js";
 // src/lib/auth.cli.ts
 import { betterAuth } from 'better-auth';
 import { Pool } from 'pg';
@@ -18,6 +19,7 @@ if (!DATABASE_URL) {
 }
 
 export const auth = betterAuth({
+ user:{additionalFields:AUTH_USER_FIELDS},
 	database: new Pool({
 		connectionString: DATABASE_URL
 	}),

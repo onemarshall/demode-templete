@@ -1,22 +1,34 @@
 <script lang="ts">
-	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import { cn } from "$lib/utils";
-	import type { Snippet } from "svelte";
-	import AppHeader from "./app-header.svelte";
-	import AppSidebar from "./app-sidebar.svelte";
-	import type { ShellUser } from "../navigation/config";
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import { cn } from '$lib/utils';
+	import type { Snippet } from 'svelte';
+	import type { SwitcherOrganisation } from '#lib/modules/tenancy/shared/types.js';
+	import type { ShellUser } from '../navigation/config';
+	import AppHeader from './app-header.svelte';
+	import AppSidebar from './app-sidebar.svelte';
 
-	let { user = null, children }: { user?: ShellUser | null; children: Snippet } = $props();
+	let {
+		user = null,
+		tenancyEnabled = true,
+		organisations = [],
+		activeBrandId = null,
+		children
+	}: {
+		user?: ShellUser | null;
+		tenancyEnabled?: boolean;
+		organisations?: SwitcherOrganisation[];
+		activeBrandId?: string | null;
+		children: Snippet;
+	} = $props();
 </script>
 
 <Sidebar.Provider>
-	<AppSidebar {user} />
+	<AppSidebar {user} {tenancyEnabled} />
 	<Sidebar.Inset>
-		<AppHeader {user} />
+		<AppHeader {user} {tenancyEnabled} {organisations} {activeBrandId} />
 		<div
 			class={cn(
-				"flex flex-1 flex-col p-4 md:p-6",
-				"mx-auto w-full bg-background max-w-(--app-wrapper-max-width)"
+				'bg-background mx-auto flex w-full max-w-(--app-wrapper-max-width) flex-1 flex-col gap-8 p-4 md:p-8'
 			)}
 		>
 			{@render children?.()}

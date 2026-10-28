@@ -1,3 +1,4 @@
+import {AUTH_USER_FIELDS} from "./user-fields";
 /**
  * User Configuration Options
  *
@@ -20,15 +21,7 @@ type ChangeEmailHookArgs = {
 };
 
 export const getUserOptions = () => ({
-	additionalFields: {
-		provider: {
-			type: 'string',
-			required: true,
-			defaultValue: 'email',
-			input: false // Don't allow client to set this
-		},
-		lastLoginMethod: { type: 'string' as const }
-	},
+	additionalFields: AUTH_USER_FIELDS,
 	changeEmail: {
 		enabled: true,
 		sendChangeEmailConfirmation: async ({ user, newEmail, url }: ChangeEmailHookArgs) => {

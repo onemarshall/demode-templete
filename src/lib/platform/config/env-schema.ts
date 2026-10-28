@@ -30,6 +30,9 @@ const SENSITIVE_KEYS = new Set([
 	'LINKEDIN_CLIENT_SECRET',
 	'TWITTER_CLIENT_SECRET',
 	'DIRECTUS_ADMIN_TOKEN',
+	'STRATEGY_DIRECTUS_READER_TOKEN',
+	'OPENROUTER_API_KEY',
+	'TRIGGER_SECRET_KEY',
 	'DIRECTUS_DEFAULT_ROLE_ID',
 	'REDIS_PASSWORD',
 	'REDIS_URL',
@@ -523,11 +526,33 @@ export const publicEnvSchema = z.object({
 	...publicStorageSchema.shape
 });
 
+/** Private Strategy activation and read-only Directus service configuration. */
+const strategyEnvSchema = z.object({
+	STRATEGY_ENABLED: envBoolean.default(false),
+	STRATEGY_INTEGRATION_TEST_MODE: envBoolean.default(false),
+	STRATEGY_DIRECTUS_URL: urlString().optional(),
+	STRATEGY_DIRECTUS_READER_TOKEN: z.string().optional(),
+	OPENROUTER_API_KEY: z.string().optional(),
+	M04_SYNTHESIS_MODEL: z.string().optional(),
+	SYNTHESIS_MODEL: z.string().optional(),
+	MODEL_POLICY_DEV: z.enum(['0','1']).optional(),
+	STRATEGY_PROVIDER_URL: urlString().optional(),
+	STRATEGY_PROVIDER_TIMEOUT_MS: z.coerce.number().int().min(1000).max(900000).optional(),
+	STRATEGY_DRAFT_MAX_TOKENS: z.coerce.number().int().min(1000).max(18000).optional(),
+	STRATEGY_CHAT_MAX_TOKENS: z.coerce.number().int().min(1000).max(12000).optional(),
+	STRATEGY_REASONING_EFFORT: z.enum(['none', 'minimal', 'low', 'medium', 'high']).optional(),
+	TRIGGER_SECRET_KEY: z.string().optional(),
+	TRIGGER_PROJECT_REF: z.string().optional(),
+	TRIGGER_API_URL: urlString().optional(),
+	TRIGGER_DEV_BRANCH: z.string().optional()
+});
+
 /**
  * Server environment variables (private + public)
  */
 export const fullEnvSchema = z.object({
 	...coreEnvSchema.shape,
+	...strategyEnvSchema.shape,
 	...emailEnvSchema.shape,
 	...socialAuthEnvSchema.shape,
 	...authFeaturesEnvSchema.shape,

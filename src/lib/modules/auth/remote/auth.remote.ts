@@ -3,6 +3,7 @@ import { auth } from '../server/config.js';
 import { z } from 'zod';
 import { redirect } from '@sveltejs/kit';
 import { setAuthCookies } from '../server/utils.js';
+import { safeRedirect } from '../shared/redirect.js';
 
 const nameRegex = /^[\p{L}\s'-]+$/u;
 
@@ -26,7 +27,10 @@ const nameSchema = z
 // Simplified schemas for Remote Functions to avoid refinement issues
 const loginRemoteSchema = z.object({
   email: z.email(),
-  password: passwordSchema
+  password: passwordSchema,
+  // Where to land after signing in. Validated with safeRedirect, so only a
+  // same-origin path survives.
+  redirectTo: z.string().optional()
 });
 
 const signupRemoteSchema = z
@@ -34,7 +38,8 @@ const signupRemoteSchema = z
     name: nameSchema,
     email: z.email(),
     password: passwordSchema,
-    passwordConfirm: passwordSchema
+    passwordConfirm: passwordSchema,
+    redirectTo: z.string().optional()
   })
   .refine((data) => data.password === data.passwordConfirm, {
     message: 'Passwords do not match',
@@ -87,7 +92,7 @@ export const login = form(loginRemoteSchema, async (data) => {
 
   setAuthCookies(cookies, response.headers);
 
-  redirect(303, '/auth/dashboard');
+  redirect(303, safeRedirect(data.redirectTo));
 });
 
 export const signup = form(signupRemoteSchema, async (data) => {

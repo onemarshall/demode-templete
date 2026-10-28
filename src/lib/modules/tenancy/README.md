@@ -1,10 +1,15 @@
 # Tenancy module
 
 Owns organisation/brand access, memberships, lifecycle, provisioning, repository
-boundaries, route resolution and switcher UI. Browser-safe display/routing contracts
-live in `shared/types.ts`, with a type-only entry at `types.ts`. Import the switcher
-from `components/index.ts`; all authority and database operations remain in `server/`.
-Switcher values and saved preferences never confer access.
+boundaries and route resolution. Browser-safe display/routing contracts live in
+`shared/types.ts`, with a type-only entry at `types.ts`. All authority and database
+operations remain in `server/`. Switcher values and saved preferences never confer
+access.
+
+The brand switcher itself is part of the application shell
+(`src/lib/app/shell/shell-brand-switcher.svelte`), not this module: it posts to
+`/app/brand`, which re-validates the chosen brand through `requireBrandAccess`
+before setting the active-brand cookie.
 
 Requirements: auth organisation membership/API configuration, billing subscription
 reads for entitlements, platform database/logger/config, shared UI (including its

@@ -16,7 +16,7 @@
  * or trust a client-supplied role. Resolution failures deny (fail closed).
  */
 
-import { getDB } from '#lib/platform/database/db.js';
+import { getDB, type DatabaseReader } from '#lib/platform/database/db.js';
 import { BrandAccessError } from './errors.js';
 import { findMembership } from './better-auth-adapter.js';
 
@@ -72,15 +72,16 @@ export interface BrandRow {
 	status: 'active' | 'archived';
 }
 
-export async function findBrandRow(brandId: string): Promise<BrandRow | null> {
-	const db = await getDB();
-	const { rows } = await db.query<BrandRow>(
+export async function findBrandRow(brandId: string, transaction?: DatabaseReader, options: { lock?: boolean } = {}): Promise<BrandRow | null> {
+	if(options.lock && !transaction) throw new Error("Authority locks require a transaction");
+	const db = transaction ?? await getDB();
+	const result = await db.query(
 		`SELECT "id", "organisation_id" AS "organisationId", "name", "slug",
 		        "created_by" AS "createdBy", "status"
-		 FROM "brand" WHERE "id" = $1 LIMIT 1`,
+		 FROM "brand" WHERE "id" = $1 LIMIT 1${options.lock ? " FOR SHARE" : ""}`,
 		[brandId]
 	);
-	return rows[0] ?? null;
+	return (result as {rows:BrandRow[]}).rows[0] ?? null;
 }
 
 function deny(): never {
@@ -91,18 +92,21 @@ export async function requireBrandAccess(
 	userId: string,
 	brandId: string,
 	action: BrandAction,
-	options: { requireEntitlement?: boolean } = {}
+	options: { requireEntitlement?: boolean; transaction?: DatabaseReader; lockAuthority?: boolean } = {}
 ): Promise<OperationContext> {
 	// 2. Brand and its organisation; active resource status.
-	const brand = await findBrandRow(brandId);
+	const transaction = options.transaction;
+	const lock = options.lockAuthority === true;
+	if(lock && !transaction) throw new Error("Authority locks require a transaction");
+	const brand = await findBrandRow(brandId, transaction, {lock});
 	if (!brand || brand.status !== 'active') deny();
 
 	// 3. Current organisation membership — live read, never cached (§6.4).
-	const membership = await findMembership(userId, brand.organisationId);
+	const membership = await findMembership(userId, brand.organisationId, transaction, {lock});
 	if (!membership) deny();
 
 	// 4. Current active, unexpired assignment.
-	const assignment = await findActiveAssignment(brandId, userId);
+	const assignment = await findActiveAssignment(brandId, userId, transaction, {lock});
 	if (!assignment) deny();
 
 	// Effective action permission from the versioned matrix.
@@ -113,7 +117,7 @@ export async function requireBrandAccess(
 	// omit this; generation (Phase 2+) sets it.
 	if (options.requireEntitlement) {
 		const { isOrganisationEntitled } = await import('./entitlements.js');
-		if (!(await isOrganisationEntitled(brand.organisationId))) deny();
+		if (!(await isOrganisationEntitled(brand.organisationId, { transaction, lock }))) deny();
 	}
 
 	const context = Object.freeze({
@@ -145,10 +149,13 @@ export interface AssignmentRow {
 
 export async function findActiveAssignment(
 	brandId: string,
-	userId: string
+	userId: string,
+	transaction?: DatabaseReader,
+	options: { lock?: boolean } = {}
 ): Promise<AssignmentRow | null> {
-	const db = await getDB();
-	const { rows } = await db.query<AssignmentRow>(
+	if(options.lock && !transaction) throw new Error("Authority locks require a transaction");
+	const db = transaction ?? await getDB();
+	const result = await db.query(
 		`SELECT "id", "brand_id" AS "brandId", "user_id" AS "userId", "role",
 		        "status", "expires_at" AS "expiresAt", "grant_source" AS "grantSource",
 		        "granted_by" AS "grantedBy", "provisioning_id" AS "provisioningId",
@@ -157,8 +164,8 @@ export async function findActiveAssignment(
 		 WHERE "brand_id" = $1 AND "user_id" = $2
 		   AND "status" = 'active'
 		   AND ("expires_at" IS NULL OR "expires_at" > now())
-		 LIMIT 1`,
+		 LIMIT 1${options.lock ? " FOR SHARE" : ""}`,
 		[brandId, userId]
 	);
-	return rows[0] ?? null;
+	return (result as {rows:AssignmentRow[]}).rows[0] ?? null;
 }
