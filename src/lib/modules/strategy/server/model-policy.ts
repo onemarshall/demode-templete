@@ -99,6 +99,11 @@ const MODULE_POLICIES = {
     defaultModel: DEFAULT_SYNTHESIS_MODEL,
     label: "Visual Direction drafting",
   },
+  CD: {
+    overrideVar: "CD_SYNTHESIS_MODEL",
+    defaultModel: DEFAULT_SYNTHESIS_MODEL,
+    label: "Commercial Direction drafting",
+  },
   M11: {
     overrideVar: "M11_SYNTHESIS_MODEL",
     defaultModel: DEFAULT_SYNTHESIS_MODEL,
@@ -152,6 +157,10 @@ export function resolveM09Model(env: Record<string, string | undefined>) {
 }
 export function resolveM10Model(env: Record<string, string | undefined>) {
   return resolveSynthesisModel(env, MODULE_POLICIES.M10);
+}
+
+export function resolveCDModel(env: Record<string, string | undefined>) {
+  return resolveSynthesisModel(env, MODULE_POLICIES.CD);
 }
 export function resolveM11Model(env: Record<string, string | undefined>) {
   return resolveSynthesisModel(env, MODULE_POLICIES.M11);

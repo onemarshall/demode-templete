@@ -122,6 +122,14 @@ See `docs/architecture/m06-module-completion.md`. Summary:
   M01→M10 run against real predecessors. The retained stack's sealed records pin upstream versions
   that have since moved, so the chained run needs a fresh pass through the modules, not a repair.
 
+## Commercial Direction (the M11 predecessor)
+
+FW_24 defined the record and M11's consumer implemented the interface, but no producer existed. It
+now does: `stages/cd` plus its host, worker, Trigger task and screen, emitting the exact handoff M11
+validates. See `commercial-direction-contract.md` and `commercial-direction-producer.md`.
+
+M11 is therefore unblocked as a build, though not yet built.
+
 ## Current blocker
 
 `scripts/strategy/integration/m02-end-to-end.ts` depends on M01 harness artifacts that do not
