@@ -133,7 +133,11 @@
 								<td class="py-3">
 									<div class="flex justify-end gap-2">
 										{#if document.canView}
-											<Button variant="outline" size="sm" href={`/app/documents/${document.id}`}>
+											<Button
+												variant="outline"
+												size="sm"
+												href={document.openPath ?? `/app/documents/${document.id}`}
+											>
 												<FileTextIcon />
 												Open
 											</Button>

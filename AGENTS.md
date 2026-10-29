@@ -21,3 +21,33 @@ You MUST use this tool whenever writing Svelte code before sending it to the use
 
 Generates a Svelte Playground link with the provided code.
 After completing the code, ask the user if they want a playground link. Only call this tool after user confirmation and NEVER if code was written to files in their project.
+
+## Diagnostic artefact import (Phase 1)
+
+`output_version` holds delivered report bytes; rows are append-only by trigger.
+Never run the migration runner or the import against the operator's local stack.
+
+```bash
+# Disposable proof of import, hashes, tenancy, share and download reads
+docker run -d --rm --name montsel-import-verify \
+  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_diagnostic_import_verify \
+  -p 127.0.0.1:55440:5432 postgres:16
+MONTSEL_IMPORT_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55440/montsel_diagnostic_import_verify \
+  bun scripts/diagnostic/verify-import.ts
+```
+
+Artefact bytes are staged in the gitignored `.local-state/diagnostic-import/`,
+named by their SHA-256. `scripts/diagnostic/hestia-artefacts.json` records the
+engine's receipts; the import refuses any file whose hash differs.
+
+```bash
+# Disposable proof of the engagement model, envelope and route immutability
+docker run -d --rm --name montsel-engagement-verify \
+  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_diagnostic_engagement_verify \
+  -p 127.0.0.1:55441:5432 postgres:16
+MONTSEL_ENGAGEMENT_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55441/montsel_diagnostic_engagement_verify \
+  bun scripts/diagnostic/verify-engagement.ts
+```
+
+Both scripts share `scripts/diagnostic/disposable-db.ts`, which refuses any
+database not named exactly as the caller declares and not on loopback.

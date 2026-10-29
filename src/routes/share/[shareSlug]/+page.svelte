@@ -16,9 +16,15 @@
 		</p>
 	</header>
 	<section class="rounded-xl border p-6">
-		<p class="text-muted-foreground text-sm">
-			This link shares the output record. The rendered content is published by the product that
-			produced it.
-		</p>
+		{#if data.shared.report}
+			<article class="prose max-w-none" aria-label="Shared report">
+				{@html data.shared.report.contentHtml}
+			</article>
+		{:else}
+			<p class="text-muted-foreground text-sm">
+				This link shares the output record. The rendered content is published by the product that
+				produced it.
+			</p>
+		{/if}
 	</section>
 </main>

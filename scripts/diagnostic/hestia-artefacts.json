@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Signal",
+		"productKey": "diagnostic.signal",
+		"title": "Hestia — Signal reading",
+		"file": "d954c0a66c1bc662b874470cc65f4725f20f42e739a05972965148b54d383658.md",
+		"contentHash": "d954c0a66c1bc662b874470cc65f4725f20f42e739a05972965148b54d383658",
+		"enginePublicationRef": "8eaa6200-550f-4ea0-93b5-efe2219043f9"
+	},
+	{
+		"name": "Gap",
+		"productKey": "diagnostic.gap",
+		"title": "Northpine Tools — Gap diagnostic",
+		"file": "5310f12c9a8277ead7cb91f1a9979537317467ab4db52a1701d88521ee2065cb.md",
+		"contentHash": "5310f12c9a8277ead7cb91f1a9979537317467ab4db52a1701d88521ee2065cb",
+		"enginePublicationRef": "8b4d0ca0-2b3b-4cae-b180-63a0494d7a1c"
+	},
+	{
+		"name": "Direction",
+		"productKey": "diagnostic.direction",
+		"title": "Northpine Tools — Direction review",
+		"file": "83c49996c0b9b24090d00c793de242c0b59b2ec0600b4c6724bc9ffb3cac7a1b.md",
+		"contentHash": "83c49996c0b9b24090d00c793de242c0b59b2ec0600b4c6724bc9ffb3cac7a1b",
+		"enginePublicationRef": "3db4e14c-9791-4e7e-bfeb-f6a46ad5bf5a"
+	}
+]

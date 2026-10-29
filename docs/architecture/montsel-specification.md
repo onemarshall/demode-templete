@@ -63,7 +63,7 @@ One organisation can own several brands. Client-owned organisations remain separ
 
 ## 4. Current implementation baseline and migration responsibility
 
-The existing application already uses Better Auth, PostgreSQL, global user roles, per-user Creem subscriptions, Directus profile synchronisation and account security history. It does not currently configure Better Auth organisations or Montsel brand membership.
+The existing application already uses Better Auth, PostgreSQL, global user roles, per-user Stripe subscriptions, Directus profile synchronisation and account security history. It does not currently configure Better Auth organisations or Montsel brand membership.
 
 The runtime uses a direct PostgreSQL pool. Drizzle is not currently installed. PostgreSQL remains the database; before tenancy migrations are implemented, engineering must record whether Montsel domain migrations use Drizzle or a versioned SQL migration runner. Introducing Drizzle is a deliberate implementation choice, not an existing capability or a requirement to rewrite Better Auth's adapter.
 
@@ -517,7 +517,7 @@ Recorded 23 October 2026 against the verified baseline (stress-review appendix, 
 
 ### C.4 D4 — Subscription ownership and transitional entitlements
 
-**Context.** `creem_subscription` rows are keyed by `referenceId` = user id; the deletion and export queries use the same mapping (verified verbatim). Organisation billing launches in Phase 5.
+**Context.** `subscription` rows are keyed by `referenceId` = user id; the deletion and export queries use the same mapping (verified verbatim). Organisation billing launches in Phase 5.
 
 **Options.** (a) Legacy subscriptions remain personal (user-scoped) through Phases 1–4; (b) re-map legacy subscriptions to the purchaser's default organisation now.
 

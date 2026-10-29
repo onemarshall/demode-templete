@@ -16,9 +16,9 @@
 import {
 	generateEmailHTML,
 	generateEmailText
-} from '#lib/modules/auth/server/email/emails/base.js';
-import type { EmailTemplateOptions } from '#lib/modules/auth/server/email/emails/types.js';
-import type { ContractContent } from '../shared/generate.js';
+} from '#lib/modules/auth/server/email/emails/base.ts';
+import type { EmailTemplateOptions } from '#lib/modules/auth/server/email/emails/types.ts';
+import type { ContractContent } from '#lib/modules/visual-contract/shared/generate.ts';
 
 export interface DesignerSendInput {
 	projectName: string;

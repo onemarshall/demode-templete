@@ -426,6 +426,30 @@ export async function loadPublicContract(publicId: string): Promise<ContractVers
 }
 
 /**
+ * Draft ids behind a set of Documents outputs.
+ *
+ * The `output` row does not know its draft — `work_item_id` only fits products
+ * that keep work items, and Visual Contract keeps drafts instead. The version
+ * row is the join. Brand scoping mirrors `listBrandOutputs`, so a caller can
+ * feed it already-filtered output ids and get back only this brand's drafts.
+ */
+export async function listDraftIdsForOutputs(
+	ctx: OperationContext,
+	outputIds: string[]
+): Promise<Map<string, string>> {
+	if (!outputIds.length) return new Map();
+	const db = await getDB();
+	const { rows } = await db.query<{ outputId: string; draftId: string }>(
+		`SELECT "output_id" AS "outputId", "draft_id" AS "draftId"
+		 FROM "visual_contract_version"
+		 WHERE "output_id" = ANY($1::text[])
+		   AND "brand_id" = $2 AND "organisation_id" = $3`,
+		[outputIds, ctx.brandId, ctx.organisationId]
+	);
+	return new Map(rows.map((row) => [row.outputId, row.draftId]));
+}
+
+/**
  * Attach a guest contract to the account that signed in.
  *
  * The guest token is the proof of ownership, so claiming requires both the

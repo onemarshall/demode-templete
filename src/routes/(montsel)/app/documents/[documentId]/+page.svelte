@@ -31,6 +31,9 @@
 				</div>
 			</div>
 			<div class="flex gap-2">
+				{#if data.openPath}
+					<Button href={data.openPath}>Open {data.productName}</Button>
+				{/if}
 				{#if data.output.canShare && data.output.shareSlug}
 					<ShareButton path={`/share/${data.output.shareSlug}`} />
 				{/if}
@@ -43,13 +46,30 @@
 		</header>
 	</div>
 
-	<Card.Root>
-		<Card.Header>
-			<Card.Title class="text-base">Output</Card.Title>
-			<Card.Description>
-				This record holds the output metadata. The content is rendered by the product that
-				produced it.
-			</Card.Description>
-		</Card.Header>
-	</Card.Root>
+	{#if data.report}
+		<Card.Root>
+			<Card.Header>
+				<Card.Title class="text-base">Report</Card.Title>
+				<Card.Description>
+					Version {data.report.versionNumber} · {formatDate(data.report.createdAt)} · verified
+					against <code class="text-xs">{data.report.contentHash.slice(0, 12)}…</code>
+				</Card.Description>
+			</Card.Header>
+			<Card.Content>
+				<article class="prose max-w-none" aria-label="Delivered report">
+					{@html data.report.contentHtml}
+				</article>
+			</Card.Content>
+		</Card.Root>
+	{:else}
+		<Card.Root>
+			<Card.Header>
+				<Card.Title class="text-base">Output</Card.Title>
+				<Card.Description>
+					This record holds the output metadata. The content is rendered by the product that
+					produced it.
+				</Card.Description>
+			</Card.Header>
+		</Card.Root>
+	{/if}
 </div>
