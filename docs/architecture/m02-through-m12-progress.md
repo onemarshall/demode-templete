@@ -17,7 +17,7 @@ Columns are deliberately separate. A stage is never "done" because it is impleme
 | Business Foundation | Yes | Partial — real-SQL service to sealed, rules, gate, seal and the real M04→BF derivation verified; browser and Directus not verified | No | Yes in tests — derived from a real sealed M04 session and version row | No |
 | M05 Brand Strategy | Yes | Partial — full real-SQL flow to sealed, gates, coverage, review, package and seal verified; browser and Directus not verified | No | In tests — derived from a sealed Foundation | No |
 | M06 Marketing Strategy | Yes (reduced parity) | Partial — real-SQL flow to sealed, gates, freeze, review and seal verified; browser and Directus not verified | No | In tests — derived from a sealed M05 | No |
-| M07 Sales Strategy | No | No | No | No | No |
+| M07 Sales Strategy | Yes (reduced parity) | Partial — real-SQL flow to sealed, gates, freeze, review and seal verified; browser and Directus not verified | No | In tests — derived from a sealed M06 | No |
 | M08 Content Strategy | No | No | No | No | No |
 | M09 Digital Direction | No | No | No | No | No |
 | M10 Visual Identity | No | No | No | No | No |
@@ -27,7 +27,7 @@ Columns are deliberately separate. A stage is never "done" because it is impleme
 Auth currently contains `m01`, `m02`, `m03`, `m04`, `bf`, `m05` and `m06` under
 `src/lib/modules/strategy/server/stages/`, and the matching `founder-conviction`,
 `market-reality`, `business-commitments`, `viability-check`, `business-foundation`,
-`brand-strategy` and `marketing-strategy` routes. The legacy implementations for the remaining stages are still only in the
+`brand-strategy`, `marketing-strategy` and `sales-strategy` routes. The legacy implementations for the remaining stages are still only in the
 Trigger repository.
 
 ## M02 detail
