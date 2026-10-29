@@ -86,6 +86,19 @@ See `docs/architecture/m05-module-completion.md` and `m05-parity.md`. Summary:
 - The screen edits records as JSON rather than the legacy stage-specific forms; complete and
   operable, but not the legacy operator experience.
 
+## Screen uniformity
+
+All editable strategy screens now share one field mechanism: `shared/fields/types.ts`
+(`Field`/`StageDefinition`), one `StageFieldEditor` with `derive`/`computed` hooks, and one
+definition file per module (`shared/fields/{m02,m03,m04,m05,bf}.ts`). M01 keeps its bespoke voice
+and output-review components, which have no equivalent.
+
+A headless browser smoke pass over all six routes returned 200, rendered the expected `h1` and
+raised no runtime errors. The editors themselves could not be exercised: creating an M03 or BF
+record against the retained stack now returns `409 source-stale`, because the sealed M02/M04
+records pin upstream versions that have since moved. That is correct refusal behaviour, and it is
+the same chained-upstream gap recorded above.
+
 ## Current blocker
 
 `scripts/strategy/integration/m02-end-to-end.ts` depends on M01 harness artifacts that do not
