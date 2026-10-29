@@ -112,6 +112,16 @@ See `docs/architecture/m06-module-completion.md`. Summary:
 - Not proven: the hydrated page, Directus readback, a live provider run, and a dedicated M05→M06
   derivation test.
 
+## Verification pass (M03–M10)
+
+- **Browser smoke:** all eleven strategy routes returned 200, rendered their expected `h1` and raised
+  no runtime errors in a headless browser against the isolated stack (founder-conviction,
+  market-reality, business-commitments, viability-check, business-foundation, brand-strategy,
+  marketing-strategy, sales-strategy, content-strategy, digital-direction, visual-identity).
+- **Still outstanding:** a Directus readback of sealed documents for M03–M10, and a chained
+  M01→M10 run against real predecessors. The retained stack's sealed records pin upstream versions
+  that have since moved, so the chained run needs a fresh pass through the modules, not a repair.
+
 ## Current blocker
 
 `scripts/strategy/integration/m02-end-to-end.ts` depends on M01 harness artifacts that do not
