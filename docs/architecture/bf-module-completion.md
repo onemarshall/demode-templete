@@ -8,9 +8,9 @@ no production deployment. Anything not exercised here is recorded as a gap.
 | Column | State |
 | --- | --- |
 | Implemented | Yes — contracts, rules, service, host, worker, provider, upstream derivation, seal, render, route and stage screen |
-| Local integration verified | Partial — real-SQL service flow from create to sealed, seal verification and tamper detection, rules, gate and upstream validation. The real M04→BF derivation, the hydrated page and Directus readback are **not** verified |
+| Local integration verified | Partial — real-SQL service flow from create to sealed, seal verification and tamper detection, rules, gate, upstream validation and the real M04→BF derivation. The hydrated page and Directus readback are **not** verified |
 | Live provider verified | No — provider exercised with a stub only |
-| Real upstream connected | In tests only — a synthetic sealed-M04 bundle is installed through the repository; the derivation from an actual sealed M04 version row has no test |
+| Real upstream connected | Yes in tests — derived from an actual sealed M04 session and version row, with the version hash, source pin and route authorisation verified (`bf-source.test.ts`) |
 | Production deployed | No — out of scope |
 
 ## Implementation
@@ -79,8 +79,8 @@ Private method corpus: five documents copied from the Trigger System templates
 
 | Check | Result |
 | --- | --- |
-| `bun test tests/strategy/bf-*.test.ts` | 10 passed, 0 failed |
-| Full M02 + M03 + BF regression (21 files) | 105 passed, 0 failed, 454 assertions |
+| `bun test tests/strategy/bf-*.test.ts` | 14 passed, 0 failed |
+| Full M02 + M03 + BF regression (22 files) | 109 passed, 0 failed, 464 assertions |
 | `bun run check` | Module boundaries across 753 files; wrangler types current; svelte-check 0 errors, 0 warnings |
 | `bun run build` | 9,266 modules; `@sveltejs/adapter-cloudflare` complete |
 | `node scripts/strategy/verify-build.mjs` | Private method resources absent from the browser build |
@@ -103,23 +103,24 @@ What the tests actually prove:
   altered canonical payload.
 - **Upstream validation:** waiting or terminal routes, unauthorised capabilities and a missing
   decision owner are refused.
+- **M04→BF derivation (real PostgreSQL):** a sealed M04 session and its immutable version are read,
+  the version hash, source pin and route authorisation are checked, the BF bundle is derived and
+  stored under `bf-m04`, validation re-derives the same bytes, a tampered version is refused, a
+  waiting route is refused, and a source that no longer matches the derived chain is rejected.
 
 ## Gaps
 
-1. **No test for the real M04→BF derivation.** `createBFUpstream` queries sealed M04 sessions,
-   verifies the version hash and derives the BF bundle. It has never been run against an actual
-   sealed M04 row; the service tests install a synthetic source directly.
-2. **No browser pass** over the foundation page. It compiles, passes svelte-check and has keyed
+1. **No browser pass** over the foundation page. It compiles, passes svelte-check and has keyed
    blocks, but no control has been clicked.
-3. **No Directus readback** for the three sealed documents.
-4. **No live provider run.** Draft, fresh review and recheck have only run against a stub.
-5. **No chained M04 → BF run**, and therefore no proof that the gate reflects a real route
-   authorisation rather than the fixture.
-6. The svelte autofixer flags two `{@html}` uses in the rendered preview and sealed view. Both
+2. **No Directus readback** for the three sealed documents.
+3. **No live provider run.** Draft, fresh review and recheck have only run against a stub.
+4. **No chained M04 → BF run through the M04 service.** The derivation test builds the sealed M04
+   row through the real schema and tables, but M04 itself is not executed first, so the seam is
+   proven at the storage boundary rather than through a full upstream run.
+5. The svelte autofixer flags two `{@html}` uses in the rendered preview and sealed view. Both
    render our own deterministic output through `renderStrategyMarkdown`, as in M02/M03.
 
 ## Next concrete action
 
-Write the M04→BF derivation test against a real sealed M04 row (mirroring `m03-source.test.ts`),
-then run the hydrated browser pass over the foundation page and add Directus readback. M05 Brand
-Strategy is next in dependency order, but its source slot depends on this gate being real.
+Run the hydrated browser pass over the foundation page and add Directus readback. M05 Brand
+Strategy is next in dependency order.

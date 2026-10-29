@@ -14,7 +14,7 @@ Columns are deliberately separate. A stage is never "done" because it is impleme
 | M02 Market Reality | Yes | Partial — sealed record, successor, exports and transport verified; full chain not re-run | No | Yes — actual sealed M01 version via `m02-m01` | No |
 | M03 Business Commitments | Yes | Partial — real-SQL service, upstream derivation, transport, worker and provider verified; no browser or Directus pass | No | Yes in tests — derived from a sealed M02 version with M01 lock re-check | No |
 | M04 Viability Check | Yes | Yes | Yes (earlier run) | M01 upstream | No |
-| Business Foundation | Yes | Partial — real-SQL service to sealed, rules, gate and seal verified; real M04 derivation, browser and Directus not verified | No | In tests only — synthetic sealed-M04 bundle | No |
+| Business Foundation | Yes | Partial — real-SQL service to sealed, rules, gate, seal and the real M04→BF derivation verified; browser and Directus not verified | No | Yes in tests — derived from a real sealed M04 session and version row | No |
 | M05 Brand Strategy | No | No | No | No | No |
 | M06 Marketing Strategy | No | No | No | No | No |
 | M07 Sales Strategy | No | No | No | No | No |
@@ -65,11 +65,11 @@ See `docs/architecture/bf-module-completion.md`. Summary:
 - Full local slice implemented: sixteen-row assessment, manifesto with verbatim declarations and
   full source trace, client document with leak/lineage/structural checks, bounded fresh review and
   recheck, named-owner client decision, immutable seal, downstream gate, durable worker and page.
-- 10 BF tests; 105 passing across the combined M02+M03+BF regression. Build, worker bundle, worker
+- 14 BF tests; 109 passing across the combined M02+M03+BF regression. Build, worker bundle, worker
   typecheck, module boundaries, svelte-check and the private-method scan all pass.
 - Five BF template documents added to the private corpus; manifest rebuilt to 99 resources across
   5 releases.
-- Not proven: the real M04→BF derivation, the hydrated page, Directus readback and a live provider.
+- Not proven: the hydrated page, Directus readback, a live provider and a chained M04→BF run through the M04 service.
 
 ## Current blocker
 
@@ -81,9 +81,6 @@ cannot be marked fully locally verified — and M03's chained pass depends on th
 M03 additionally has no browser or Directus verification yet; its page compiles and passes
 svelte-check but has never been driven in a hydrated browser.
 
-The Business Foundation's upstream derivation (`createBFUpstream`) is implemented but untested
-against a real sealed M04 row. Until that test exists, the BF gate is proven against a fixture, not
-against the module that feeds it.
 
 ## Last recoverable checkpoint
 
@@ -101,10 +98,10 @@ against the module that feeds it.
 
 ## Next concrete action
 
-Write the M04→BF derivation test against a real sealed M04 row, then refresh the isolated workspace
-with the M02, M03 and BF slices and drive all three pages in a hydrated browser. Then regenerate the
-M01 harness artifacts and run the chained `m02-end-to-end.ts`, adding M03 and BF steps so the real
-M01 → M02 → M03 → M04 → BF handoff is proven rather than derived from synthetic rows.
+Refresh the isolated workspace with the M02, M03 and BF slices and drive all three pages in a
+hydrated browser. Then regenerate the M01 harness artifacts and run the chained
+`m02-end-to-end.ts`, adding M03 and BF steps so the real M01 → M02 → M03 → M04 → BF handoff is
+proven rather than derived from synthetic rows.
 
 M11 remains blocked independently: no Commercial Direction producer exists, and that dependency
 must not be manufactured, weakened or replaced with a fixture.
