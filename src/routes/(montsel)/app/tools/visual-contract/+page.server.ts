@@ -2,8 +2,11 @@ import type { Actions, PageServerLoad } from './$types';
 import { resolveActiveBrand } from '#lib/modules/products/server/brand-context.js';
 import { resolveBrandProducts } from '#lib/modules/products/server/resolve.js';
 import { listBrandOutputs } from '#lib/modules/products/server/repository.js';
-import { listBrandDrafts } from '#lib/modules/visual-contract/server/repository.js';
-import { resumePath, startBrandDraft } from '#lib/modules/visual-contract/server/flow.js';
+import {
+	listBrandDrafts,
+	listDraftIdsForOutputs
+} from '#lib/modules/visual-contract/server/repository.js';
+import { paths, resumePath, startBrandDraft } from '#lib/modules/visual-contract/server/flow.js';
 
 const BASE = '/app/tools/visual-contract';
 
@@ -16,9 +19,21 @@ export const load: PageServerLoad = async (event) => {
 	]);
 
 	const entry = products.find((product) => product.product.key === 'tool.visual_contract') ?? null;
+	const openDrafts = await listDraftIdsForOutputs(
+		ctx,
+		outputs.map((output) => output.id)
+	);
+
 	return {
 		entry,
-		contracts: outputs,
+		// Open lands on the owner's generated contract, not the Documents record.
+		contracts: outputs.map((output) => {
+			const draftId = openDrafts.get(output.id);
+			return {
+				...output,
+				openPath: draftId ? paths(BASE, draftId).generated : `/app/documents/${output.id}`
+			};
+		}),
 		// Only drafts that belong to this brand. A guest draft can never appear here.
 		drafts: drafts
 			.filter((draft) => draft.status !== 'generated')

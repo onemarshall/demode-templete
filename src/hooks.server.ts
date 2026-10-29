@@ -465,7 +465,11 @@ function applySecurityHeaders(response: Response, event: RequestEvent): Response
 			? corsOrigin
 			: undefined;
 	const securityHeaders: Record<string, string> = createSecurityHeaders({
-		corsOrigin: resolvedCorsOrigin
+		corsOrigin: resolvedCorsOrigin,
+		// Only the authenticated, configured interview page can request a microphone.
+		allowMicrophone: Boolean(env.STRATEGY_M01_VOICE_ENABLED && event.locals.user &&
+			response.ok && event.request.method === 'GET' &&
+			event.route.id === '/(dashboard)/o/[organisationSlug]/[brandSlug]/strategy/engagements/[engagementId]/founder-conviction')
 	});
 
 	const nonce = event.locals.cspNonce ?? '';

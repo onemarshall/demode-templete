@@ -193,11 +193,14 @@ export function unownedProducts(access: readonly ProductAccess[]): ProductAccess
 	);
 }
 
+/** How many recent projects a tool card shows before the rest sit behind "View all". */
+export const RECENT_PROJECTS_LIMIT = 3;
+
 /** Recent projects for a project-based tool, most recently active first (§5.4). */
 export function recentProjects(
 	access: readonly ProductAccess[],
 	productKey: ProductKey,
-	limit = 3,
+	limit = RECENT_PROJECTS_LIMIT,
 ): WorkItemView[] {
 	const entry = access.find((item) => item.product.key === productKey);
 	if (!entry?.product.supportsProjects) return [];

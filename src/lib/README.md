@@ -8,7 +8,7 @@ assets also remain outside individual features.
 | Folder | Owns | Reuse boundary |
 | --- | --- | --- |
 | `modules/auth` | Auth client/server, account UI, security, feature plugins | Host supplies integrations; see its README |
-| `modules/billing` | Creem plugin, subscription queries, checkout and billing UI | Requires auth and platform |
+| `modules/billing` | Stripe plugin, subscription queries, checkout and billing UI | Requires auth and platform |
 | `modules/tenancy` | Organisation/brand authority, provisioning and switcher | Requires auth, billing and platform |
 | `modules/monitoring` | Infrastructure probes, APM hook and health remote | Requires auth and platform |
 | `platform` | Config, database, Redis, CMS, storage, logger | Must not import modules or app |

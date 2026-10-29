@@ -20,7 +20,7 @@ async function withVisualContractProjects(
 	userId: string
 ): Promise<ProductAccess[]> {
 	const drafts = await listBrandDrafts(ctx, userId);
-	const projects: WorkItemView[] = drafts.slice(0, 3).map((draft) => ({
+	const projects: WorkItemView[] = drafts.map((draft) => ({
 		id: draft.id,
 		productKey: 'tool.visual_contract',
 		title: draft.projectContext.projectName?.trim() || 'Untitled contract',

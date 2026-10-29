@@ -123,9 +123,7 @@
 									</p>
 								</div>
 								{#if contract.canView}
-									<Button variant="outline" size="sm" href={`/app/documents/${contract.id}`}>
-										Open
-									</Button>
+									<Button variant="outline" size="sm" href={contract.openPath}>Open</Button>
 								{/if}
 								{#if contract.canShare && contract.shareSlug}
 									<ShareButton path={`/share/${contract.shareSlug}`} />

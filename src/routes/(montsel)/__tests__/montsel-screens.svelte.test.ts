@@ -186,6 +186,29 @@ describe('tools library', () => {
 		await expect.element(page.getByText('Think, Act, Decide')).not.toBeInTheDocument();
 		await expect.element(page.getByRole('heading', { name: 'Your tools' })).not.toBeInTheDocument();
 	});
+
+	it('shows at most three recent projects and counts the rest behind View all', async () => {
+		const projects = Array.from({ length: 5 }, (_, index) =>
+			work({
+				id: `project-${index + 1}`,
+				productKey: 'tool.visual_contract',
+				title: `Project ${index + 1}`,
+				lastActivityAt: `2026-10-0${5 - index}T00:00:00.000Z`
+			})
+		);
+		const products = [
+			buildProductAccess(requireProduct('tool.visual_contract'), undefined, projects)
+		];
+		render(ToolsPage, { props: { data: { sections: librarySections(products) } } as never });
+
+		await expect.element(page.getByText('Project 1')).toBeInTheDocument();
+		await expect.element(page.getByText('Project 3')).toBeInTheDocument();
+		await expect.element(page.getByText('Project 4')).not.toBeInTheDocument();
+		await expect.element(page.getByText('Project 5')).not.toBeInTheDocument();
+		await expect
+			.element(page.getByRole('link', { name: 'View all 5 Visual Contract projects' }))
+			.toBeInTheDocument();
+	});
 });
 
 describe('documents', () => {
@@ -242,5 +265,37 @@ describe('documents', () => {
 			.element(page.getByRole('link', { name: /Open/ }))
 			.toHaveAttribute('href', '/app/documents/output-1');
 		await expect.element(page.getByRole('link', { name: /Download/ })).not.toBeInTheDocument();
+	});
+
+	it('opens a visual contract on its generated page', async () => {
+		render(DocumentsPage, {
+			props: {
+				data: {
+					documents: [
+						{
+							id: 'output-2',
+							productKey: 'tool.visual_contract',
+							workItemId: null,
+							title: 'Rebrand contract',
+							format: 'web_page',
+							shareSlug: 'public-id',
+							canView: true,
+							canShare: true,
+							canDownload: false,
+							createdAt: '2026-10-14T00:00:00.000Z',
+							openPath: '/app/tools/visual-contract/draft-1/generated'
+						}
+					],
+					counts: { diagnostic: 0, strategy: 0, tool: 1 },
+					total: 1,
+					filters: emptyFilters,
+					emptyAction: { label: 'Open Visual Contract', href: '/app/tools/visual-contract' }
+				}
+			} as never
+		});
+
+		await expect
+			.element(page.getByRole('link', { name: 'Open' }))
+			.toHaveAttribute('href', '/app/tools/visual-contract/draft-1/generated');
 	});
 });

@@ -7,6 +7,7 @@
 	import ProjectActions from '$lib/app/components/montsel/project-actions.svelte';
 	import { formatDate } from '$lib/app/components/montsel/format';
 	import type { ProductAccess } from '#lib/modules/products/shared/access.js';
+	import { RECENT_PROJECTS_LIMIT } from '#lib/modules/products/shared/access.js';
 
 	let { data }: PageProps = $props();
 
@@ -49,7 +50,7 @@
 					<p class="text-muted-foreground text-xs font-medium">Your recent projects</p>
 					{#if entry.projects.length}
 						<ul class="flex flex-col divide-y rounded-lg border">
-							{#each entry.projects.slice(0, 3) as project (project.id)}
+							{#each entry.projects.slice(0, RECENT_PROJECTS_LIMIT) as project (project.id)}
 								<li class="flex items-center justify-between gap-3 px-3 py-2.5">
 									<div class="flex min-w-0 flex-col gap-0.5">
 										<p class="truncate text-sm">{project.title ?? 'Untitled project'}</p>
@@ -66,7 +67,11 @@
 							{/each}
 						</ul>
 						<Button variant="outline" size="sm" href={entry.product.route}>
-							View all {entry.product.name} projects
+							{#if entry.projects.length > RECENT_PROJECTS_LIMIT}
+								View all {entry.projects.length} {entry.product.name} projects
+							{:else}
+								View all {entry.product.name} projects
+							{/if}
 						</Button>
 					{:else}
 						<p class="text-muted-foreground rounded-lg border border-dashed px-3 py-8 text-center text-sm">
