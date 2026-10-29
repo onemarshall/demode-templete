@@ -1,6 +1,6 @@
 /** Explicit private runtime configuration shared by web and Node composition. */
 import {z} from 'zod';
-import {resolveM04Model,resolveM01Model,resolveM02Model,resolveM03Model,resolveBFModel,resolveM05Model} from '#lib/modules/strategy/server/model-policy.js';
+import {resolveM04Model,resolveM01Model,resolveM02Model,resolveM03Model,resolveBFModel,resolveM05Model,resolveM06Model} from '#lib/modules/strategy/server/model-policy.js';
 import type {M04ProviderConfig} from '#lib/modules/strategy/server/providers/m04.js';
 const providerSchema=z.object({
  OPENROUTER_API_KEY:z.string().trim().min(1),
@@ -58,3 +58,5 @@ export const strategyM03ProviderConfiguration=(input:Record<string,unknown>)=>pr
 export const strategyBFProviderConfiguration=(input:Record<string,unknown>)=>providerConfiguration(input,resolveBFModel);
 
 export const strategyM05ProviderConfiguration=(input:Record<string,unknown>)=>providerConfiguration(input,resolveM05Model);
+
+export const strategyM06ProviderConfiguration=(input:Record<string,unknown>)=>providerConfiguration(input,resolveM06Model);

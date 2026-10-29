@@ -16,7 +16,7 @@ Columns are deliberately separate. A stage is never "done" because it is impleme
 | M04 Viability Check | Yes | Yes | Yes (earlier run) | M01 upstream | No |
 | Business Foundation | Yes | Partial — real-SQL service to sealed, rules, gate, seal and the real M04→BF derivation verified; browser and Directus not verified | No | Yes in tests — derived from a real sealed M04 session and version row | No |
 | M05 Brand Strategy | Yes | Partial — full real-SQL flow to sealed, gates, coverage, review, package and seal verified; browser and Directus not verified | No | In tests — derived from a sealed Foundation | No |
-| M06 Marketing Strategy | No | No | No | No | No |
+| M06 Marketing Strategy | Yes (reduced parity) | Partial — real-SQL flow to sealed, gates, freeze, review and seal verified; browser and Directus not verified | No | In tests — derived from a sealed M05 | No |
 | M07 Sales Strategy | No | No | No | No | No |
 | M08 Content Strategy | No | No | No | No | No |
 | M09 Digital Direction | No | No | No | No | No |
@@ -24,10 +24,10 @@ Columns are deliberately separate. A stage is never "done" because it is impleme
 | M11 Execution Planning | No | No | No | Blocked — no Commercial Direction producer identified | No |
 | M12 Work Coordination | No | No | No | Depends on M11 | No |
 
-Auth currently contains `m01`, `m02`, `m03`, `m04`, `bf` and `m05` under
+Auth currently contains `m01`, `m02`, `m03`, `m04`, `bf`, `m05` and `m06` under
 `src/lib/modules/strategy/server/stages/`, and the matching `founder-conviction`,
-`market-reality`, `business-commitments`, `viability-check`, `business-foundation` and
-`brand-strategy` routes. The legacy implementations for the remaining stages are still only in the
+`market-reality`, `business-commitments`, `viability-check`, `business-foundation`,
+`brand-strategy` and `marketing-strategy` routes. The legacy implementations for the remaining stages are still only in the
 Trigger repository.
 
 ## M02 detail
@@ -98,6 +98,19 @@ raised no runtime errors. The editors themselves could not be exercised: creatin
 record against the retained stack now returns `409 source-stale`, because the sealed M02/M04
 records pin upstream versions that have since moved. That is correct refusal behaviour, and it is
 the same chained-upstream gap recorded above.
+
+## M06 detail
+
+See `docs/architecture/m06-module-completion.md`. Summary:
+
+- Full local slice: route authority, sealed-M05 gate, eight confirmed data stages, gates 0–7,
+  candidate freeze, six-lens independent review, client decision, seal, durable worker, Trigger task,
+  host and screen on the shared field mechanism.
+- 2 M06 tests; check, build, worker bundle, worker typecheck and the private-method scan all pass.
+- **Reduced parity**: research requests, critique, starter plan, derived views, risk register and
+  initiative record are not ported.
+- Not proven: the hydrated page, Directus readback, a live provider run, and a dedicated M05→M06
+  derivation test.
 
 ## Current blocker
 
