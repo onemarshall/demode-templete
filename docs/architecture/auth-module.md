@@ -31,7 +31,7 @@ src/lib/auth/
 ├── modules/                  # Feature modules
 │   ├── core.ts
 │   ├── admin/
-│   ├── creem/                # Creem billing integration
+│   ├── stripe/               # Stripe billing integration
 │   ├── emailOTP/
 │   ├── lastLoginMethod/
 │   ├── magicLink/

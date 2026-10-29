@@ -9,12 +9,12 @@
  */
 
 import type { DatabaseReader } from '#lib/platform/database/db.js';
-import { queryUserSubscriptions, type CreemSubscriptionRow } from '#lib/modules/billing/server/subscription.js';
+import { queryUserSubscriptions, type SubscriptionRow } from '#lib/modules/billing/server/subscription.js';
 import { getPersonalOrganisationOwner } from './better-auth-adapter.js';
 
 /** Only an active subscription with a verifiably future paid-through date qualifies. */
 function subscriptionIsLive(
-	row: Pick<CreemSubscriptionRow, 'status' | 'periodEnd'>,
+	row: Pick<SubscriptionRow, 'status' | 'periodEnd'>,
 	now = Date.now()
 ): boolean {
 	if (row.status !== 'active') return false;

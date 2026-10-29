@@ -9,13 +9,13 @@ import { isOrganisationEntitled } from '../entitlements.js';
 beforeEach(() => {
 	vi.clearAllMocks();
 	mocks.getPersonalOrganisationOwner.mockResolvedValue('owner-1');
-	mocks.query.mockImplementation(async (sql: string) => ({ rows: sql.includes('creem_subscription') ? [] : [] }));
+	mocks.query.mockImplementation(async (sql: string) => ({ rows: sql.includes('subscription') ? [] : [] }));
 });
 
 describe('transitional subscription entitlement', () => {
 	it('uses the explicit personal organisation owner mapping', async () => {
 		await isOrganisationEntitled('org-1');
-		expect(mocks.getPersonalOrganisationOwner).toHaveBeenCalledWith('org-1');
+		expect(mocks.getPersonalOrganisationOwner).toHaveBeenCalledWith('org-1', undefined, { lock: undefined });
 		expect(mocks.query).toHaveBeenCalledWith(expect.stringContaining('"referenceId" = $1'), ['owner-1']);
 	});
 

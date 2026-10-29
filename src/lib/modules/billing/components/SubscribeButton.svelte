@@ -2,22 +2,18 @@
 	import { authClient } from '#lib/modules/auth/client/client.js';
 
 	interface Props {
-		productId: string;
+		plan: string;
 	}
 
-	let { productId }: Props = $props();
+	let { plan }: Props = $props();
 
 	async function handleCheckout() {
-		const { data, error } = await authClient.creem.createCheckout({
-			productId,
+		await authClient.subscription.upgrade({
+			plan,
 			successUrl: '/dashboard',
-			discountCode: 'LAUNCH50', // Optional
-			metadata: { planType: 'pro' } // Optional
+			cancelUrl: '/subscribe',
+			disableRedirect: false
 		});
-
-		if (data?.url) {
-			window.location.href = data.url;
-		}
 	}
 </script>
 

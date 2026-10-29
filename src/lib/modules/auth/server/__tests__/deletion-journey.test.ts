@@ -12,8 +12,8 @@ import Database from 'better-sqlite3';
 
 const mocks = vi.hoisted(() => ({ query: vi.fn() }));
 vi.mock('#lib/platform/database/db.js', () => ({ getDB: async () => ({ query: mocks.query }) }));
-vi.mock('#lib/platform/config/server.server.js', () => ({ getServerEnv: async () => ({ AUTH_ORGANIZATION_PLUGIN: false }), publicEnv: { PUBLIC_CREEM_ENABLED: false } }));
-vi.mock('#lib/platform/config/index.js', () => ({ getServerEnv: async () => ({ AUTH_ORGANIZATION_PLUGIN: false }), publicEnv: { PUBLIC_CREEM_ENABLED: false } }));
+vi.mock('#lib/platform/config/server.server.js', () => ({ getServerEnv: async () => ({ AUTH_ORGANIZATION_PLUGIN: false }), publicEnv: { PUBLIC_STRIPE_ENABLED: false } }));
+vi.mock('#lib/platform/config/index.js', () => ({ getServerEnv: async () => ({ AUTH_ORGANIZATION_PLUGIN: false }), publicEnv: { PUBLIC_STRIPE_ENABLED: false } }));
 
 import { accountDeletionPolicyPlugin } from '../deletion-policy';
 

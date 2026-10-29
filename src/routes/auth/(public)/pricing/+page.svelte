@@ -2,101 +2,68 @@
 	import { authClient } from "#lib/modules/auth/client/client.js";
 	import { goto } from "$app/navigation";
 	import { PLANS as plans } from "#lib/app/plans.js";
-	import { createGuestCheckout } from "#lib/modules/billing/remote/checkout.remote.js";
+	import { createCheckout } from "#lib/modules/billing/remote/checkout.remote.js";
+	import type { PageData } from "./$types";
+
+	let { data }: { data: PageData } = $props();
 
 	const session = authClient.useSession();
 	const isAuthed = $derived(!!$session.data?.user);
 	const sessionLoading = $derived($session.isPending ?? false);
 
+	const software = $derived(plans.filter((p) => ["signal", "gap", "direction", "full-diagnostic", "strategy"].includes(p.id)));
+	const books = $derived(plans.filter((p) => !software.some((s) => s.id === p.id)));
+
 	let loading = $state<string | null>(null);
 	let error = $state<string | null>(null);
-	let currentPlan = $state<string | null>(null);
-	let guestModalPlanId = $state<string | null>(null);
+	// Required by the Consumer Contracts Regulations before the 14-day
+	// cancellation right can be waived for immediate digital supply.
+	let consent = $state(false);
+	let guestPlanId = $state<string | null>(null);
 	let guestEmail = $state("");
 
-	$effect(() => {
-		if (!isAuthed) {
-			currentPlan = null;
-			return;
-		}
-		(async () => {
-			const { data } = await authClient.creem.retrieveSubscription();
-			if (data?.product?.id) {
-				currentPlan = data.product.id;
-			}
-		})();
-	});
+	const vatSuffix = $derived(
+		!data.vatEnabled ? "" : data.vatDisplay === "inclusive" ? "incl. VAT" : "excl. VAT",
+	);
+
+	function formatPrice(price: number): string {
+		return price === 0 ? "Free" : `£${price.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+	}
 
 	async function handleCheckout(planId: string, isFree: boolean) {
 		if (sessionLoading) return;
 
 		if (isFree) {
-			if (!isAuthed) {
-				goto(`/auth/sign-up?redirectTo=%2Fauth%2Fdashboard`);
-				return;
-			}
-			goto("/auth/dashboard");
+			goto(isAuthed ? "/auth/dashboard" : "/auth/sign-up?redirectTo=%2Fauth%2Fdashboard");
 			return;
 		}
 
 		if (!isAuthed) {
-			guestModalPlanId = planId;
+			guestPlanId = planId;
 			error = null;
 			return;
 		}
 
-		loading = planId;
-		error = null;
-
-		try {
-			const { data, error: checkoutError } =
-				await authClient.creem.createCheckout({
-					productId: planId,
-					successUrl: "/auth/profile?subscription=success",
-					cancelUrl: "/pricing?subscription=canceled",
-				});
-
-			if (checkoutError) {
-				error = checkoutError.message ?? "Failed to create checkout";
-				return;
-			}
-
-			if (data?.url) {
-				window.location.href = data.url;
-			} else {
-				error = "No checkout URL returned";
-			}
-		} catch (err) {
-			error =
-				err instanceof Error
-					? err.message
-					: "An unexpected error occurred";
-		} finally {
-			loading = null;
-		}
+		await startCheckout(planId);
 	}
 
 	async function submitGuestCheckout(event: SubmitEvent) {
 		event.preventDefault();
-		if (!guestModalPlanId) return;
-		await startCheckout();
+		if (!guestPlanId) return;
+		await startCheckout(guestPlanId);
 	}
 
-	async function startCheckout() {
-		if (!guestModalPlanId) return;
-		const planId = guestModalPlanId;
+	async function startCheckout(planId: string) {
 		loading = planId;
 		error = null;
 
 		try {
-			const data = await createGuestCheckout({
+			const result = await createCheckout({
 				productId: planId,
-				email: guestEmail,
-				successUrl: "/auth/profile?subscription=success",
-				cancelUrl: "/pricing?subscription=canceled",
+				email: isAuthed ? undefined : guestEmail,
+				cancellationConsent: true,
 			});
-
-			window.location.href = data.url;
+			window.location.href = result.url;
 		} catch (err) {
 			error =
 				err && typeof err === "object" && "body" in err
@@ -108,316 +75,199 @@
 			loading = null;
 		}
 	}
-
-	async function openPortal() {
-		if (!isAuthed) {
-			goto("/auth/sign-in?redirectTo=%2Fpricing");
-			return;
-		}
-		const { error: portalError } = await authClient.creem.createPortal({
-			redirect: true
-		});
-		if (portalError) {
-			error = portalError.message ?? "Failed to open portal";
-		}
-	}
-
-	function formatPrice(price: number): string {
-		return price === 0 ? "Free" : `$${price}`;
-	}
 </script>
 
 <div class="min-h-screen bg-gray-50">
-	<!-- Header -->
 	<div class="bg-white border-b border-gray-200">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 			<div class="text-center">
-				<h1 class="text-4xl font-bold text-gray-900 mb-4">
-					Simple, transparent pricing
-				</h1>
+				<h1 class="text-4xl font-bold text-gray-900 mb-4">Buy what you need</h1>
 				<p class="text-xl text-gray-600 max-w-2xl mx-auto">
-					Choose the perfect plan for your needs. All plans include
-					core authentication features. Upgrade or downgrade anytime.
+					Each product is a one-time purchase. No subscription, no mandatory
+					call and no consultant sign-off.
 				</p>
 			</div>
 		</div>
 	</div>
 
-	<!-- Error Message -->
 	{#if error}
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-			<div class="bg-red-50 border border-red-200 rounded-lg p-4">
-				<div class="flex">
-					<div class="shrink-0">
-						<svg
-							class="h-5 w-5 text-red-400"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-					</div>
-					<div class="ml-3">
-						<p class="text-sm text-red-700">{error}</p>
-					</div>
-				</div>
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+			<div class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800" role="alert">
+				{error}
 			</div>
 		</div>
 	{/if}
 
-	<!-- Pricing Cards -->
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-			{#each plans as plan}
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+		<label
+			class="flex gap-3 items-start rounded-lg border border-gray-200 bg-white p-4 mb-8 text-sm text-gray-700"
+		>
+			<input
+				type="checkbox"
+				bind:checked={consent}
+				class="mt-0.5 h-4 w-4 shrink-0"
+			/>
+			<span>
+				I understand that access begins immediately, and that I lose the
+				14-day right to cancel once it does. This does not affect my rights if
+				the product is faulty or not as described. See
+				<a href="/auth/terms" class="underline">refund and cancellation terms</a>.
+			</span>
+		</label>
+
+		<h2 class="text-2xl font-semibold text-gray-900 mb-2">Montsel software</h2>
+		<p class="text-gray-600 mb-8">
+			Self-service analysis you run yourself. Prices exclude VAT.
+		</p>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{#each software as plan (plan.id)}
 				<div
-					class="relative bg-white rounded-2xl shadow-lg overflow-hidden border-2 {plan.popular
-						? 'border-blue-500'
-						: 'border-transparent'}"
+					class="rounded-lg border bg-white p-6 flex flex-col {plan.popular
+						? 'border-gray-900 ring-2 ring-gray-900'
+						: 'border-gray-200'}"
 				>
-					<!-- Popular Badge -->
 					{#if plan.popular}
-						<div
-							class="absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg"
-						>
-							MOST POPULAR
-						</div>
+						<span class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
+							Most complete
+						</span>
 					{/if}
-
-					<div class="p-6">
-						<!-- Plan Header -->
-						<div class="mb-6">
-							<h3 class="text-2xl font-bold text-gray-900">
-								{plan.name}
-							</h3>
-							<p class="text-gray-600 mt-1">{plan.description}</p>
-						</div>
-
-						<!-- Price -->
-						<div class="mb-6">
-							<div class="flex items-baseline">
-								<span class="text-5xl font-bold text-gray-900"
-									>{formatPrice(plan.price)}</span
-								>
-								{#if plan.period}
-									<span class="text-gray-500 ml-2"
-										>/{plan.period}</span
-									>
-								{/if}
-							</div>
-							{#if plan.trial}
-								<p class="text-sm text-green-600 mt-1">
-									{plan.trial}
-								</p>
-							{/if}
-						</div>
-
-						<!-- Features -->
-						<ul class="space-y-3 mb-8">
-							{#each plan.features as feature}
-								<li class="flex items-start">
-									<svg
-										class="h-5 w-5 text-green-500 shrink-0 mr-3 mt-0.5"
-										fill="currentColor"
-										viewBox="0 0 20 20"
-									>
-										<path
-											fill-rule="evenodd"
-											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-											clip-rule="evenodd"
-										/>
-									</svg>
-									<span class="text-sm text-gray-600"
-										>{feature}</span
-									>
-								</li>
-							{/each}
-						</ul>
-
-						<!-- CTA Button -->
-						<button
-							onclick={() =>
-								handleCheckout(plan.id, plan.price === 0)}
-							disabled={loading === plan.id ||
-								currentPlan === plan.id}
-							class="w-full py-3 px-4 rounded-lg font-semibold transition-colors {plan.popular
-								? 'bg-blue-600 hover:bg-blue-700 text-white'
-								: plan.price === 0
-									? 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-									: 'bg-gray-900 hover:bg-gray-800 text-white'}
-							{loading === plan.id || currentPlan === plan.id
-								? 'opacity-50 cursor-not-allowed'
-								: ''}"
-						>
-							{#if loading === plan.id}
-								<span class="flex items-center justify-center">
-									<svg
-										class="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
-										fill="none"
-										viewBox="0 0 24 24"
-									>
-										<circle
-											class="opacity-25"
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											stroke-width="4"
-										></circle>
-										<path
-											class="opacity-75"
-											fill="currentColor"
-											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-										></path>
-									</svg>
-									Processing...
-								</span>
-							{:else if currentPlan === plan.id}
-								Current Plan
-							{:else}
-								{plan.cta}
-							{/if}
-						</button>
-					</div>
+					<h3 class="text-lg font-semibold text-gray-900">{plan.name}</h3>
+					<p class="mt-2 text-sm text-gray-600">{plan.description}</p>
+					<p class="mt-4 text-3xl font-bold text-gray-900">
+						{formatPrice(plan.price)}
+					</p>
+					<p class="text-xs text-gray-500">
+						One-time purchase{vatSuffix ? `, ${vatSuffix}` : ""}
+					</p>
+					<ul class="mt-4 space-y-2 text-sm text-gray-600 flex-1">
+						{#each plan.features as feature}
+							<li class="flex gap-2">
+								<span aria-hidden="true">•</span>
+								<span>{feature}</span>
+							</li>
+						{/each}
+					</ul>
+					<button
+						type="button"
+						class="mt-6 w-full rounded-md bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 disabled:opacity-50"
+						disabled={loading === plan.id || (plan.price > 0 && !consent)}
+						onclick={() => handleCheckout(plan.id, plan.price === 0)}
+					>
+						{loading === plan.id ? "Opening checkout…" : plan.cta}
+					</button>
 				</div>
 			{/each}
 		</div>
-	</div>
 
-	<!-- Current Subscription -->
-	{#if currentPlan}
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-			<div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-				<div class="flex items-center justify-between">
-					<div>
-						<h3 class="text-lg font-semibold text-blue-900">
-							Active Subscription
-						</h3>
-						<p class="text-blue-700 mt-1">
-							You're currently on a paid plan. Manage your billing
-							settings below.
-						</p>
-					</div>
+		<h2 class="text-2xl font-semibold text-gray-900 mt-16 mb-2">Books and tools</h2>
+		<p class="text-gray-600 mb-8">
+			Lower-cost products for thinking and deciding. Independent of the software.
+		</p>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+			{#each books as plan (plan.id)}
+				<div class="rounded-lg border border-gray-200 bg-white p-6 flex flex-col">
+					<h3 class="text-lg font-semibold text-gray-900">{plan.name}</h3>
+					<p class="mt-2 text-sm text-gray-600">{plan.description}</p>
+					<p class="mt-4 text-2xl font-bold text-gray-900">
+						{formatPrice(plan.price)}
+					</p>
+					{#if plan.price > 0}
+						<p class="text-xs text-gray-500">
+						One-time purchase{vatSuffix ? `, ${vatSuffix}` : ""}
+					</p>
+					{/if}
 					<button
-						onclick={openPortal}
-						class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+						type="button"
+						class="mt-6 w-full rounded-md border border-gray-900 px-4 py-2 text-gray-900 hover:bg-gray-50 disabled:opacity-50"
+						disabled={loading === plan.id || (plan.price > 0 && !consent)}
+						onclick={() => handleCheckout(plan.id, plan.price === 0)}
 					>
-						Manage Billing
+						{loading === plan.id ? "Opening checkout…" : plan.cta}
 					</button>
 				</div>
-			</div>
+			{/each}
 		</div>
-	{/if}
 
-	<!-- Guest Checkout Modal -->
-	{#if guestModalPlanId}
-		<div
-			class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-			role="dialog"
-			aria-modal="true"
-		>
-			<div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-				<h2 class="text-xl font-bold text-gray-900">
-					Continue to payment
-				</h2>
-				<p class="mt-1 text-sm text-gray-600">
-					Enter your email — you'll go straight to the secure Creem
-					checkout. We'll also send you a sign-in link so you can
-					manage your subscription after paying.
-				</p>
-				<form onsubmit={submitGuestCheckout} class="mt-4 space-y-4">
-					<label class="block">
-						<span class="text-sm font-medium text-gray-700"
-							>Email</span
-						>
-						<input
-							type="email"
-							bind:value={guestEmail}
-							required
-							autocomplete="email"
-							class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-						/>
-					</label>
-					<div class="flex justify-end gap-2">
-						<button
-							type="button"
-							onclick={() => {
-								guestModalPlanId = null;
-								guestEmail = "";
-							}}
-							class="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-						>
-							Cancel
-						</button>
-						<button
-							type="submit"
-							disabled={loading === guestModalPlanId}
-							class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-						>
-							{loading === guestModalPlanId
-								? "Starting…"
-								: "Continue"}
-						</button>
-					</div>
-					<p class="text-center text-xs text-gray-500">
-						Already have an account?
-						<a
-							href="/auth/sign-in?redirectTo=%2Fpricing"
-							class="text-blue-600 hover:underline">Sign in</a
-						>
-					</p>
-				</form>
-			</div>
+		<div class="mt-16 rounded-lg border border-gray-200 bg-white p-6">
+			<h2 class="text-xl font-semibold text-gray-900">Direct strategic support</h2>
+			<p class="mt-2 text-gray-600">
+				Langfell is a separate, founder-led consultancy for decisions that need
+				investigation, challenge and judgement. Engagements are scoped by
+				proposal: Strategic Diagnostic £12,500, Strategic Foundation from
+				£15,000, and an Integrated Strategic Engagement at a £35,000 reference.
+			</p>
+			<a href="/auth/contact" class="mt-4 inline-block text-gray-900 underline">
+				Enquire about working with Langfell
+			</a>
 		</div>
-	{/if}
 
-	<!-- FAQ Section -->
-	<div
-		class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-200"
-	>
-		<h2 class="text-3xl font-bold text-gray-900 text-center mb-8">
-			Frequently Asked Questions
-		</h2>
-		<div class="space-y-6">
+		<div class="mt-12 space-y-6">
 			<div>
-				<h3 class="text-lg font-semibold text-gray-900">
-					Can I upgrade or downgrade anytime?
-				</h3>
+				<h3 class="text-lg font-semibold text-gray-900">Is this a subscription?</h3>
 				<p class="text-gray-600 mt-2">
-					Yes, changes take effect at the next billing cycle. Prorated
-					credits are applied automatically.
+					No. Every product is a single payment. You are not enrolled in
+					anything recurring.
 				</p>
 			</div>
 			<div>
-				<h3 class="text-lg font-semibold text-gray-900">
-					What happens if I exceed my limits?
-				</h3>
+				<h3 class="text-lg font-semibold text-gray-900">Do I need a call?</h3>
 				<p class="text-gray-600 mt-2">
-					We'll notify you at 80% and 100% usage. You can upgrade
-					instantly or contact sales for custom limits.
+					No. The software products are self-service. Langfell consultancy is
+					the only route that involves speaking to Rob.
 				</p>
 			</div>
 			<div>
-				<h3 class="text-lg font-semibold text-gray-900">
-					Is there a refund policy?
-				</h3>
+				<h3 class="text-lg font-semibold text-gray-900">What if a product does not fit my situation?</h3>
 				<p class="text-gray-600 mt-2">
-					30-day money-back guarantee for all paid plans. No questions
-					asked.
-				</p>
-			</div>
-			<div>
-				<h3 class="text-lg font-semibold text-gray-900">
-					Do you offer annual billing?
-				</h3>
-				<p class="text-gray-600 mt-2">
-					Yes! Annual billing gives you 2 months free. Contact us for
-					details.
+					Direction needs a proposal you already have. If you do not have one,
+					the checkout will tell you before you pay. If the product cannot be
+					delivered, you are refunded in full. See
+					<a href="/auth/terms" class="underline">refund and cancellation terms</a>.
 				</p>
 			</div>
 		</div>
 	</div>
 </div>
+
+{#if guestPlanId}
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+		<form
+			class="w-full max-w-md rounded-lg bg-white p-6"
+			onsubmit={submitGuestCheckout}
+		>
+			<h2 class="text-lg font-semibold text-gray-900">Where should we send your receipt?</h2>
+			<p class="mt-1 text-sm text-gray-600">
+				We will create your account and email you a sign-in link.
+			</p>
+			<label class="mt-4 block text-sm font-medium text-gray-700" for="guest-email">
+				Email address
+			</label>
+			<input
+				id="guest-email"
+				type="email"
+				required
+				bind:value={guestEmail}
+				class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+				autocomplete="email"
+			/>
+			<div class="mt-6 flex gap-3">
+				<button
+					type="button"
+					class="flex-1 rounded-md border border-gray-300 px-4 py-2"
+					onclick={() => (guestPlanId = null)}
+				>
+					Cancel
+				</button>
+				<button
+					type="submit"
+					class="flex-1 rounded-md bg-gray-900 px-4 py-2 text-white disabled:opacity-50"
+					disabled={loading !== null}
+				>
+					{loading ? "Opening checkout…" : "Continue to payment"}
+				</button>
+			</div>
+		</form>
+	</div>
+{/if}

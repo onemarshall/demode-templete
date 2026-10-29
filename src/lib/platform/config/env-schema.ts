@@ -32,6 +32,7 @@ const SENSITIVE_KEYS = new Set([
 	'DIRECTUS_ADMIN_TOKEN',
 	'STRATEGY_DIRECTUS_READER_TOKEN',
 	'OPENROUTER_API_KEY',
+	'OPENAI_API_KEY',
 	'TRIGGER_SECRET_KEY',
 	'DIRECTUS_DEFAULT_ROLE_ID',
 	'REDIS_PASSWORD',
@@ -41,8 +42,8 @@ const SENSITIVE_KEYS = new Set([
 	'CLOUDINARY_API_SECRET',
 	'CLOUDINARY_API_KEY',
 	'CAP_SECRET',
-	'CREEM_API_KEY',
-	'CREEM_WEBHOOK_SECRET',
+	'STRIPE_SECRET_KEY',
+	'STRIPE_WEBHOOK_SECRET',
 	''
 ]);
 
@@ -442,15 +443,29 @@ const securityAnalyticsEnvSchema = z.object({
 });
 
 /**
- * Creem payment/subscription schema
+ * Stripe payment/subscription schema
  */
-const creemEnvSchema = z.object({
-	CREEM_API_KEY: z.string().optional(),
-	CREEM_WEBHOOK_SECRET: z.string().optional(),
-	CREEM_TEST_MODE: envBoolean.default(true),
-	CREEM_PERSIST_SUBSCRIPTIONS: envBoolean.default(true),
-	CREEM_DEFAULT_SUCCESS_URL: z.string().default('/dashboard'),
-	PUBLIC_CREEM_ENABLED: envBoolean.default(false)
+const stripeEnvSchema = z.object({
+	STRIPE_SECRET_KEY: z.string().optional(),
+	STRIPE_WEBHOOK_SECRET: z.string().optional(),
+	STRIPE_PRICE_SIGNAL: z.string().optional(),
+	STRIPE_PRICE_GAP: z.string().optional(),
+	STRIPE_PRICE_DIRECTION: z.string().optional(),
+	STRIPE_PRICE_FULL_DIAGNOSTIC: z.string().optional(),
+	STRIPE_PRICE_STRATEGY: z.string().optional(),
+	STRIPE_PRICE_101_BETTER_WAYS: z.string().optional(),
+	STRIPE_PRICE_EVERYTHING_WORKS: z.string().optional(),
+	STRIPE_PRICE_THINK_DECIDE_ACT: z.string().optional()
+});
+
+/**
+ * VAT stays off until the owner has confirmed registration, recreated the
+ * prices with an explicit tax_behavior and added a Stripe Tax registration.
+ */
+const vatEnvSchema = z.object({
+	VAT_ENABLED: z.string().optional(),
+	VAT_RATE_PERCENT: z.string().optional(),
+	VAT_PRICE_DISPLAY: z.string().optional()
 });
 
 // ============================================
@@ -480,7 +495,7 @@ const publicAuthFeaturesSchema = z.object({
 	PUBLIC_AUTH_MAX_SESSIONS: positiveNumber.default(5),
 	PUBLIC_WALLETCONNECT_ID: z.string().optional(),
 	PUBLIC_AUTH_SIWE_PLUGIN: envBoolean.default(false),
-	PUBLIC_CREEM_ENABLED: envBoolean.default(false)
+	PUBLIC_STRIPE_ENABLED: envBoolean.default(false)
 });
 
 const publicSocialFlagsSchema = z.object({
@@ -534,6 +549,12 @@ const strategyEnvSchema = z.object({
 	STRATEGY_DIRECTUS_READER_TOKEN: z.string().optional(),
 	OPENROUTER_API_KEY: z.string().optional(),
 	M04_SYNTHESIS_MODEL: z.string().optional(),
+	M01_SYNTHESIS_MODEL: z.string().optional(),
+	M02_SYNTHESIS_MODEL: z.string().optional(),
+	OPENAI_API_KEY: z.string().optional(),
+	STRATEGY_M01_VOICE_ENABLED: envBoolean.default(false),
+	STRATEGY_M01_VOICE_URL: urlString().optional(),
+	STRATEGY_M01_VOICE_MODEL: z.string().optional(),
 	SYNTHESIS_MODEL: z.string().optional(),
 	MODEL_POLICY_DEV: z.enum(['0','1']).optional(),
 	STRATEGY_PROVIDER_URL: urlString().optional(),
@@ -561,7 +582,8 @@ export const fullEnvSchema = z.object({
 	...storageEnvSchema.shape,
 	...redisEnvSchema.shape,
 	...securityAnalyticsEnvSchema.shape,
-	...creemEnvSchema.shape,
+	...stripeEnvSchema.shape,
+	...vatEnvSchema.shape,
 	...publicAuthFeaturesSchema.shape,
 	...publicSocialFlagsSchema.shape,
 	...publicSecuritySchema.shape,

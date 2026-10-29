@@ -2,22 +2,22 @@
 	import { authClient } from '#lib/modules/auth/client/client.js';
 
 	interface Props {
-		productId: string;
+		plan: string;
 		label?: string;
 		successUrl?: string;
 		cancelUrl?: string;
-		discountCode?: string;
-		metadata?: Record<string, string>;
+		annual?: boolean;
+		metadata?: Record<string, unknown>;
 		class?: string;
 		onError?: (error: string) => void;
 	}
 
 	let {
-		productId,
+		plan,
 		label = 'Subscribe',
 		successUrl = '/dashboard',
-		cancelUrl = '/',
-		discountCode,
+		cancelUrl = '/pricing',
+		annual,
 		metadata,
 		class: className = '',
 		onError
@@ -26,49 +26,30 @@
 	let loading = $state(false);
 
 	async function handleCheckout() {
-		if (!productId) {
-			onError?.('Product ID is required');
+		if (!plan) {
+			onError?.('Plan is required');
 			return;
 		}
 
 		loading = true;
 
 		try {
-			const input: {
-				productId: string;
-				successUrl: string;
-				cancelUrl: string;
-				discountCode?: string;
-				metadata?: Record<string, string>;
-			} = {
-				productId,
+			const { error: checkoutError } = await authClient.subscription.upgrade({
+				plan,
 				successUrl,
-				cancelUrl
-			};
-
-			if (discountCode) {
-				input.discountCode = discountCode;
-			}
-
-			if (metadata) {
-				input.metadata = metadata;
-			}
-
-			const { data, error: checkoutError } = await authClient.creem.createCheckout(input);
+				cancelUrl,
+				disableRedirect: false,
+				...(annual ? { annual } : {}),
+				...(metadata ? { metadata } : {})
+			});
 
 			if (checkoutError) {
 				onError?.(checkoutError.message ?? 'Checkout failed');
-				return;
+				loading = false;
 			}
-
-			if (data?.url) {
-				window.location.href = data.url;
-			} else {
-				onError?.('No checkout URL returned');
-			}
+			// On success the client navigates to Stripe Checkout.
 		} catch (err) {
 			onError?.(err instanceof Error ? err.message : 'Unexpected error');
-		} finally {
 			loading = false;
 		}
 	}

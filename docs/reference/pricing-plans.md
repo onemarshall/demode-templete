@@ -1,249 +1,94 @@
 # Pricing Plans
 
-Product definitions for Creem integration. Use these `productId` values when creating checkout sessions.
+Product catalogue for the Stripe integration. Use these plan ids with `authClient.subscription.upgrade({ plan })`. Stripe price ids live in `STRIPE_PRICE_*` environment variables.
+
+**Status: catalogue approved, checkout implemented, billing disabled.** Prices are one-time, GBP, and approved in the Langfell commercial authority at `01-Library/02-Business/03-Offers/01-Pricing-and-Outcomes`. No product is available for purchase.
+
+`checkout.remote.ts` creates `mode: "payment"` sessions and `products/server/fulfilment.ts` grants the entitlement from the webhook, so the two blockers previously recorded here are closed. `PUBLIC_STRIPE_ENABLED` stays `false` in `wrangler.jsonc` until the VAT position is established — the four conditions are listed in `src/lib/app/vat.server.ts`. Flipping it is a commercial decision, not a deployment step.
 
 ---
 
-## Plans Overview
+## Montsel software
 
-| Plan           | Product ID        | Price | Billing | Description                         |
-| -------------- | ----------------- | ----- | ------- | ----------------------------------- |
-| **Free**       | `prod_free`       | $0    | -       | Get started with core features      |
-| **Basic**      | `prod_basic`      | $9    | Monthly | Essential tools for individuals     |
-| **Pro**        | `prod_pro`        | $29   | Monthly | Advanced features for professionals |
-| **Enterprise** | `prod_enterprise` | $99   | Monthly | Full platform for teams             |
+| Plan id | Product | Price | Billing | Description |
+| --- | --- | --- | --- | --- |
+| `signal` | Signal | £395 | One-time | A source-bounded reading of public communication |
+| `gap` | Gap | £995 | One-time | Evidence-backed weaknesses, contradictions and opportunities |
+| `direction` | Direction | £1,495 | One-time | A Proceed, Refine, Pause or Reset decision on a supplied direction |
+| `full-diagnostic` | Full Diagnostic | £2,495 | One-time | One integrated assessment across all three |
+| `strategy` | Strategy | £4,995 | One-time | Business Foundation and connected strategic direction |
 
----
+## Montsel books and practical products
 
-## Free
+| Plan id | Product | Price | Billing | Description |
+| --- | --- | --- | --- | --- |
+| `101-better-ways-to-think` | 101 Better Ways to Think | £14.95 | One-time | Short-form thinking ideas |
+| `everything-works-nothing-fits` | Everything Works. Nothing Fits. | £24.95 | One-time | The business worldview and connected strategy |
+| `think-decide-act` | Think, Decide & Act | £69 | One-time | One integrated product, three connected stages |
+| `visual-contract` | Visual Contract | Free | — | Visual priorities and a designer brief |
 
-**Product ID:** `prod_free`
+Think, Decide & Act is one product at one price. Its three stages are not separate SKUs and it is not a bundle.
 
-| Attribute   | Value |
-| ----------- | ----- |
-| **Price**   | $0    |
-| **Billing** | None  |
-| **Trial**   | N/A   |
+## Langfell consultancy — not a checkout product
 
-### Features
+| Offer | Fee | Basis |
+| --- | --- | --- |
+| Strategic Diagnostic | £12,500 | Proposal-defined |
+| Strategic Foundation | from £15,000 | Scope-dependent |
+| Integrated Strategic Engagement | £35,000 reference | Scoped individually |
 
-- Core authentication (email/password, social login)
-- 1 brand
-- Community support
-- Basic security analytics
-- 1,000 monthly active users
-- Standard email delivery
-
-### Use Case
-
-Individual developers testing the platform or building small personal projects.
+These must never appear as Stripe products. They are scoped by proposal, invoiced, and carry engagement terms that a checkout cannot express.
 
 ---
 
-## Basic
+## Environment variables
 
-**Product ID:** `prod_basic`
-
-| Attribute   | Value             |
-| ----------- | ----------------- |
-| **Price**   | $9/month          |
-| **Billing** | Recurring monthly |
-| **Trial**   | 7 days free       |
-
-### Features
-
-- Everything in Free, plus:
-- 3 brands
-- Email support (48h response)
-- Advanced security analytics
-- 10,000 monthly active users
-- Priority email delivery
-- Custom branding
-- Webhook access
-- API rate limit: 1,000 requests/hour
-
-### Use Case
-
-Freelancers and small startups needing professional auth with moderate scale.
-
----
-
-## Pro
-
-**Product ID:** `prod_pro`
-
-| Attribute   | Value             |
-| ----------- | ----------------- |
-| **Price**   | $29/month         |
-| **Billing** | Recurring monthly |
-| **Trial**   | 14 days free      |
-
-### Features
-
-- Everything in Basic, plus:
-- Unlimited brands
-- Priority email support (24h response)
-- Real-time security analytics
-- 100,000 monthly active users
-- Dedicated IP for email
-- Advanced SSO (SAML, OIDC)
-- Custom domains
-- Organization management
-- API rate limit: 10,000 requests/hour
-- Audit logs (90 days)
-- Role-based access control (RBAC)
-
-### Use Case
-
-Growing SaaS companies and agencies managing multiple client projects.
-
----
-
-## Enterprise
-
-**Product ID:** `prod_enterprise`
-
-| Attribute   | Value             |
-| ----------- | ----------------- |
-| **Price**   | $99/month         |
-| **Billing** | Recurring monthly |
-| **Trial**   | 30 days free      |
-
-### Features
-
-- Everything in Pro, plus:
-- Unlimited everything
-- Dedicated support channel (4h response)
-- Custom SLA available
-- Unlimited monthly active users
-- Premium infrastructure (99.99% uptime SLA)
-- Advanced fraud detection
-- Geographic redundancy
-- Custom integrations
-- API rate limit: Unlimited
-- Audit logs (unlimited retention)
-- Security compliance (SOC2, GDPR, HIPAA)
-- Dedicated account manager
-- Custom contracts & invoicing
-
-### Use Case
-
-Large enterprises and scale-ups requiring maximum reliability, compliance, and support.
-
----
-
-## Usage Examples
-
-### Checkout Button
-
-```svelte
-<script>
-  import SubscribeButton from '#lib/components/SubscribeButton.svelte';
-</script>
-
-<!-- Free tier - no checkout needed -->
-<p>Start for free, no credit card required.</p>
-
-<!-- Basic plan -->
-<SubscribeButton productId="prod_basic" />
-
-<!-- Pro plan -->
-<SubscribeButton productId="prod_pro" />
-
-<!-- Enterprise plan -->
-<SubscribeButton productId="prod_enterprise" />
+```
+STRIPE_PRICE_SIGNAL
+STRIPE_PRICE_GAP
+STRIPE_PRICE_DIRECTION
+STRIPE_PRICE_FULL_DIAGNOSTIC
+STRIPE_PRICE_STRATEGY
+STRIPE_PRICE_101_BETTER_WAYS
+STRIPE_PRICE_EVERYTHING_WORKS
+STRIPE_PRICE_THINK_DECIDE_ACT
 ```
 
-### Dynamic Pricing Display
+Visual Contract is free and needs no price id.
 
-```svelte
-<script>
-  const plans = [
-    { id: 'prod_free', name: 'Free', price: 0, period: null },
-    { id: 'prod_basic', name: 'Basic', price: 9, period: 'month' },
-    { id: 'prod_pro', name: 'Pro', price: 29, period: 'month' },
-    { id: 'prod_enterprise', name: 'Enterprise', price: 99, period: 'month' }
-  ];
-</script>
+## Test-mode ids
 
-<div class="grid grid-cols-4 gap-4">
-  {#each plans as plan}
-    <div class="border rounded-lg p-4">
-      <h3>{plan.name}</h3>
-      <p class="text-2xl font-bold">
-        ${plan.price}
-        {#if plan.period}
-          <span class="text-sm">/{plan.period}</span>
-        {/if}
-      </p>
-      <SubscribeButton productId={plan.id} />
-    </div>
-  {/each}
-</div>
-```
+Created 29 October 2026 in the Demo test account `acct_1LwmLsHQny0VaIlg` (`livemode: false`), catalogue tag `langfell-montsel-2026-10-29`. All GBP, `type: one_time`, `tax_behavior: unspecified`.
+
+| Plan id | Product | Price id |
+| --- | --- | --- |
+| `signal` | Signal | `price_1UVtfyHQny0VaIlgvDJZ8V3I` |
+| `gap` | Gap | `price_1UVtg2HQny0VaIlgLKXo2Eng` |
+| `direction` | Direction | `price_1UVtg3HQny0VaIlgxVLSk0Ol` |
+| `full-diagnostic` | Full Diagnostic | `price_1UVtg3HQny0VaIlg6UWIIJfP` |
+| `strategy` | Strategy | `price_1UVtg4HQny0VaIlgu02dcNQg` |
+| `101-better-ways-to-think` | 101 Better Ways to Think | `price_1UVtg8HQny0VaIlg9zOuYUcR` |
+| `everything-works-nothing-fits` | Everything Works. Nothing Fits. | `price_1UVtg9HQny0VaIlgHTjKoTpA` |
+| `think-decide-act` | Think, Decide & Act | `price_1UVtg9HQny0VaIlgZ3xhUhbo` |
+
+These are **test-mode** ids. A live account will produce different ids; do not copy them into a production environment.
 
 ---
 
-## Creem Dashboard Setup
+## What the payments task must still do
 
-Create these products in your [Creem Dashboard](https://creem.io/dashboard/products):
+1. Change checkout from `mode: "subscription"` to `mode: "payment"`.
+2. Remove `subscription_data` from the session and handle one-time completion.
+3. Establish VAT treatment per product, including e-books and the Think, Decide & Act format.
+4. Build entitlement and fulfilment: report delivery for diagnostics, file delivery for books.
+5. Implement the Direction pre-purchase eligibility check and the refund path for an unsuitable purchase.
+6. Replace the `?subscription=success` return handling with a purchase-based equivalent.
+7. Publish refund and digital-cancellation terms before enabling checkout.
 
-### 1. Basic Plan
-
-- **Name:** Basic
-- **Price:** $9.00
-- **Billing:** Recurring monthly
-- **Product ID:** `prod_basic`
-
-### 2. Pro Plan
-
-- **Name:** Pro
-- **Price:** $29.00
-- **Billing:** Recurring monthly
-- **Product ID:** `prod_pro`
-
-### 3. Enterprise Plan
-
-- **Name:** Enterprise
-- **Price:** $99.00
-- **Billing:** Recurring monthly
-- **Product ID:** `prod_enterprise`
+The subscription table and webhook handler remain in place. If no product is ever recurring, decide whether to retire them rather than leaving dead configuration.
 
 ---
 
-## Webhook Events
+## History
 
-When subscriptions change, Creem sends webhooks. Handle these in your app:
-
-| Event                   | Action                           |
-| ----------------------- | -------------------------------- |
-| `subscription.active`   | Grant Pro/Enterprise features    |
-| `subscription.canceled` | Schedule downgrade at period end |
-| `subscription.expired`  | Downgrade to Free                |
-| `payment.failed`        | Send payment retry notification  |
-
----
-
-## Annual Discounts
-
-Contact sales for annual billing with 2 months free:
-
-- **Basic Annual:** $90/year (save $18)
-- **Pro Annual:** $290/year (save $58)
-- **Enterprise Annual:** $990/year (save $198)
-
----
-
-## FAQ
-
-**Q: Can I upgrade/downgrade plans?**
-A: Yes, changes take effect at the next billing cycle. Prorated credits applied automatically.
-
-**Q: What happens when I exceed my MAU limit?**
-A: We'll notify you at 80% and 100%. You can upgrade instantly or contact sales.
-
-**Q: Is there a refund policy?**
-A: 30-day money-back guarantee for all paid plans.
-
-**Q: Can I use this for a nonprofit?**
-A: Contact us at <support@creem.io> for nonprofit discounts.
+This file previously described a generic SaaS ladder: Free, Basic $9/month, Pro $29/month, Enterprise $99/month, with annual variants. That catalogue was never the Langfell product set and is superseded. The old `STRIPE_PRICE_BASIC`, `_PRO` and `_ENTERPRISE` variables are retired.

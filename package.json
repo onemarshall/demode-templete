@@ -26,8 +26,8 @@
   "dependencies": {
     "@better-auth/core": "^1.7.12",
     "@better-auth/passkey": "^1.7.12",
+    "@better-auth/stripe": "1.7.12",
     "@better-captcha/svelte": "^0.8.0",
-    "@creem_io/better-auth": "^2.0.4",
     "@fontsource-variable/inter": "^5.3.0",
     "@internationalized/date": "^3.12.4",
     "@lucide/svelte": "^1.61.0",
@@ -41,10 +41,10 @@
     "better-auth-directus": "file:./better-auth-directus",
     "bits-ui": "^2.19.5",
     "consola": "^3.4.2",
-    "creem": "^1.13.0",
     "cursix": "^1.1.4",
     "formsnap": "^2.1.0",
     "gsap": "^3.15.0",
+    "markdown-it": "^15.0.3",
     "mode-watcher": "^1.1.0",
     "number-flow": "^0.6.2",
     "otpauth": "^9.5.2",
@@ -53,6 +53,7 @@
     "qrcode": "^1.5.4",
     "redis": "^6.3.0",
     "runed": "^0.37.1",
+    "stripe": "22.6.2",
     "svelte-easy-crop": "^5.0.1",
     "svelte-sonner": "^1.2.1",
     "svelte-toolbelt": "^0.10.6",
@@ -61,8 +62,7 @@
     "usesend-js": "^1.6.3",
     "vanilla-cookieconsent": "^3.1.0",
     "viem": "^2.57.7",
-    "zod": "^4.6.7",
-    "markdown-it": "^15.0.3"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@directus/sdk": "^26.0.0",

@@ -25,7 +25,7 @@ vi.mock("../config.js", () => ({
   },
 }));
 vi.mock("#lib/platform/database/db.js", () => ({ getDB: async () => ({ query: mocks.query }) }));
-vi.mock("#lib/platform/config/index.js", () => ({ publicEnv: { get PUBLIC_CREEM_ENABLED() { return mocks.billingEnabled; } }, getPublicEnv: mocks.publicEnv }));
+vi.mock("#lib/platform/config/index.js", () => ({ publicEnv: { get PUBLIC_STRIPE_ENABLED() { return mocks.billingEnabled; } }, getPublicEnv: mocks.publicEnv }));
 
 import { createAccountExport } from "../account-export";
 
@@ -33,7 +33,7 @@ const now = Date.parse("2026-10-22T12:00:00.000Z");
 
 beforeEach(() => { configureTestIntegrations(); mocks.billingEnabled = false;
   vi.clearAllMocks();
-  mocks.publicEnv.mockResolvedValue({ PUBLIC_CREEM_ENABLED: false });
+  mocks.publicEnv.mockResolvedValue({ PUBLIC_STRIPE_ENABLED: false });
   mocks.getSession.mockResolvedValue({
     user: {
       id: "user-a",
@@ -71,12 +71,12 @@ beforeEach(() => { configureTestIntegrations(); mocks.billingEnabled = false;
   mocks.query.mockResolvedValue({
     rows: [
       {
-        productId: "pro",
+        plan: "pro",
         status: "active",
         periodStart: new Date(now),
         periodEnd: new Date(now + 100_000),
         cancelAtPeriodEnd: false,
-        creemSubscriptionId: "private-provider-id",
+        subscriptionId: "private-provider-id",
       },
     ],
   });
@@ -114,7 +114,7 @@ describe("account data export", () => {
     ]);
     expect(result.subscriptions).toEqual([
       {
-        productId: "pro",
+        plan: "pro",
         status: "active",
         cancelAtPeriodEnd: false,
         periodStart: new Date(now).toISOString(),
@@ -172,7 +172,7 @@ describe("account data export", () => {
       sessions: { truncated: true },
       subscriptions: { truncated: false },
     });
-    expect(mocks.query.mock.calls[0][0]).toContain('SELECT "productId", status');
+    expect(mocks.query.mock.calls[0][0]).toContain('SELECT plan, status');
     expect(mocks.query.mock.calls[0][0]).not.toMatch(/SELECT\s+\*/i);
     expect(mocks.query.mock.calls[0][0]).not.toMatch(/createdAt|updatedAt/);
     expect(mocks.query.mock.calls[0][0]).toContain(
@@ -187,7 +187,7 @@ describe("account data export", () => {
     expect(result.subscriptions).toEqual([]);
 
     mocks.billingEnabled = true;
-    mocks.publicEnv.mockResolvedValue({ PUBLIC_CREEM_ENABLED: true });
+    mocks.publicEnv.mockResolvedValue({ PUBLIC_STRIPE_ENABLED: true });
     mocks.query.mockRejectedValueOnce(Object.assign(new Error("missing table"), { code: "42P01" }));
     await expect(createAccountExport(new Headers(), now)).rejects.toThrow("missing table");
   });
@@ -201,7 +201,7 @@ describe("account data export", () => {
 
   it("reports subscription truncation when there are more than the export limit", async () => {
     mocks.query.mockResolvedValueOnce({
-      rows: Array.from({ length: 101 }, () => ({ productId: "pro", status: "active" })),
+      rows: Array.from({ length: 101 }, () => ({ plan: "pro", status: "active" })),
     });
     const result = await createAccountExport(new Headers(), now);
     expect(result.subscriptions as unknown[]).toHaveLength(100);

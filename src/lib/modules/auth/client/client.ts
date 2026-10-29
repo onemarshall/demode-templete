@@ -17,7 +17,7 @@ import {
 	magicLinkClient,
 	emailOTPClient
 } from 'better-auth/client/plugins';
-import { creemClient } from '@creem_io/better-auth/client';
+import { stripeClient } from '@better-auth/stripe/client';
 
 import { publicEnv } from '#lib/platform/config/index.js';
 import type { auth } from '../server/config.js';
@@ -90,7 +90,7 @@ export const authClient = createAuthClient({
 					})
 				]
 			: []),
-		...(publicEnv.PUBLIC_CREEM_ENABLED ? [creemClient()] : [])
+		...(publicEnv.PUBLIC_STRIPE_ENABLED ? [stripeClient({ subscription: true })] : [])
 	]
 });
 

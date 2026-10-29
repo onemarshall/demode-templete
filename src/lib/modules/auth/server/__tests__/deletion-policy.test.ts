@@ -10,7 +10,7 @@ import { betterAuth } from 'better-auth';
 import { getMigrations } from 'better-auth/db/migration';
 import Database from 'better-sqlite3';
 import { admin } from 'better-auth/plugins/admin';
-const mocks = vi.hoisted(() => ({ query: vi.fn(), membershipGuard: vi.fn(), env: { PUBLIC_CREEM_ENABLED: true } }));
+const mocks = vi.hoisted(() => ({ query: vi.fn(), membershipGuard: vi.fn(), env: { PUBLIC_STRIPE_ENABLED: true } }));
 vi.mock('#lib/platform/database/db.js', () => ({ getDB: async () => ({ query: mocks.query }) }));
 vi.mock('#lib/platform/config/server.server.js', () => ({ getServerEnv: async () => ({ AUTH_ORGANIZATION_PLUGIN: false }), publicEnv: mocks.env }));
 vi.mock('#lib/platform/config/index.js', () => ({ getServerEnv: async () => ({ AUTH_ORGANIZATION_PLUGIN: false }), publicEnv: mocks.env }));
@@ -21,7 +21,7 @@ const past = new Date(Date.now() - 10000);
 const future = new Date(Date.now() + 100000);
 
 describe('account deletion policy', () => {
-	beforeEach(() => { configureTestIntegrations(); vi.clearAllMocks(); mocks.env.PUBLIC_CREEM_ENABLED = true; mocks.query.mockResolvedValue({ rows: [] }); });
+	beforeEach(() => { configureTestIntegrations(); vi.clearAllMocks(); mocks.env.PUBLIC_STRIPE_ENABLED = true; mocks.query.mockResolvedValue({ rows: [] }); });
 	it('blocks multi-role administrators before querying billing', async () => {
 		expect(await loadDeletionEligibility({ ...user, role: 'user, admin' })).toMatchObject({ allowed: false, reason: 'admin' });
 		expect(mocks.query).not.toHaveBeenCalled();
@@ -54,13 +54,13 @@ describe('account deletion policy', () => {
 		await expect(assertCanDeleteAccount(user)).rejects.toMatchObject({ status: 'SERVICE_UNAVAILABLE' });
 	});
 	it('does not require a billing schema for installations without billing', async () => {
-		mocks.env.PUBLIC_CREEM_ENABLED = false;
+		mocks.env.PUBLIC_STRIPE_ENABLED = false;
 		mocks.query.mockRejectedValue(Object.assign(new Error('table missing'), { code: '42P01' }));
 		expect(await loadDeletionEligibility(user)).toMatchObject({ allowed: true });
 		expect(mocks.query).toHaveBeenCalledOnce();
 	});
 	it('still checks existing subscriptions when the billing feature is disabled', async () => {
-		mocks.env.PUBLIC_CREEM_ENABLED = false;
+		mocks.env.PUBLIC_STRIPE_ENABLED = false;
 		mocks.query.mockResolvedValue({ rows: [{ status: 'active', periodEnd: future }] });
 		expect(await loadDeletionEligibility(user)).toMatchObject({ allowed: false, reason: 'subscription' });
 	});

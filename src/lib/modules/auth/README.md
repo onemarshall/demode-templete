@@ -37,12 +37,12 @@ Email templates remain auth-owned. The Directus CMS adapter needs the local
 infrastructure. Configure the intended CMS provider explicitly.
 
 Direct external imports currently require `better-auth`, `@better-auth/core`,
-`@better-auth/passkey`, `@better-captcha/svelte`, `@creem_io/better-auth`,
+`@better-auth/passkey`, `@better-captcha/svelte`, `@better-auth/stripe`, `stripe`,
 `@walletconnect/ethereum-provider`, `viem`, `qrcode`, `redis`, `usesend-js`, `zod`,
 `consola`, `@lucide/svelte`, `bits-ui`, `layerchart`, `svelte-sonner`,
 `sveltekit-superforms`, Svelte and SvelteKit, plus dependencies of shared UI/platform.
 Keep versions compatible with this app's package manifest. The browser client
-still imports Creem's client plugin statically, so disabling billing at runtime
+still imports Stripe's client plugin statically, so disabling billing at runtime
 alone does not remove that package dependency.
 
 Outside this folder, integrate `src/env.ts`, `src/app.d.ts`, `hooks.server.ts`,

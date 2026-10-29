@@ -63,8 +63,9 @@ import * as Card from '#lib/components/ui/card/index.js';
 		error = null;
 
 		try {
-			const { data: subData, error: subError } =
-				await authClient.creem.retrieveSubscription();
+			const { data: subData, error: subError } = await authClient.subscription.list({
+				query: {}
+			});
 			if (subError) {
 				const status = (subError as { status?: number }).status;
 				if (status === 401 || status === 403) {
@@ -72,10 +73,24 @@ import * as Card from '#lib/components/ui/card/index.js';
 				} else if (subError.message?.includes("not found")) {
 					subscription = null;
 				} else {
-					error = subError.message;
+					error = subError.message ?? "Failed to load subscription";
 				}
-			} else if (subData) {
-				subscription = subData as SubscriptionData;
+			} else {
+				const item = subData?.find(
+					(candidate) =>
+						candidate.status === "active" || candidate.status === "trialing"
+				);
+				subscription = item
+					? {
+							status: item.status,
+							product: { id: item.plan },
+							periodStart: item.periodStart
+								? new Date(item.periodStart).toISOString()
+								: null,
+							periodEnd: item.periodEnd ? new Date(item.periodEnd).toISOString() : null,
+							cancelAtPeriodEnd: item.cancelAtPeriodEnd ?? false,
+						}
+					: null;
 			}
 		} catch (err) {
 			error =
@@ -87,42 +102,13 @@ import * as Card from '#lib/components/ui/card/index.js';
 		}
 	}
 
-	async function handleCancel() {
-		if (!confirm("Are you sure you want to cancel your subscription?")) {
-			return;
-		}
-
-		loading = true;
-
-		try {
-			const { data, error: cancelError } =
-				await authClient.creem.cancelSubscription();
-
-			if (cancelError) {
-				error = cancelError.message ?? "Failed to cancel subscription";
-				return;
-			}
-
-			if (data?.success) {
-				await loadSubscriptionData();
-			}
-		} catch (err) {
-			error =
-				err instanceof Error
-					? err.message
-					: "Failed to cancel subscription";
-		} finally {
-			loading = false;
-		}
-	}
-
 	async function openPortal() {
 		if (portalLoading) return;
 		portalLoading = true;
 		error = null;
 		try {
-			const { error: portalError } = await authClient.creem.createPortal({
-				redirect: true
+			const { error: portalError } = await authClient.subscription.billingPortal({
+				returnUrl: "/billing"
 			});
 			if (portalError) {
 				error = portalError.message ?? "Failed to open portal";
@@ -226,16 +212,6 @@ import * as Card from '#lib/components/ui/card/index.js';
 					{/if}
 					Manage
 				</Button>
-
-					{#if subscription.status === "active"}
-						<Button
-							onclick={handleCancel}
-							variant="destructive"
-							class="flex-1"
-						>
-							Cancel
-						</Button>
-					{/if}
 				</div>
 			</div>
 		</div>

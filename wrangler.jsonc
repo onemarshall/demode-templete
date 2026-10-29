@@ -39,7 +39,7 @@
     "PUBLIC_AUTH_2FA_ISSUER": "IAM Studio",
     "PUBLIC_AUTH_2FA_PLUGIN": "true",
     "PUBLIC_AUTH_ADMIN_PLUGIN": "true",
-    "PUBLIC_AUTH_CALLBACK_URL": "https://demode-templete.app-840.workers.dev",
+    "PUBLIC_AUTH_CALLBACK_URL": "https://auth.iamstudios.cc",
     "PUBLIC_AUTH_EMAIL_OTP_PLUGIN": "true",
     "PUBLIC_AUTH_LAST_LOGIN_METHOD_PLUGIN": "false",
     "PUBLIC_AUTH_MAGIC_LINK_PLUGIN": "true",
@@ -47,15 +47,29 @@
     "PUBLIC_AUTH_PASSKEY_RP_NAME": "IAM Studio",
     "PUBLIC_AUTH_PASSKEYS_PLUGIN": "true",
     "PUBLIC_AUTH_SOCIAL_LOGINS_ENABLED": "true",
-    "PUBLIC_BETTER_AUTH_URL": "https://demode-templete.app-840.workers.dev",
+    "PUBLIC_BETTER_AUTH_URL": "https://auth.iamstudios.cc",
     "PUBLIC_CAP_ENDPOINT": "https://cap.iamstudios.cc/",
     "PUBLIC_CAP_KEY": "8335e7c118",
-    "PUBLIC_CREEM_ENABLED": "true",
+    // Off until the VAT position is established. Checkout and fulfilment are
+    // implemented and one-time; see src/lib/app/vat.server.ts for the four
+    // conditions that must hold before this is set to "true".
+    "PUBLIC_STRIPE_ENABLED": "false",
     "PUBLIC_ENV_MODE": "production",
-    "PUBLIC_SITE_URL": "https://demode-templete.app-840.workers.dev",
+    "PUBLIC_SITE_URL": "https://auth.iamstudios.cc",
     "PUBLIC_TRUSTED_IPS": "141.147.76.172,127.0.0.1,192.168.1.10",
     "REDIS_HOST": "sites-betterauth-fmrvqy",
     "REDIS_PORT": "8099",
-    "SECURITY_STORAGE": "postgres"
+    "SECURITY_STORAGE": "postgres",
+    "STRIPE_PRICE_SIGNAL": "price_1UVtfyHQny0VaIlgvDJZ8V3I",
+    "STRIPE_PRICE_GAP": "price_1UVtg2HQny0VaIlgLKXo2Eng",
+    "STRIPE_PRICE_DIRECTION": "price_1UVtg3HQny0VaIlgxVLSk0Ol",
+    "STRIPE_PRICE_FULL_DIAGNOSTIC": "price_1UVtg3HQny0VaIlg6UWIIJfP",
+    "STRIPE_PRICE_STRATEGY": "price_1UVtg4HQny0VaIlgu02dcNQg",
+    "STRIPE_PRICE_101_BETTER_WAYS": "price_1UVtg8HQny0VaIlg9zOuYUcR",
+    "STRIPE_PRICE_EVERYTHING_WORKS": "price_1UVtg9HQny0VaIlgHTjKoTpA",
+    "STRIPE_PRICE_THINK_DECIDE_ACT": "price_1UVtg9HQny0VaIlgZ3xhUhbo",
+    "VAT_ENABLED": "false",
+    "VAT_PRICE_DISPLAY": "exclusive",
+    "VAT_RATE_PERCENT": "20"
   }
 }

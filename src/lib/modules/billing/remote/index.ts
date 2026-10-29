@@ -4,4 +4,4 @@
  * Import from `#lib/modules/billing/remote/index.js`.
  */
 
-export { createGuestCheckout } from './checkout.remote.ts';
+export { createCheckout } from './checkout.remote.ts';

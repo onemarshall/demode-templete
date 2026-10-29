@@ -2,31 +2,31 @@ import { getDB, type DatabaseReader } from '#lib/platform/database/db.js';
 import { logger } from '#lib/platform/logger.js';
 
 /**
- * Column map for creem_subscription — a Better Auth plugin table owned by
- * @creem_io/better-auth, not a Directus collection. Single source of truth for
+ * Column map for `subscription` — a Better Auth plugin table owned by
+ * @better-auth/stripe, not a Directus collection. Single source of truth for
  * every billing read; update this map when the plugin's schema changes.
  */
 const SUBSCRIPTION_COLUMNS = {
 	id: 'id',
-	productId: '"productId"',
+	plan: 'plan',
 	status: 'status',
-	creemSubscriptionId: '"creemSubscriptionId"',
+	stripeSubscriptionId: '"stripeSubscriptionId"',
 	periodStart: '"periodStart"',
 	periodEnd: '"periodEnd"',
 	cancelAtPeriodEnd: '"cancelAtPeriodEnd"'
 } as const;
 
-export interface CreemSubscriptionRow {
+export interface SubscriptionRow {
 	id: string;
-	productId: string;
+	plan: string;
 	status: string;
-	creemSubscriptionId: string | null;
+	stripeSubscriptionId: string | null;
 	periodStart: Date | null;
 	periodEnd: Date | null;
 	cancelAtPeriodEnd: boolean;
 }
 
-type SubscriptionColumn = keyof CreemSubscriptionRow;
+type SubscriptionColumn = keyof SubscriptionRow;
 
 interface SubscriptionQuery<K extends SubscriptionColumn> {
 	transaction?: DatabaseReader;
@@ -47,7 +47,7 @@ interface SubscriptionQuery<K extends SubscriptionColumn> {
 export async function queryUserSubscriptions<K extends SubscriptionColumn = SubscriptionColumn>(
 	referenceId: string,
 	{ columns, orderBy, limit, transaction, lock }: SubscriptionQuery<K> = {}
-): Promise<Pick<CreemSubscriptionRow, K>[]> {
+): Promise<Pick<SubscriptionRow, K>[]> {
 	const select = (columns ?? (Object.keys(SUBSCRIPTION_COLUMNS) as K[]))
 		.map((key) => SUBSCRIPTION_COLUMNS[key])
 		.join(', ');
@@ -63,14 +63,14 @@ export async function queryUserSubscriptions<K extends SubscriptionColumn = Subs
 	const lockClause=lock?" FOR SHARE":"";
 	const result = limit
 		? await pool.query(
-				`SELECT ${select} FROM creem_subscription WHERE "referenceId" = $1${orderByClause} LIMIT $2${lockClause}`,
+				`SELECT ${select} FROM subscription WHERE "referenceId" = $1${orderByClause} LIMIT $2${lockClause}`,
 				[referenceId, limit]
 			)
 		: await pool.query(
-				`SELECT ${select} FROM creem_subscription WHERE "referenceId" = $1${orderByClause}${lockClause}`,
+				`SELECT ${select} FROM subscription WHERE "referenceId" = $1${orderByClause}${lockClause}`,
 				[referenceId]
 			);
-	return (result as { rows: Pick<CreemSubscriptionRow,K>[] }).rows;
+	return (result as { rows: Pick<SubscriptionRow,K>[] }).rows;
 }
 
 export interface UserSubscription {
@@ -79,7 +79,7 @@ export interface UserSubscription {
 	periodStart: string | null;
 	periodEnd: string | null;
 	cancelAtPeriodEnd: boolean;
-	creemSubscriptionId: string | null;
+	subscriptionId: string;
 }
 
 export async function loadActiveSubscription(userId: string): Promise<UserSubscription | null> {
@@ -91,11 +91,11 @@ export async function loadActiveSubscription(userId: string): Promise<UserSubscr
 
 		return {
 			status: row.status,
-			product: { id: row.productId },
+			product: { id: row.plan },
 			periodStart: row.periodStart?.toISOString() ?? null,
 			periodEnd: row.periodEnd?.toISOString() ?? null,
 			cancelAtPeriodEnd: row.cancelAtPeriodEnd,
-			creemSubscriptionId: row.creemSubscriptionId
+			subscriptionId: row.id
 		};
 	} catch (err) {
 		logger.error('[subscription] failed to load', {

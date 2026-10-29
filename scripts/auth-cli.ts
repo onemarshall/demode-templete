@@ -5,7 +5,8 @@ import { Pool } from 'pg';
 // Import any plugins that CREATE TABLES directly (not from your builders)
 import { twoFactor, admin, magicLink, siwe, lastLoginMethod, organization } from 'better-auth/plugins';
 import { passkey } from '@better-auth/passkey';
-import { creem } from '@creem_io/better-auth';
+import { stripe } from '@better-auth/stripe';
+import Stripe from 'stripe';
 import { ac, owner, admin as organizationAdmin, member } from '../src/lib/modules/auth/features/organization/permissions.js';
 
 const PASSKEY_ENABLED = process.env.PUBLIC_AUTH_PASSKEYS_PLUGIN === 'true';
@@ -62,11 +63,14 @@ export const auth = betterAuth({
 			verifyMessage: async () => true
 		}),
 		twoFactor(),
-		creem({
-			apiKey: process.env.CREEM_API_KEY || 'cli-placeholder',
-			webhookSecret: process.env.CREEM_WEBHOOK_SECRET,
-			testMode: true,
-			persistSubscriptions: true
+		stripe({
+			stripeClient: new Stripe(process.env.STRIPE_SECRET_KEY || 'cli-placeholder'),
+			stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || 'cli-placeholder',
+			createCustomerOnSignUp: true,
+			subscription: {
+				enabled: true,
+				plans: [{ name: 'signal', priceId: process.env.STRIPE_PRICE_SIGNAL || 'cli-placeholder' }]
+			}
 		}),
 		...(PASSKEY_ENABLED && PASSKEY_RPID && PASSKEY_ORIGIN
 			? [passkey({ rpID: PASSKEY_RPID, rpName: PASSKEY_RP_NAME || 'App', origin: PASSKEY_ORIGIN })]

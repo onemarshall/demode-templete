@@ -119,7 +119,7 @@ export async function createAccountExport(
         };
       }),
     subscriptions: subscriptionRows.map((row: UnknownRecord) => ({
-      ...pick(row, ["productId", "status", "cancelAtPeriodEnd"]),
+      ...pick(row, ["plan", "status", "cancelAtPeriodEnd"]),
       periodStart: dateValue(row.periodStart),
       periodEnd: dateValue(row.periodEnd),
     })),

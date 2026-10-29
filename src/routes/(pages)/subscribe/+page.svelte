@@ -8,33 +8,24 @@
 	let error = $state<string | null>(null);
 	// Intentionally captured once: the product ID is user-editable after load.
 	// svelte-ignore state_referenced_locally
-	let productId = $state(page.url.searchParams.get('productId') ?? "prod_default");
-	let discountCode = $state("");
+	let productId = $state(page.url.searchParams.get('productId') ?? "pro");
 
 	async function handleCheckout() {
 		loading = true;
 		error = null;
 
 		try {
-			const { data: checkoutData, error: checkoutError } =
-				await authClient.creem.createCheckout({
-					productId,
-					successUrl: "/dashboard",
-					cancelUrl: "/subscribe",
-					...(discountCode ? { discountCode } : {}),
-				});
+			const { error: checkoutError } = await authClient.subscription.upgrade({
+				plan: productId,
+				successUrl: "/dashboard",
+				cancelUrl: "/subscribe",
+				disableRedirect: false,
+			});
 
 			if (checkoutError) {
 				error = checkoutError.message ?? "Failed to create checkout";
-				return;
 			}
-
-			if (checkoutData?.url) {
-				// Redirect to Creem checkout
-				window.location.href = checkoutData.url;
-			} else {
-				error = "No checkout URL returned";
-			}
+			// On success the client navigates to Stripe Checkout.
 		} catch (err) {
 			error =
 				err instanceof Error
@@ -50,15 +41,13 @@
 		error = null;
 
 		try {
-			const { data: portalData, error: portalError } =
-				await authClient.creem.createPortal({ redirect: true });
+			const { error: portalError } =
+				await authClient.subscription.billingPortal({ returnUrl: "/subscribe" });
 
 			if (portalError) {
 				error = portalError.message ?? "Failed to open portal";
 				return;
 			}
-
-			// redirect: true makes the client navigate to the portal URL
 		} catch (err) {
 			error =
 				err instanceof Error
@@ -70,8 +59,13 @@
 	}
 
 	async function checkAccess() {
-		const { data: accessData } = await authClient.creem.hasAccessGranted();
-		return accessData?.hasAccessGranted ?? false;
+		const { data } = await authClient.subscription.list({ query: {} });
+		return (
+			data?.some(
+				(subscription) =>
+					subscription.status === "active" || subscription.status === "trialing"
+			) ?? false
+		);
 	}
 </script>
 
@@ -103,22 +97,6 @@
 				/>
 			</div>
 
-			<div>
-				<label
-					for="discount"
-					class="block text-sm font-medium text-gray-700 mb-1"
-				>
-					Discount Code (optional)
-				</label>
-				<input
-					id="discount"
-					type="text"
-					bind:value={discountCode}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-					placeholder="e.g., LAUNCH50"
-				/>
-			</div>
-
 			<button
 				onclick={handleCheckout}
 				disabled={loading || !productId}
@@ -141,9 +119,9 @@
 		<div class="mt-6 text-center text-sm text-gray-500">
 			<p>
 				Powered by <a
-					href="https://creem.io"
+					href="https://stripe.com"
 					target="_blank"
-					class="text-blue-600 hover:underline">Creem</a
+					class="text-blue-600 hover:underline">Stripe</a
 				>
 			</p>
 		</div>

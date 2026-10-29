@@ -51,7 +51,7 @@ export const variables = defineEnvVars({
 	PUBLIC_AUTH_MAX_SESSIONS: publicVar('Maximum number of concurrent sessions'),
 	PUBLIC_AUTH_SIWE_PLUGIN: publicVar('Enables Sign-In With Ethereum'),
 	PUBLIC_AUTH_SECURITY_PLUGIN: publicVar('Enables the unified security plugin'),
-	PUBLIC_CREEM_ENABLED: publicVar('Enables Creem payments'),
+	PUBLIC_STRIPE_ENABLED: publicVar('Enables Stripe billing'),
 	PUBLIC_WALLETCONNECT_ID: publicVar('WalletConnect Cloud project id'),
 
 	// --- Social providers -------------------------------------------------

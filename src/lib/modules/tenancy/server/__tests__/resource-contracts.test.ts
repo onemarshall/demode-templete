@@ -91,7 +91,7 @@ beforeEach(() => {
           : [],
       };
     }
-    if (sql.includes("creem_subscription")) {
+    if (sql.includes("subscription")) {
       return {
         rows: mocks.state.entitled
           ? [{ status: "active", periodEnd: new Date(Date.now() + 60_000) }]
