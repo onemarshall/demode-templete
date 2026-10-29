@@ -4,12 +4,13 @@ import {collectM02Url} from '#lib/modules/strategy/server/providers/m02-collecti
 import {createM02Providers} from '#lib/modules/strategy/server/providers/m02.js';
 import {createM03Providers} from '#lib/modules/strategy/server/providers/m03.js';
 import {createBFProviders} from '#lib/modules/strategy/server/providers/bf.js';
+import {createM05Providers} from '#lib/modules/strategy/server/providers/m05.js';
 import {createM01Providers} from '#lib/modules/strategy/server/providers/m01.js';
 import {z} from 'zod';
 import {createStrategyExecution} from './strategy-runtime.server';
 import {createM04Providers} from '#lib/modules/strategy/server/providers/m04.js';
-import {createTriggerM04Gateway,createTriggerM01Gateway,createTriggerM02Gateway,createTriggerM03Gateway,createTriggerBFGateway} from '#lib/modules/strategy/server/jobs/gateway.js';
-import {strategyProviderConfiguration,strategyM01ProviderConfiguration,strategyM02ProviderConfiguration,strategyM03ProviderConfiguration,strategyBFProviderConfiguration,strategyDeliveryConfiguration} from './strategy-configuration.server';
+import {createTriggerM04Gateway,createTriggerM01Gateway,createTriggerM02Gateway,createTriggerM03Gateway,createTriggerBFGateway,createTriggerM05Gateway} from '#lib/modules/strategy/server/jobs/gateway.js';
+import {strategyProviderConfiguration,strategyM01ProviderConfiguration,strategyM02ProviderConfiguration,strategyM03ProviderConfiguration,strategyBFProviderConfiguration,strategyM05ProviderConfiguration,strategyDeliveryConfiguration} from './strategy-configuration.server';
 const required=z.object({BETTER_DATABASE_URL:z.url()});
 function workerDatabaseUrl(input:Record<string,unknown>) {
  if(input.STRATEGY_ENABLED!==true&&!['true','1'].includes(String(input.STRATEGY_ENABLED)))throw new Error('Strategy worker is not enabled');
@@ -31,15 +32,17 @@ export function createStrategyWorkerRuntime(input:Record<string,unknown>,options
  const m03Providers=createM03Providers({...m03Config,maxTokens:m03Config.draftMaxTokens,onDiagnostic:diagnostic=>console.info('Strategy M03 provider',diagnostic)});
  const bfConfig=strategyBFProviderConfiguration(input);
  const bfProviders=createBFProviders({...bfConfig,maxTokens:bfConfig.draftMaxTokens,onDiagnostic:diagnostic=>console.info('Strategy BF provider',diagnostic)});
+ const m05Config=strategyM05ProviderConfiguration(input);
+ const m05Providers=createM05Providers({...m05Config,maxTokens:m05Config.draftMaxTokens,onDiagnostic:diagnostic=>console.info('Strategy M05 provider',diagnostic)});
  const pool=options.pool??workerPool(input);
- return {...createStrategyExecution({pool,providers,m01Providers,m02Collector:collectM02Url,m02Providers:m02Providers.generate,m02Gateway:createTriggerM02Gateway(strategyDeliveryConfiguration(input)),m03Providers:m03Providers.generate,m03Gateway:createTriggerM03Gateway(strategyDeliveryConfiguration(input)),bfProviders:bfProviders.generate,bfGateway:createTriggerBFGateway(strategyDeliveryConfiguration(input)),gateway:createTriggerM04Gateway(strategyDeliveryConfiguration(input)),m01Gateway:createTriggerM01Gateway(strategyDeliveryConfiguration(input))}),close:()=>pool.end()};
+ return {...createStrategyExecution({pool,providers,m01Providers,m02Collector:collectM02Url,m02Providers:m02Providers.generate,m02Gateway:createTriggerM02Gateway(strategyDeliveryConfiguration(input)),m03Providers:m03Providers.generate,m03Gateway:createTriggerM03Gateway(strategyDeliveryConfiguration(input)),bfProviders:bfProviders.generate,bfGateway:createTriggerBFGateway(strategyDeliveryConfiguration(input)),m05Providers:m05Providers.generate,m05Gateway:createTriggerM05Gateway(strategyDeliveryConfiguration(input)),gateway:createTriggerM04Gateway(strategyDeliveryConfiguration(input)),m01Gateway:createTriggerM01Gateway(strategyDeliveryConfiguration(input))}),close:()=>pool.end()};
 }
 let runtime:ReturnType<typeof createStrategyWorkerRuntime>|undefined;
 export async function getStrategyWorkerRuntime(){return runtime??=createStrategyWorkerRuntime(process.env);}
 let recovery:ReturnType<typeof createStrategyExecution> & {close:()=>Promise<void>}|undefined;
 /** Committed checkpoints keep recovering when AI or document-reader configuration is unavailable. */
 export async function getStrategyRecoveryRuntime(){
- if(!recovery){const pool=workerPool(process.env);recovery={...createStrategyExecution({pool,m02Gateway:createTriggerM02Gateway(strategyDeliveryConfiguration(process.env)),m03Gateway:createTriggerM03Gateway(strategyDeliveryConfiguration(process.env)),bfGateway:createTriggerBFGateway(strategyDeliveryConfiguration(process.env)),gateway:createTriggerM04Gateway(strategyDeliveryConfiguration(process.env)),m01Gateway:createTriggerM01Gateway(strategyDeliveryConfiguration(process.env))}),close:()=>pool.end()};}
+ if(!recovery){const pool=workerPool(process.env);recovery={...createStrategyExecution({pool,m02Gateway:createTriggerM02Gateway(strategyDeliveryConfiguration(process.env)),m03Gateway:createTriggerM03Gateway(strategyDeliveryConfiguration(process.env)),bfGateway:createTriggerBFGateway(strategyDeliveryConfiguration(process.env)),m05Gateway:createTriggerM05Gateway(strategyDeliveryConfiguration(process.env)),gateway:createTriggerM04Gateway(strategyDeliveryConfiguration(process.env)),m01Gateway:createTriggerM01Gateway(strategyDeliveryConfiguration(process.env))}),close:()=>pool.end()};}
  return recovery;
 }
 export async function closeStrategyWorkerRuntime(){const a=runtime,b=recovery;runtime=undefined;recovery=undefined;await Promise.all([a?.close(),b?.close()]);}

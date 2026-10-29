@@ -15,7 +15,7 @@ Columns are deliberately separate. A stage is never "done" because it is impleme
 | M03 Business Commitments | Yes | Partial — real-SQL service, upstream derivation, transport, worker and provider verified; no browser or Directus pass | No | Yes in tests — derived from a sealed M02 version with M01 lock re-check | No |
 | M04 Viability Check | Yes | Yes | Yes (earlier run) | M01 upstream | No |
 | Business Foundation | Yes | Partial — real-SQL service to sealed, rules, gate, seal and the real M04→BF derivation verified; browser and Directus not verified | No | Yes in tests — derived from a real sealed M04 session and version row | No |
-| M05 Brand Strategy | No | No | No | No | No |
+| M05 Brand Strategy | Yes | Partial — full real-SQL flow to sealed, gates, coverage, review, package and seal verified; browser and Directus not verified | No | In tests — derived from a sealed Foundation | No |
 | M06 Marketing Strategy | No | No | No | No | No |
 | M07 Sales Strategy | No | No | No | No | No |
 | M08 Content Strategy | No | No | No | No | No |
@@ -24,10 +24,11 @@ Columns are deliberately separate. A stage is never "done" because it is impleme
 | M11 Execution Planning | No | No | No | Blocked — no Commercial Direction producer identified | No |
 | M12 Work Coordination | No | No | No | Depends on M11 | No |
 
-Auth currently contains `m01`, `m02`, `m03`, `m04` and `bf` under
+Auth currently contains `m01`, `m02`, `m03`, `m04`, `bf` and `m05` under
 `src/lib/modules/strategy/server/stages/`, and the matching `founder-conviction`,
-`market-reality`, `business-commitments`, `viability-check` and `business-foundation` routes. The
-legacy implementations for the remaining stages are still only in the Trigger repository.
+`market-reality`, `business-commitments`, `viability-check`, `business-foundation` and
+`brand-strategy` routes. The legacy implementations for the remaining stages are still only in the
+Trigger repository.
 
 ## M02 detail
 
@@ -71,6 +72,20 @@ See `docs/architecture/bf-module-completion.md`. Summary:
   5 releases.
 - Not proven: the hydrated page, Directus readback, a live provider and a chained M04→BF run through the M04 service.
 
+## M05 detail
+
+See `docs/architecture/m05-module-completion.md` and `m05-parity.md`. Summary:
+
+- Full local slice: fourteen stages, route authority, Foundation-derived upstream gate, inheritance
+  and semantic checks, decision packet, gates 0–6 with coverage and candidate freeze, Gate 7 review,
+  package, client decision, seal, durable worker and Trigger task, host and stage screen.
+- 8 M05 tests; 117 passing across the combined M02–M05 regression. Build, worker bundle, worker
+  typecheck, module boundaries, svelte-check and the private-method scan all pass.
+- Not proven: the hydrated page, Directus readback, a live provider run, and a chained
+  Foundation→M05 run through the Foundation service.
+- The screen edits records as JSON rather than the legacy stage-specific forms; complete and
+  operable, but not the legacy operator experience.
+
 ## Current blocker
 
 `scripts/strategy/integration/m02-end-to-end.ts` depends on M01 harness artifacts that do not
@@ -98,7 +113,7 @@ svelte-check but has never been driven in a hydrated browser.
 
 ## Next concrete action
 
-Refresh the isolated workspace with the M02, M03 and BF slices and drive all three pages in a
+Refresh the isolated workspace with the M02, M03, BF and M05 slices and drive all four pages in a
 hydrated browser. Then regenerate the M01 harness artifacts and run the chained
 `m02-end-to-end.ts`, adding M03 and BF steps so the real M01 → M02 → M03 → M04 → BF handoff is
 proven rather than derived from synthetic rows.
