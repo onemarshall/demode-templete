@@ -1,6 +1,6 @@
 /** Web activation composes Strategy with real Better Auth. Fixture mode changes
  * model/delivery ports only; it never supplies a principal, permission or source. */
-import {createTriggerM04Gateway,createTriggerM01Gateway,createTriggerM02Gateway} from '#lib/modules/strategy/server/jobs/gateway.js';
+import {createTriggerM04Gateway,createTriggerM01Gateway,createTriggerM02Gateway,createTriggerM03Gateway,createTriggerBFGateway} from '#lib/modules/strategy/server/jobs/gateway.js';
 import {strategyDeliveryConfiguration,strategyM01VoiceConfiguration} from './strategy-configuration.server';
 import {dev} from '$app/env';
 import {createM01VoiceProvider} from '#lib/modules/strategy/server/providers/m01-voice.js';
@@ -25,7 +25,7 @@ export async function initializeAuthStrategy():Promise<void> {
   const delivery=strategyDeliveryConfiguration(configuration);
   if(!delivery)throw new Error('Strategy delivery credentials are not configured');
   const voiceConfig=strategyM01VoiceConfiguration(configuration);
-  configured=await createAuthStrategyRuntime({voice:voiceConfig?createM01VoiceProvider(voiceConfig):undefined,m01Gateway:createTriggerM01Gateway(delivery),m02Gateway:createTriggerM02Gateway(delivery),gateway:createTriggerM04Gateway(delivery),directus:{url:env.STRATEGY_DIRECTUS_URL??'',token:env.STRATEGY_DIRECTUS_READER_TOKEN??''},resolvePrincipal:async event=>{
+  configured=await createAuthStrategyRuntime({voice:voiceConfig?createM01VoiceProvider(voiceConfig):undefined,m01Gateway:createTriggerM01Gateway(delivery),m02Gateway:createTriggerM02Gateway(delivery),m03Gateway:createTriggerM03Gateway(delivery),bfGateway:createTriggerBFGateway(delivery),gateway:createTriggerM04Gateway(delivery),directus:{url:env.STRATEGY_DIRECTUS_URL??'',token:env.STRATEGY_DIRECTUS_READER_TOKEN??''},resolvePrincipal:async event=>{
    const session=await auth.api.getSession({headers:event.request.headers});return session?.user?.id??null;
   }});
  })();
@@ -38,3 +38,7 @@ export function authStrategyHost() {
 export function authStrategyM01Host(){if(!configured)throw new StrategyAccessError();return configured.m01Host;}
 
 export function authStrategyM02Host(){if(!configured)throw new StrategyAccessError();return configured.m02Host;}
+
+export function authStrategyM03Host(){if(!configured)throw new StrategyAccessError();return configured.m03Host;}
+
+export function authStrategyBFHost(){if(!configured)throw new StrategyAccessError();return configured.bfHost;}
