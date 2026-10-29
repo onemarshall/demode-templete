@@ -166,13 +166,21 @@ Two sessions, because the module is roughly three times BF.
 7. Route `brand-strategy` and the stage screen.
 8. Tests: full flow to seal, gate failures, review independence, tamper detection, successor.
 
-## Open questions that need a user decision
+## Decisions taken (29 October 2026, user-approved)
 
-1. **M05 route authority.** Auth has no Entry Brief. Does M05 require its own confirmed route record
-   (a new small authority surface), or does it inherit the Foundation's authorisation with the
-   dependency recorded explicitly? The legacy gate refuses without a confirmed M05 route, so this
-   cannot be silently dropped.
-2. **Entry-authority receipt.** The legacy gate checks an M05 entry-authority receipt that names the
-   exact approved sources. Auth's equivalent is the BF source chain. Either that chain is adopted as
-   the M05 entry authority (and the receipt becomes a derived record), or the receipt is dropped and
-   the parity spec records the reduced guarantee.
+1. **M05 route authority — a route record is added.** Auth has no Entry Brief, so M05 gets its own
+   confirmed module route: `full`, `constrained` or `light`, with a reason, the confirming actor and
+   a timestamp. There is no `skip` route — a skipped module has no session and can never reach the
+   record. The record is pinned as immutable versions under the `m05-route` source slot with a moving
+   head, so no migration or per-stage table is needed and the history is preserved.
+2. **Entry-authority receipt — derived from the BF chain.** The receipt is generated at derivation
+   time from the sealed Foundation tuple: a fingerprint over `{bf, m04, m03, m02, m01}`, the
+   Foundation's approver and its seal time. The receipt is excluded from its own fingerprint, so it
+   is not self-referential. The receipt id is derived deterministically from the fingerprint (a
+   v4-shaped UUID), because validation re-derives the body and compares exact bytes — a random id
+   would make every validation fail.
+
+The gate now refuses without a confirmed route, refuses a Foundation whose downstream gate is not
+open with M05 permission granted, refuses an unapproved Foundation, refuses a handoff that does not
+pin the exact sealed version, and refuses a receipt whose fingerprint does not match the chain it
+accompanies.
