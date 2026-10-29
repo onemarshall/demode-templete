@@ -35,7 +35,7 @@ export interface StrategyCheckpointGateway {
 /** Explicit Node host adapter; no task instance enters the web application bundle. */
 export interface TriggerDeliveryConfiguration {accessToken:string;baseURL?:string;branch?:string}
 export function createTriggerStrategyGateway(taskId:string,configuration?:TriggerDeliveryConfiguration): StrategyJobGateway {
-  if(!["auth-strategy-m04-session-v2","auth-strategy-m01-session-v1","auth-strategy-m02-session-v1","auth-strategy-m03-session-v1","auth-strategy-bf-session-v1","auth-strategy-m05-session-v1","auth-strategy-m06-session-v1","auth-strategy-m07-session-v1","auth-strategy-m08-session-v1","auth-strategy-m09-session-v1","auth-strategy-m10-session-v1","auth-strategy-cd-session-v1"].includes(taskId))throw new Error("Unsupported Strategy task");
+  if(!["auth-strategy-m04-session-v2","auth-strategy-m01-session-v1","auth-strategy-m02-session-v1","auth-strategy-m03-session-v1","auth-strategy-bf-session-v1","auth-strategy-m05-session-v1","auth-strategy-m06-session-v1","auth-strategy-m07-session-v1","auth-strategy-m08-session-v1","auth-strategy-m09-session-v1","auth-strategy-m10-session-v1","auth-strategy-cd-session-v1","auth-strategy-m11-session-v1"].includes(taskId))throw new Error("Unsupported Strategy task");
   return {
     async dispatch({ jobId, idempotencyKey }) {
       const { tasks, idempotencyKeys } = await import("@trigger.dev/sdk");
@@ -73,3 +73,5 @@ export const createTriggerM09Gateway=(configuration?:TriggerDeliveryConfiguratio
 export const createTriggerM10Gateway=(configuration?:TriggerDeliveryConfiguration)=>createTriggerStrategyGateway("auth-strategy-m10-session-v1",configuration);
 
 export const createTriggerCDGateway=(configuration?:TriggerDeliveryConfiguration)=>createTriggerStrategyGateway("auth-strategy-cd-session-v1",configuration);
+
+export const createTriggerM11Gateway=(configuration?:TriggerDeliveryConfiguration)=>createTriggerStrategyGateway("auth-strategy-m11-session-v1",configuration);

@@ -47,6 +47,10 @@ import {createCDWorker} from '#lib/modules/strategy/server/jobs/cd-worker.js';
 import type {CDServicePorts} from '#lib/modules/strategy/server/stages/cd/service.js';
 import {createCDHost} from './strategy-cd-host.server';
 import {createCDUpstream} from './strategy-cd-source.server';
+import {createM11Worker} from '#lib/modules/strategy/server/jobs/m11-worker.js';
+import type {M11ServicePorts} from '#lib/modules/strategy/server/stages/m11/service.js';
+import {createM11Host} from './strategy-m11-host.server';
+import {createM11Upstream} from './strategy-m11-source.server';
 import {createM01Worker} from '#lib/modules/strategy/server/jobs/m01-worker.js';
 import type {M01Ports} from '#lib/modules/strategy/server/stages/m01/service.js';
 import {createM01Host,type M01VoicePort} from './strategy-m01-host.server';
@@ -55,7 +59,7 @@ import {getDB} from '#lib/platform/database/db.js';
 import {StrategyRepository} from '#lib/modules/strategy/server/data/repository.js';
 import {StrategyJobs} from '#lib/modules/strategy/server/data/jobs.js';
 import {createM04Worker} from '#lib/modules/strategy/server/jobs/worker.js';
-import {createTriggerM04Gateway,createTriggerM01Gateway,createTriggerM02Gateway,createTriggerM03Gateway,createTriggerBFGateway,createTriggerM05Gateway,createTriggerM06Gateway,createTriggerM07Gateway,createTriggerM08Gateway,createTriggerM09Gateway,createTriggerM10Gateway,createTriggerCDGateway} from '#lib/modules/strategy/server/jobs/gateway.js';
+import {createTriggerM04Gateway,createTriggerM01Gateway,createTriggerM02Gateway,createTriggerM03Gateway,createTriggerBFGateway,createTriggerM05Gateway,createTriggerM06Gateway,createTriggerM07Gateway,createTriggerM08Gateway,createTriggerM09Gateway,createTriggerM10Gateway,createTriggerCDGateway,createTriggerM11Gateway} from '#lib/modules/strategy/server/jobs/gateway.js';
 import {createM04Service,type M04ServicePorts} from '#lib/modules/strategy/server/stages/m04/service.js';
 import {loadStrategyMethod} from '#lib/modules/strategy/server/resources.js';
 import {DirectusStrategyDocumentReader} from '#lib/modules/strategy/server/data/directus-documents.js';
@@ -91,6 +95,8 @@ export interface AuthStrategyRuntimeOptions {
  m10Gateway?:StrategyJobGateway;
  cdProviders?:CDServicePorts['generate'];
  cdGateway?:StrategyJobGateway;
+ m11Providers?:M11ServicePorts['generate'];
+ m11Gateway?:StrategyJobGateway;
  voice?:M01VoicePort;
  m01Gateway?:StrategyJobGateway;
  documentReader?:StrategyHostPorts['documentReader'];
@@ -160,13 +166,16 @@ export function createStrategyExecution(options:AuthStrategyRuntimeOptions & {po
  const cdUpstream=createCDUpstream(pool);
  const cdWorker=createCDWorker({jobs,repository,generate:options.cdProviders,validateSource:cdUpstream.validate,authorize:policy.authorizeWorker,policy:async job=>{if(!options.cdProviders)throw new Error('Commercial Direction provider is not configured');await policy.workerPolicy(job)}});
  const cdGateway=options.cdGateway??createTriggerCDGateway();
+ const m11Upstream=createM11Upstream(pool);
+ const m11Worker=createM11Worker({jobs,repository,generate:options.m11Providers,validateSource:m11Upstream.validate,authorize:policy.authorizeWorker,policy:async job=>{if(!options.m11Providers)throw new Error('M11 provider is not configured');await policy.workerPolicy(job)}});
+ const m11Gateway=options.m11Gateway??createTriggerM11Gateway();
  const m04Gateway=options.gateway??createTriggerM04Gateway(),m01Gateway=options.m01Gateway??createTriggerM01Gateway();
- const gateway:StrategyJobGateway={async dispatch(input){const stage=await jobs.moduleForJob(input.jobId);if(stage==='m04')return m04Gateway.dispatch(input);if(stage==='m01')return m01Gateway.dispatch(input);if(stage==='m02')return m02Gateway.dispatch(input);if(stage==='m03')return m03Gateway.dispatch(input);if(stage==='bf')return bfGateway.dispatch(input);if(stage==='m05')return m05Gateway.dispatch(input);if(stage==='m06')return m06Gateway.dispatch(input);if(stage==='m07')return m07Gateway.dispatch(input);if(stage==='m08')return m08Gateway.dispatch(input);if(stage==='m09')return m09Gateway.dispatch(input);if(stage==='m10')return m10Gateway.dispatch(input);if(stage==='cd')return cdGateway.dispatch(input);throw new Error('Strategy job module is unavailable')}};
+ const gateway:StrategyJobGateway={async dispatch(input){const stage=await jobs.moduleForJob(input.jobId);if(stage==='m04')return m04Gateway.dispatch(input);if(stage==='m01')return m01Gateway.dispatch(input);if(stage==='m02')return m02Gateway.dispatch(input);if(stage==='m03')return m03Gateway.dispatch(input);if(stage==='bf')return bfGateway.dispatch(input);if(stage==='m05')return m05Gateway.dispatch(input);if(stage==='m06')return m06Gateway.dispatch(input);if(stage==='m07')return m07Gateway.dispatch(input);if(stage==='m08')return m08Gateway.dispatch(input);if(stage==='m09')return m09Gateway.dispatch(input);if(stage==='m10')return m10Gateway.dispatch(input);if(stage==='cd')return cdGateway.dispatch(input);if(stage==='m11')return m11Gateway.dispatch(input);throw new Error('Strategy job module is unavailable')}};
  const outbox=new StrategyOutbox(pool);
  const outboxDispatcher=createStrategyOutboxDispatcher({outbox,jobs:gateway,checkpoints:createStrategyCheckpointGateway(pool)});
- const recoveries=['m04','m01','m02','m03','bf','m05','m06','m07','m08','m09','m10','cd'].map(stage=>createStrategyRecovery({jobs,gateway,stage}));
+ const recoveries=['m04','m01','m02','m03','bf','m05','m06','m07','m08','m09','m10','cd','m11'].map(stage=>createStrategyRecovery({jobs,gateway,stage}));
  const recovery={async dispatchRecoverable(){let total=0;const errors:unknown[]=[];for(const entry of recoveries){try{total+=await entry.dispatchRecoverable()}catch(error){errors.push(error)}}if(errors.length)throw new AggregateError(errors,'Strategy recovery incomplete');return total}};
- return {worker:{async run(id:string){if(await jobs.moduleForJob(id)!=='m04')throw new Error('Job belongs to a different Strategy worker');return worker.run(id)}},m01Worker,m02Worker,m02Upstream,m03Worker,m03Upstream,bfWorker,bfUpstream,m05Worker,m05Upstream,m05Route,m06Worker,m06Upstream,m06Route,m07Worker,m07Upstream,m07Route,m08Worker,m08Upstream,m08Route,m09Worker,m09Upstream,m09Route,m10Worker,m10Upstream,m10Route,cdWorker,cdUpstream,repository,jobs,outbox,outboxDispatcher,recovery,policy,gateway,authorizeWorker:policy.authorizeWorker};
+ return {worker:{async run(id:string){if(await jobs.moduleForJob(id)!=='m04')throw new Error('Job belongs to a different Strategy worker');return worker.run(id)}},m01Worker,m02Worker,m02Upstream,m03Worker,m03Upstream,bfWorker,bfUpstream,m05Worker,m05Upstream,m05Route,m06Worker,m06Upstream,m06Route,m07Worker,m07Upstream,m07Route,m08Worker,m08Upstream,m08Route,m09Worker,m09Upstream,m09Route,m10Worker,m10Upstream,m10Route,cdWorker,cdUpstream,m11Worker,m11Upstream,repository,jobs,outbox,outboxDispatcher,recovery,policy,gateway,authorizeWorker:policy.authorizeWorker};
 }
 /** Web-only surface layered over the same execution and persistence services. */
 export async function createAuthStrategyRuntime(options:AuthStrategyRuntimeOptions={}) {
@@ -226,5 +235,9 @@ export async function createAuthStrategyRuntime(options:AuthStrategyRuntimeOptio
   target:policy.target,authority:policy.authority,
   generationPolicy:(_event,scope)=>policy.generationPolicy(scope),
   dispatchJob:options.dispatchJob??(async jobId=>{await execution.outbox.dispatchCommittedJob(jobId,gateway);})});
- return {...execution,host,m01Host,m02Host,m03Host,bfHost,m05Host,m06Host,m07Host,m08Host,m09Host,m10Host,cdHost};
+ const m11Host=createM11Host({repository,jobs,documentReader,upstream:execution.m11Upstream,
+  target:policy.target,authority:policy.authority,
+  generationPolicy:(_event,scope)=>policy.generationPolicy(scope),
+  dispatchJob:options.dispatchJob??(async jobId=>{await execution.outbox.dispatchCommittedJob(jobId,gateway);})});
+ return {...execution,host,m01Host,m02Host,m03Host,bfHost,m05Host,m06Host,m07Host,m08Host,m09Host,m10Host,cdHost,m11Host};
 }

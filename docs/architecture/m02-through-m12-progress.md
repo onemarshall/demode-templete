@@ -128,7 +128,7 @@ FW_24 defined the record and M11's consumer implemented the interface, but no pr
 now does: `stages/cd` plus its host, worker, Trigger task and screen, emitting the exact handoff M11
 validates. See `commercial-direction-contract.md` and `commercial-direction-producer.md`.
 
-M11 is therefore unblocked as a build, though not yet built.
+M11 is built against it and its gate re-checks the direction independently.
 
 ## Current blocker
 
