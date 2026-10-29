@@ -59,6 +59,23 @@ describe('M04 source-bound draft identity',()=>{
  test('keeps non-financial stage schemas unchanged',()=>{
   expect(JSON.stringify(draftResponseSchema(session,'market-readiness'))).toBe(JSON.stringify(z.toJSONSchema(STAGE_SCHEMAS['market-readiness'])));
  });
+ test('adds concise recommendation guidance without changing its schema or authority boundary',()=>{
+  const method='Complete canonical method stays here, including every governing test and requirement.';
+  const [system,user]=draftMessages(session,'recommendation',method);
+  const prompt=system.content;
+  expect(prompt).toContain(method);
+  expect(prompt).toContain('Aim for no more than 6000 output tokens');
+  expect(prompt).toContain('generally keep each text field to 40 words or fewer');
+  expect(prompt).toContain('Assess the routes meaningfully against the actual evidence');
+  expect(prompt).toContain('minimum material meaning and accountability');
+  expect(prompt).toContain('Preserve unknowns, limitations, dissent and low confidence explicitly');
+  expect(prompt).toContain('Do not fabricate a human confirmation');
+  expect(prompt).toContain('Do not create a human confirmation, decision, approval or route authority');
+  expect(prompt).toContain('unconfirmed candidate for human review');
+  expect(JSON.parse(user.content)).toMatchObject({sourceBundle:session.sources,confirmedFindings:session.data});
+  expect(JSON.stringify(draftResponseSchema(session,'recommendation'))).toBe(JSON.stringify(z.toJSONSchema(STAGE_SCHEMAS.recommendation)));
+  expect(draftMessages(session,'market-readiness',method)[0].content).not.toContain('6000 output tokens');
+ });
  test('chat prompt uses the same typed financial record schema without forcing completion',()=>{
   const prompt=systemPrompt(session,'financial-grounding');
   expect(prompt).toContain('input_type=unknown and value_or_range=null');

@@ -76,6 +76,7 @@ export const PlanSchema = z.object({
       { message: `Plan must contain exactly these elements, in order: ${ELEMENTS.join(", ")}` },
     ),
 });
+export const PlanGenerationContract = { name: "m01_intake_plan", schema: { type: "object", additionalProperties: false, required: ["summary", "elements"], properties: { summary: { type: "string" }, elements: { type: "array", items: { type: "object", additionalProperties: false, required: ["element", "coverage", "feedback", "evidence", "questions"], properties: { element: { type: "string" }, coverage: { type: "string", enum: ["Full", "Partial", "Thin", "None"] }, feedback: { type: "string" }, evidence: { type: "array", items: { type: "string" } }, questions: { type: "array", items: { type: "string" } } } } } } } } as const;
 export type IntakePlan = z.infer<typeof PlanSchema>;
 
 export const RULES = `You assess supplied founder material for five conviction elements and write the questions a live interviewer should ask.

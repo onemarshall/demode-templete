@@ -1,0 +1,118 @@
+/** Real Auth, separate local Node worker, SQL, Directus and browser; synthetic evidence only. */
+import {readFile,writeFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {randomUUID,createHash} from 'node:crypto';
+import {Pool} from 'pg';
+import {request,chromium} from '@playwright/test';
+import {readConnection,integrationState} from './local-stack';
+import {m02Drafts} from '../../../tests/strategy/fixtures/m02';
+import {verifyM02Seal} from '../../../src/lib/modules/strategy/server/stages/m02/seal';
+const config=await readConnection();
+const read=async(name:string)=>JSON.parse(await readFile(resolve(integrationState,name),'utf8'));
+const target=await read('m01-browser-target.json'),origin=new URL(target.url).origin;
+if(origin!=='http://127.0.0.1:5188')throw new Error('M02 verification requires the isolated Auth app');
+const predecessor=await read('m01-end-to-end-result.json');
+const base=target.base.replace(/founder-conviction$/,'market-reality');
+const api=await request.newContext({baseURL:origin,storageState:await read('m01-browser-state.json'),extraHTTPHeaders:{origin}});
+const anonymous=await request.newContext({baseURL:origin});
+const pool=new Pool({connectionString:config.databaseUrl});
+const hash=(text:string)=>createHash('sha256').update(text).digest('hex');
+let assertions=0,browser:Awaited<ReturnType<typeof chromium.launch>>|undefined;
+const check=(value:unknown,message:string)=>{if(!value)throw new Error(message);assertions++};
+let current:any;
+const fetchCurrent=async()=>{const response=await api.get(`${base}?sessionId=${current.session.sessionId}`,{headers:{accept:'application/json'}});check(response.ok(),'M02 scoped read succeeds');current=await response.json();return current};
+const command=(action:string,extra:Record<string,unknown>={})=>({action,sessionId:current.session.sessionId,expectedRevision:current.revision,commandId:randomUUID(),...extra});
+const post=async(body:unknown)=>{const response=await api.post(base,{data:body});const value=await response.json();if(!response.ok())throw new Error(`M02 command rejected (${response.status()}): ${value.error??'unknown'}`);assertions++;return value};
+const confirm=async(action:string,extra:Record<string,unknown>={})=>{await post(command(action,extra));await fetchCurrent()};
+const draft=async(gate:string)=>{
+ const before=current.revision,packet=command('draft',{gate}),job=await post(packet);
+ const replay=await post(packet);check(job.jobId===replay.jobId,'Draft request replay returns the same durable job');
+ let status:string|undefined;
+ for(let i=0;i<80;i++){
+  const response=await api.get(`${base}?sessionId=${current.session.sessionId}&jobId=${job.jobId}`,{headers:{accept:'application/json'}});
+  check(response.ok(),'Scoped job polling succeeds');status=(await response.json()).status;
+  if(status==='succeeded'||status==='failed'||status==='cancelled')break;
+  await new Promise(resolve=>setTimeout(resolve,350));
+ }
+ check(status==='succeeded',`Separate M02 worker completes ${gate}`);await fetchCurrent();
+ check(current.revision===before+1,'Draft commits exactly one session revision');
+ check(!!current.drafts[gate]?.candidate,'Draft candidate persists across independent HTTP reads');
+ check(!current.session.confirmations[gate],'Generation does not confirm the gate');
+ return job;
+};
+try {
+ await pool.query('UPDATE strategy_access_grant SET revoked_at=NULL WHERE id=$1',[target.grantId]);
+ check((await anonymous.get(base,{headers:{accept:'application/json'}})).status()===403,'Anonymous read denied');
+ const creation={action:'create',commandId:randomUUID()};
+ const created=await post(creation),replayed=await post(creation);check(created.id===replayed.id,'Create replay is idempotent');
+ current=created.payload;await fetchCurrent();
+ check(current.session.m01.sessionId===predecessor.sessionId,'M02 consumes the actual M01 session produced through Auth');
+ const foreign=await api.get(base.replace('/synthetic/','/not-assigned-synthetic/')+`?sessionId=${created.id}`,{headers:{accept:'application/json'}});
+ check([403,404].includes(foreign.status()),'Cross-brand read denied');
+ const setupJob=await draft('setup');
+ const stale=await api.post(base,{data:{...command('confirm-setup',{research:m02Drafts.setup}),expectedRevision:1}});
+ check(stale.status()===409,'Stale revision rejected');
+ await confirm('confirm-setup',{research:m02Drafts.setup,route:'full'});
+ const artifact=async(kind:string,targetName:string,url:string)=>{
+  const packet=command('add-artifact',{artifact:{kind,channel:'paste',target:targetName,source:`Synthetic ${kind} publication`,url,retrievedAt:'2026-10-29T12:00:00.000Z',verbatim:`Fictional software-test ${kind} evidence; no real observation or claim.`,access:'public',consent:'Synthetic fixture only; no external collection.',status:'gathered'}});
+  const added=await post(packet);await fetchCurrent();return added.artifact.id as string;
+ };
+ const competitor=await artifact('competitor','Synthetic Acme','https://acme.example/default');
+ const customer=await artifact('customer',m02Drafts.setup.cohort,'https://customers.example/testimony');
+ const market=await artifact('market',m02Drafts.setup.geography,'https://market.example/report');
+ await confirm('finish-gather');await confirm('review-artifacts');
+ await confirm('builder-inputs',{inputs:{p1:{verdict:'pass',finding:'Synthetic capability input.'},p2:{verdict:'pass',segment:m02Drafts.setup.cohort,standingStrength:'moderate',finding:'Synthetic standing input.'},p3:{verdict:'pass',finding:'Synthetic alignment input.'},foundersProblem:'Synthetic problem input; not testimony.',secondVoice:{present:false},ownedAudit:[]}});
+ await draft('terrain');await draft('gate1');
+ await confirm('confirm-gate1',{terrain:{...m02Drafts.terrain,artifactRefs:[market]},gate:{...m02Drafts.gate1,verdict:'pass',finding:'Synthetic software-test verdict.'}});
+ await draft('gate2');await confirm('confirm-gate2',{gate:{...m02Drafts.gate2,artifactRefs:[competitor],verdict:'pass',finding:'Synthetic software-test verdict.'}});
+ await draft('gate3');await confirm('confirm-gate3',{gate:{...m02Drafts.gate3,artifactRefs:[customer],verdict:'pass',finding:'Synthetic software-test verdict.'}});
+ await draft('gate4');await confirm('confirm-gate4',{gate:{...m02Drafts.gate4,artifactRefs:[customer],verdict:'pass',finding:'Synthetic software-test verdict.'}});
+ await draft('gate5');await confirm('confirm-gate5',{gate:{risks:m02Drafts.gate5.risks.map(r=>({...r,declined:false,dispute:''}))}});
+ await draft('gate6');await confirm('confirm-gate6',{gate:{...m02Drafts.gate6,standsWithoutTruth:false,artifactRefs:[market],verdictA:'pass',verdictB:'pass',finding:'Synthetic software-test verdict.'}});
+ const beforeReview=current.revision;
+ await confirm('evidence-review',{review:{disposition:'sufficient_for_provisional',rationale:'Synthetic software-test review of the fictional fixture only; not client approval or actual evidence.'}});
+ check(current.revision===beforeReview+1&&!current.session.progressionDecision,'Evidence judgment is recorded independently');
+ await confirm('outcome',{outcome:{outcome:'provisional_a',statement:'Synthetic decision: hypothesis work only, no validated demand or spending authority.',contrarianFlags:[]}});
+ const sealPacket=command('seal');await post(sealPacket);await fetchCurrent();await post(sealPacket);
+ check(current.session.stage==='sealed','Full M02 workflow seals');
+ const version=(await pool.query('SELECT canonical_payload,seal_hash,hash_algorithm FROM strategy_version WHERE id=$1',[current.seal.receiptId])).rows[0];
+ check(verifyM02Seal({sessionId:created.id,version:{canonicalPayload:version.canonical_payload,sealHash:version.seal_hash,hashAlgorithm:version.hash_algorithm},current,expectedSource:{versionId:current.sourceVersionId,hash:current.sourceHash}}).valid,'Independent receipt, canonical version, render and snapshot verification succeeds');
+ const versions=(await pool.query('SELECT count(*)::int AS count FROM strategy_version WHERE session_id=$1',[created.id])).rows[0].count;
+ check(versions===1,'Lost seal response replay creates one immutable version');
+ for(const document of current.documents){
+  const stored=(await pool.query('SELECT content,hash FROM strategy_document WHERE id=$1',[document.id])).rows[0];
+  check(stored.content===document.content&&stored.hash===hash(document.content),'Directus document bytes equal SQL content and hash');
+  const download=await api.get(`${base}/handoff?sessionId=${created.id}&versionId=${document.versionId}&documentId=${document.id}`);
+  check(download.ok()&&await download.text()===stored.content,'Export preserves exact immutable document bytes');
+ }
+ const document=current.documents.find((d:any)=>d.kind==='market-reality');
+ check(!!document&&!document.content.includes('[object Promise]'),'Deterministic client render contains real evidence counts');
+ browser=await chromium.launch({headless:true});const context=await browser.newContext({storageState:await api.storageState()}),page=await context.newPage();
+ const browserErrors:string[]=[];page.on('pageerror',error=>browserErrors.push(error.message));
+ await page.goto(`${origin}${base}?sessionId=${created.id}`,{waitUntil:'domcontentloaded',timeout:180000});
+ await page.getByRole('heading',{name:'Sealed Market Reality',exact:true}).waitFor({timeout:90000});
+ check(await page.getByRole('link',{name:'Download exact Markdown document'}).isVisible(),'Authenticated browser displays the exact saved document export');
+ check(await page.getByRole('button',{name:'Approve and seal immutable Market Reality'}).count()===0,'Sealed screen has no seal mutation control');
+ await page.screenshot({path:resolve(integrationState,'m02-sealed.png'),fullPage:true});
+ await page.getByLabel('Reason for a successor').fill('Synthetic browser recovery test.');
+ await page.getByRole('button',{name:'Create editable successor'}).click();
+ await page.waitForURL(url=>url.searchParams.get('sessionId')!==created.id,{timeout:30000});
+ await page.getByRole('button',{name:'Suggest setup',exact:true}).waitFor();
+ await page.getByRole('button',{name:'Suggest setup',exact:true}).click();
+ await page.getByRole('status').filter({hasText:'Suggested draft loaded'}).waitFor({timeout:90000});
+ check(await page.getByLabel('Cohort').inputValue()===m02Drafts.setup.cohort,'Browser loads the persisted generated research candidate');
+ await page.reload({waitUntil:'domcontentloaded'});
+ check(await page.getByLabel('Cohort').inputValue()===m02Drafts.setup.cohort,'Generated research candidate survives browser reload');
+ check(browserErrors.length===0,'Hydrated browser has no runtime errors');
+ await context.close();await browser.close();browser=undefined;
+ await pool.query('UPDATE strategy_access_grant SET revoked_at=now() WHERE id=$1',[target.grantId]);
+ check((await api.get(`${base}?sessionId=${created.id}`,{headers:{accept:'application/json'}})).status()===403,'Revoked grant blocks reads');
+ check((await api.get(`${base}/handoff?sessionId=${created.id}&versionId=${document.versionId}&documentId=${document.id}`)).status()===403,'Revoked grant blocks downloads');
+ check((await api.get(`${base}?sessionId=${created.id}&jobId=${setupJob.jobId}`,{headers:{accept:'application/json'}})).status()===403,'Revoked grant blocks job polling');
+ await writeFile(resolve(integrationState,'m02-end-to-end-result.json'),JSON.stringify({passed:true,assertions,sessionId:created.id,engagementId:predecessor.engagementId,versionId:current.seal.receiptId,versionHash:version.seal_hash,receiptHash:current.seal.sealHash,originM01SessionId:predecessor.sessionId,separateWorker:true,realAuth:true,directus:true,browser:true,provider:'local synthetic fake',paidRequests:0,at:new Date().toISOString()},null,2),{mode:0o600});
+ console.log(`PASS: ${assertions} M02 assertions across real Auth, separate worker, SQL, Directus, immutable export and hydrated browser. Zero paid requests.`);
+}finally{
+ await browser?.close();
+ await pool.query('UPDATE strategy_access_grant SET revoked_at=now() WHERE id=$1',[target.grantId]).catch(()=>{});
+ await api.dispose();await anonymous.dispose();await pool.end();
+}

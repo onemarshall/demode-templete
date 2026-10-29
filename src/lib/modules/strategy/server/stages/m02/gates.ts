@@ -16,10 +16,10 @@ export const Gate1Draft = z.object({
               vulnerability: z.string().default(""),
             }),
           )
-          .default([]),
+          .default(() => []),
       }),
     )
-    .default([]),
+    .default(() => []),
   descriptiveDefault: z.string().default(""),
   cohort: z.string().default(""),
   concentration: z.enum(["competitive", "concentrated"]).default("competitive"),
@@ -38,6 +38,7 @@ export const TerrainBody = z.object({
     "ambiguous-needs-evidence",
   ]),
   diagnosisEvidence: z.string().default(""),
+  artifactRefs: z.array(z.string()).default(() => []),
 });
 
 export type TerrainBody = z.infer<typeof TerrainBody>;
@@ -105,7 +106,7 @@ export const Gate2Draft = z.object({
 export type Gate2Draft = z.infer<typeof Gate2Draft>;
 
 export const Gate2Body = Gate2Draft.extend({
-  artifactRefs: z.array(z.string()).default([]),
+  artifactRefs: z.array(z.string()).default(() => []),
   verdict: z.enum(["pass", "fail", "evidence-insufficient"]),
   finding: z.string().default(""),
 });
@@ -125,7 +126,7 @@ export const Gate3Draft = z.object({
 export type Gate3Draft = z.infer<typeof Gate3Draft>;
 
 export const Gate3Body = Gate3Draft.extend({
-  artifactRefs: z.array(z.string()).default([]),
+  artifactRefs: z.array(z.string()).default(() => []),
   verdict: z.enum(["pass", "fail", "evidence-insufficient"]),
   finding: z.string().default(""),
 });
@@ -142,7 +143,7 @@ export const Gate4Draft = z.object({
 export type Gate4Draft = z.infer<typeof Gate4Draft>;
 
 export const Gate4Body = Gate4Draft.extend({
-  artifactRefs: z.array(z.string()).default([]),
+  artifactRefs: z.array(z.string()).default(() => []),
   verdict: z.enum(["pass", "fail", "evidence-insufficient"]),
   finding: z.string().default(""),
 });
@@ -192,7 +193,7 @@ const RiskDraftRow = z.object({
     .transform((v) => v ?? ""),
 });
 
-export const Gate5Draft = z.object({ risks: z.array(RiskDraftRow).default([]) });
+export const Gate5Draft = z.object({ risks: z.array(RiskDraftRow).default(() => []) });
 
 export type Gate5Draft = z.infer<typeof Gate5Draft>;
 
@@ -227,7 +228,7 @@ export const Gate6Body = z.object({
   standsWithoutTruth: z.boolean({
     error: "Answer the removal test — does the vacuum still stand without the Hidden Truth?",
   }),
-  artifactRefs: z.array(z.string()).default([]),
+  artifactRefs: z.array(z.string()).default(() => []),
   verdictA: z.enum(["pass", "fail", "evidence-insufficient"]),
   verdictB: z.enum(["pass", "fail", "evidence-insufficient"]),
   finding: z.string().default(""),
@@ -320,7 +321,7 @@ export function allowedOutcomes(
 export const OutcomeBody = z.object({
   outcome: z.enum(["provisional_a", "validated_a", "outcome_b", "outcome_c"]),
   statement: z.string().min(1, "Write the outcome statement"),
-  contrarianFlags: z.array(z.string()).default([]),
+  contrarianFlags: z.array(z.string()).default(() => []),
 });
 
 export type OutcomeBody = z.infer<typeof OutcomeBody>;
@@ -332,3 +333,12 @@ export const EvidenceReviewBody = z.object({
 });
 
 export type EvidenceReviewBody = z.infer<typeof EvidenceReviewBody>;
+
+/** Outcome A is only available after an explicit human finding of sufficient evidence. */
+export function assertEvidenceDispositionForOutcome(
+  outcome: string,
+  disposition: "sufficient_for_provisional" | "insufficient" | "contested" | null | undefined,
+) {
+  if ((outcome === "provisional_a" || outcome === "validated_a") && disposition !== "sufficient_for_provisional")
+    throw new Error("Outcome A needs a separate evidence review finding that the evidence is sufficient for provisional reliance");
+}

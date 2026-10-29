@@ -57,6 +57,8 @@ export function resolveSynthesisModel(
 const DEFAULT_SYNTHESIS_MODEL = "openai/gpt-6.1-sol";
 
 const MODULE_POLICIES = {
+  M01: { overrideVar: "M01_SYNTHESIS_MODEL", defaultModel: DEFAULT_SYNTHESIS_MODEL, label: "Founder Conviction drafting" },
+  M02: { overrideVar: "M02_SYNTHESIS_MODEL", defaultModel: DEFAULT_SYNTHESIS_MODEL, label: "Market Reality drafting" },
   M03: {
     overrideVar: "M03_SYNTHESIS_MODEL",
     defaultModel: DEFAULT_SYNTHESIS_MODEL,
@@ -160,3 +162,9 @@ export function resolveM12Model(env: Record<string, string | undefined>) {
 export function resolveBFModel(env: Record<string, string | undefined>) {
   return resolveSynthesisModel(env, MODULE_POLICIES.BF);
 }
+
+export const M01_DEFAULT_SYNTHESIS_MODEL=MODULE_POLICIES.M01.defaultModel;
+export function resolveM01Model(env:Record<string,string|undefined>){return resolveSynthesisModel(env,MODULE_POLICIES.M01);}
+
+export const M02_DEFAULT_SYNTHESIS_MODEL=MODULE_POLICIES.M02.defaultModel;
+export function resolveM02Model(env:Record<string,string|undefined>){return resolveSynthesisModel(env,MODULE_POLICIES.M02);}

@@ -13,7 +13,7 @@ export type M04LiveStage = typeof M04_LIVE_STAGES[number];
 export type M04StageCompletion = { revision: number; draftHash: string; generatedRevision: number };
 export type M04StageJob = { jobId?: string; inputRevision: number; providerRunId?: string; reserved: true };
 export type M04ReviewAudit = { originalGeneratedHash: string; changedFields: string[]; provenance: string; sourcePinnedIdentityCorrection: boolean };
-export type M04PreviousAttempt = { job: M04StageJob; completed: M04StageCompletion; commandId?: string; confirmCommandId?: string; reviewAudit?: M04ReviewAudit; reviewReason: string; archivedAt: string; jobStatus: string };
+export type M04PreviousAttempt = { job: M04StageJob; completed?: M04StageCompletion; commandId?: string; confirmCommandId?: string; reviewAudit?: M04ReviewAudit; reviewReason: string; archivedAt: string; failureKind: 'candidate-replaced' | 'terminal-job-retried'; jobStatus: string; jobError?: string | null };
 export type Checkpoint = { version: 2; runName: string; sessionId?: string; createCommandId?: string; commandIds: Partial<Record<M04LiveStage, string>>; confirmCommandIds: Partial<Record<M04LiveStage, string>>; finalCommandIds: Partial<Record<'present'|'decide'|'seal', string>>; finalCommands?: Partial<Record<'present'|'decide'|'seal', { commandId: string; expectedRevision: number; payloadHash?: string }>>; finalDecisionHash?: string; presentedHash?: string; jobs: Partial<Record<M04LiveStage, M04StageJob>>; completed: Partial<Record<M04LiveStage, M04StageCompletion>>; confirmed: Partial<Record<M04LiveStage, number>>; reviewAudit?: Partial<Record<M04LiveStage, M04ReviewAudit>>; previousAttempts?: Partial<Record<M04LiveStage, M04PreviousAttempt[]>>; budgetExtensions?: { from: number; to: number; reason: string; at: string }[]; callBudget: number; reservedCalls: number; createdAt: string };
 export function canonicalJson(value: any): string {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
@@ -57,8 +57,8 @@ export function prepareStageRetry(input: {
   checkpoint: Checkpoint;
   stage: M04LiveStage;
   reviewReason: string;
-  session: { stage?: string; seal?: unknown; confirmations?: Record<string, unknown>; drafts?: Record<string, unknown> };
-  previousJob: { id: string; status: string } | null;
+  session: { stage?: string; revision?: number; seal?: unknown; confirmations?: Record<string, unknown>; drafts?: Record<string, unknown> };
+  previousJob: { id: string; status: string; inputRevision?: number; lastError?: string | null } | null;
   activeJobs: { id: string; status: string }[];
   extendBudget?: 1;
   maxCalls: number;
@@ -80,6 +80,7 @@ export function prepareStageRetry(input: {
     if (input.extendBudget) throw new Error('The one-time budget extension cannot be repeated');
     if (input.maxCalls !== cp.callBudget) throw new Error('Resume must use the current lifetime budget');
     if (currentJob.jobId === priorAttempts.at(-1)?.job.jobId) throw new Error('Retry checkpoint still points at the archived job');
+    if (input.previousJob?.id === currentJob.jobId && ['failed', 'cancelled'].includes(input.previousJob.status)) throw new Error('This stage retry already ended without a candidate; the same stage cannot be retried again');
     if (input.activeJobs.some(job => (job.status === 'pending' || job.status === 'running') && job.id !== currentJob.jobId)) throw new Error('Cannot retry while another Strategy job is active');
     return { checkpoint: cp, prepared: false, alreadyPrepared: true };
   }
@@ -94,30 +95,46 @@ export function prepareStageRetry(input: {
   const completion = currentCompletion;
   const job = currentJob;
   const draft = input.session.drafts?.[input.stage];
-  if (!completion || !job?.jobId || !job.providerRunId || job.providerRunId.startsWith('run_local_') || !draft) throw new Error('Retry requires an existing live completed candidate and durable job');
-  if (safeHash(draft) !== completion.draftHash) throw new Error('Persisted candidate does not match the completed checkpoint hash');
-  if (!input.previousJob || input.previousJob.id !== job.jobId || input.previousJob.status !== 'succeeded') throw new Error('Original durable job must exist and be succeeded before retry');
+  if (!job?.jobId || !job.providerRunId || job.providerRunId.startsWith('run_local_')) throw new Error('Retry requires an existing live durable job');
+  if (!input.previousJob || input.previousJob.id !== job.jobId || input.previousJob.inputRevision !== job.inputRevision) throw new Error('Original durable job and input revision must match the checkpoint');
+  const failedWithoutCandidate = !completion && input.previousJob.status === 'failed';
+  if (completion) {
+    if (!draft) throw new Error('Retry requires an existing completed candidate and durable job');
+    if (safeHash(draft) !== completion.draftHash) throw new Error('Persisted candidate does not match the completed checkpoint hash');
+    if (input.previousJob.status !== 'succeeded') throw new Error('Completed candidate must belong to a succeeded durable job');
+  } else if (failedWithoutCandidate) {
+    if (draft) throw new Error('A terminal failed job cannot be retried while a stage candidate exists');
+    if (input.session.revision !== job.inputRevision) throw new Error('Terminal failed job input revision must match the current session revision');
+  } else {
+    throw new Error('Retry requires either a completed candidate or a terminal failed job without a candidate');
+  }
 
   if (input.extendBudget) {
-    if (input.extendBudget !== 1 || cp.callBudget !== 7 || cp.reservedCalls < 1 || cp.reservedCalls > 7 || input.maxCalls !== 8 || (cp.budgetExtensions?.length ?? 0) > 0)
-      throw new Error('One-time budget extension is available only from the original 7-call budget to 8');
+    const extensions = cp.budgetExtensions ?? [];
+    const firstExtension = cp.callBudget === 7 && cp.reservedCalls >= 1 && cp.reservedCalls <= 7 && input.maxCalls === 8 && extensions.length === 0;
+    const secondExtension = cp.callBudget === 8 && cp.reservedCalls === 8 && input.maxCalls === 9 && extensions.length === 1 && extensions[0].from === 7 && extensions[0].to === 8;
+    if (input.extendBudget !== 1 || (!firstExtension && !secondExtension))
+      throw new Error('One-time budget extension must advance exactly 7 to 8 or 8 to 9 at the matching reserved-call count');
     cp.budgetExtensions ??= [];
-    cp.budgetExtensions.push({ from: 7, to: 8, reason, at: input.now ?? new Date().toISOString() });
-    cp.callBudget = 8;
+    const from = cp.callBudget;
+    cp.budgetExtensions.push({ from, to: from + 1, reason, at: input.now ?? new Date().toISOString() });
+    cp.callBudget = from + 1;
   } else if (input.maxCalls !== cp.callBudget) {
-    throw new Error('Resume must use the current lifetime budget; use --extend-budget 1 explicitly for the one allowed extension');
+    throw new Error('Resume must use the current lifetime budget; use --extend-budget 1 explicitly for an allowed one-call extension');
   }
-  if (!input.extendBudget && cp.reservedCalls >= cp.callBudget) throw new Error('Lifetime provider call budget exhausted; explicitly extend the original budget before retrying');
+  if (!input.extendBudget && cp.reservedCalls >= cp.callBudget) throw new Error('Lifetime provider call budget exhausted; explicitly extend the budget before retrying');
 
   const attempt: M04PreviousAttempt = {
     job: structuredClone(job),
-    completed: structuredClone(completion),
+    ...(completion ? { completed: structuredClone(completion) } : {}),
     ...(cp.commandIds[input.stage] ? { commandId: cp.commandIds[input.stage] } : {}),
     ...(cp.confirmCommandIds[input.stage] ? { confirmCommandId: cp.confirmCommandIds[input.stage] } : {}),
     ...(cp.reviewAudit?.[input.stage] ? { reviewAudit: structuredClone(cp.reviewAudit[input.stage]) } : {}),
     reviewReason: reason,
     archivedAt: input.now ?? new Date().toISOString(),
+    failureKind: completion ? 'candidate-replaced' : 'terminal-job-retried',
     jobStatus: input.previousJob.status,
+    ...(input.previousJob.lastError ? { jobError: input.previousJob.lastError.slice(0, 500) } : { jobError: null }),
   };
   cp.previousAttempts ??= {};
   cp.previousAttempts[input.stage] ??= [];
@@ -155,7 +172,7 @@ export function parseOptions(argv: string[]) {
     if (argv[i] === '--extend-budget') options.extendBudget = Number(argv[++i]) as 1;
   }
   if (!options.live && options.maxCalls !== 0) throw new Error('--max-calls requires explicit --live');
-  if (options.live && (!Number.isInteger(options.maxCalls) || options.maxCalls < 1 || options.maxCalls > 8)) throw new Error('--live requires --max-calls between 1 and 8');
+  if (options.live && (!Number.isInteger(options.maxCalls) || options.maxCalls < 1 || options.maxCalls > 9)) throw new Error('--live requires --max-calls between 1 and 9');
   if (argv.includes('--retry-stage') && !options.retryStage) throw new Error('--retry-stage must name a M04 data stage');
   if (options.retryStage && !M04_LIVE_STAGES.includes(options.retryStage)) throw new Error('--retry-stage must name a M04 data stage');
   if (options.retryStage && (!options.live || !options.run || !options.resume || options.newRun)) throw new Error('--retry-stage requires --run <name> --resume --live');
@@ -164,7 +181,7 @@ export function parseOptions(argv: string[]) {
   if (options.extendBudget !== undefined && options.extendBudget !== 1) throw new Error('--extend-budget supports exactly 1 additional call');
   if (options.extendBudget && !options.retryStage) throw new Error('--extend-budget requires --retry-stage');
   if (options.newRun && options.maxCalls > 7) throw new Error('New runs cannot exceed the original 7-call budget');
-  if (options.extendBudget && options.maxCalls !== 8) throw new Error('--extend-budget 1 requires --max-calls 8');
+  if (options.extendBudget && ![8, 9].includes(options.maxCalls)) throw new Error('--extend-budget 1 requires --max-calls 8 or 9');
   if (options.envFile && !options.live) throw new Error('--env-file requires explicit --live');
   if (options.newRun && options.run) throw new Error('Use --new-run or --run, not both');
   if (options.live && !options.envFile) throw new Error('--live requires --env-file pointing to the private approved development configuration');
@@ -250,7 +267,7 @@ async function main() {
     cp = await readJson<Checkpoint>(checkpointPath);
     if (!options.run || options.newRun || !options.resume) throw new Error('Checkpoint already exists; use --run <name> --resume or choose a new --new-run name');
     if (cp.version !== 2 || cp.runName !== runName) throw new Error('Unsupported or mismatched checkpoint');
-    const extending = options.retryStage && options.extendBudget === 1 && cp.callBudget === 7 && options.maxCalls === 8;
+    const extending = options.retryStage && options.extendBudget === 1 && ((cp.callBudget === 7 && options.maxCalls === 8) || (cp.callBudget === 8 && options.maxCalls === 9));
     if (options.live && options.maxCalls !== cp.callBudget && !extending) throw new Error('Resume must use the current lifetime --max-calls budget');
   } catch (error) {
     if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) throw error;
@@ -389,7 +406,7 @@ async function main() {
       const loaded = await response.json();
       const oldJobId = cp.jobs[stage]?.jobId;
       const previousJobRow = oldJobId
-        ? (await observer.query('SELECT id,status FROM strategy_job WHERE id=$1 AND session_id=$2 AND engagement_id=$3', [oldJobId, cp.sessionId, test.engagementId])).rows[0]
+        ? (await observer.query('SELECT id,status,last_error,input_revision FROM strategy_job WHERE id=$1 AND session_id=$2 AND engagement_id=$3', [oldJobId, cp.sessionId, test.engagementId])).rows[0]
         : undefined;
       const activeRows = await observer.query("SELECT id,status FROM strategy_job WHERE session_id=$1 AND engagement_id=$2 AND status IN ('pending','running')", [cp.sessionId, test.engagementId]);
       const prepared = prepareStageRetry({
@@ -397,7 +414,7 @@ async function main() {
         stage,
         reviewReason: options.reviewReason!,
         session: loaded.session,
-        previousJob: previousJobRow ? { id: String(previousJobRow.id), status: String(previousJobRow.status) } : null,
+        previousJob: previousJobRow ? { id: String(previousJobRow.id), status: String(previousJobRow.status), inputRevision: Number(previousJobRow.input_revision), lastError: previousJobRow.last_error == null ? null : String(previousJobRow.last_error) } : null,
         activeJobs: activeRows.rows.map((row: any) => ({ id: String(row.id), status: String(row.status) })),
         extendBudget: options.extendBudget,
         maxCalls: options.maxCalls,

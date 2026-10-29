@@ -164,7 +164,7 @@ export class StrategyRepository implements StrategyStore {
       | { id: string; stage: string; payload: T }
       | ((source: SourceRecord) => { id: string; stage: string; payload: T }),
     slot: string,
-    verify: (source: SourceRecord) => void,
+    verify: (source: SourceRecord, tx: MutationContext) => void | Promise<void>,
     options?: { commandId: string; commandInput: unknown },
   ): Promise<StrategySession<T>> {
     assertStrategyScope(scope, ["edit", "manage"]);
@@ -188,7 +188,11 @@ export class StrategyRepository implements StrategyStore {
       }
       const source = await this.readSource(db, scope, slot);
       if (!source) throw new StrategyNotFound();
-      verify(source);
+      await verify(source, {
+        getSource: (slot) => this.readSource(db, scope, slot),
+        query: (text, values) => db.query(text, values),
+        assertJobLease: async () => { throw new Error("Jobs cannot create sessions"); },
+      });
       const input = typeof initializer === "function" ? initializer(source) : initializer;
       const session = await this.insertSession(db, scope, input);
       await db.query("INSERT INTO strategy_source_ref VALUES($1,$2,$3,$4,1,$5,$6,$7)", [

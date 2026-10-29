@@ -1,4 +1,4 @@
-import { strategyMethodRelease, loadStrategyMethod } from "../resources";
+import { hasStrategyMethodRelease, loadStrategyMethod } from "../resources";
 import { createStrategyJobRunner, type StrategyJobRunnerPorts } from "./runner";
 /** Node composition supplies current identity/permission/billing and provider ports.
  * There is deliberately no environment-derived admin or serialized-scope fallback.
@@ -7,7 +7,7 @@ export function createM04Worker(ports: StrategyJobRunnerPorts) {
   return createStrategyJobRunner({
     ...ports,
     execute: async (scope, job, lease, beforePublish) => {
-      if (job.methodRelease !== strategyMethodRelease)
+      if (!hasStrategyMethodRelease(job.methodRelease))
         throw new Error("Persisted method release unavailable in this worker");
       loadStrategyMethod("04-Viability-Check/04-Prompt.md", job.methodRelease);
       return ports.execute(scope, job, lease, beforePublish);

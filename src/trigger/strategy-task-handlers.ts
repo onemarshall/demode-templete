@@ -42,3 +42,13 @@ export async function runAuthStrategyRecoveryV1(runtime: {
   }
   return { jobs, outbox, errors: 0 };
 }
+
+export const authStrategyM01SessionV1PayloadSchema=z.object({version:z.literal(1),jobId:z.uuid()}).strict();
+export async function runAuthStrategyM01SessionV1(input:z.infer<typeof authStrategyM01SessionV1PayloadSchema>,runtime:{m01Worker:{run(jobId:string):Promise<'succeeded'|'unavailable'>}}){
+ const status=await runtime.m01Worker.run(input.jobId);return {jobId:input.jobId,status};
+}
+
+export const authStrategyM02SessionV1PayloadSchema=z.object({version:z.literal(1),jobId:z.uuid()}).strict();
+export async function runAuthStrategyM02SessionV1(input:z.infer<typeof authStrategyM02SessionV1PayloadSchema>,runtime:{m02Worker:{run(jobId:string):Promise<'succeeded'|'unavailable'>}}){
+ const status=await runtime.m02Worker.run(input.jobId);return {jobId:input.jobId,status};
+}

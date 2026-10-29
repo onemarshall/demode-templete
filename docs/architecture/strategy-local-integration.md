@@ -1,5 +1,7 @@
 # Strategy in Auth: local integration checkpoint
 
+**28 October completion:** Viability Check is complete as a locally verified Auth module. See [the consolidated completion checkpoint](m04-module-completion.md) for the seven-section live run, fixes, review limits and cleanup. Earlier dated sections below are historical evidence. No production rollout occurred.
+
 **27 October update:** The real provider adapter, versioned Trigger tasks and recovery are now implemented and verified locally. See [the worker checkpoint](strategy-worker-integration.md). Live Trigger registration/provider smoke testing requires approval after an automatic-review block; no production deployment has occurred.
 
 25 October 2026. M04 Viability Check is integrated into the Auth application in code and verified against a disposable local PostgreSQL and Directus stack. The existing Auth/Directus database has not been migrated, no real brand records were imported, and nothing was deployed. Strategy remains disabled by default.

@@ -48,7 +48,7 @@ export const ResearchForm = z.object({
   competitors: z.array(Competitor).min(1).max(8),
   cohort: z.string().min(1),
   geography: z.string().min(1),
-  platforms: z.array(z.string().min(1)).default([]),
+  platforms: z.array(z.string().min(1)).default(() => []),
   sectorGuess: z.string().default(""),
   rationale: z.string().default(""),
 });
@@ -125,7 +125,7 @@ export const M02Session = z.object({
     confirmed: ResearchForm.nullable().default(null),
   }),
   // Every human act is attributable: who confirmed, when.
-  confirmations: z.record(z.string(), Confirmation).default({}),
+  confirmations: z.record(z.string(), Confirmation).default(() => ({})),
   evidenceReview: EvidenceReviewReceipt.nullable().default(null),
   progressionDecision: ProgressionDecisionReceipt.nullable().default(null),
   revisionRequest: z
@@ -193,7 +193,7 @@ export const CollectionRecord = z.object({
   state: CollectionState,
   cohort: z.string().default(""),
   geography: z.string().default(""),
-  expected: z.array(ExpectedArtifact).default([]),
+  expected: z.array(ExpectedArtifact).default(() => []),
   // Stable event IDs + retrieval timestamps — pause/resume updates the
   // record idempotently rather than duplicating transitions.
   events: z
@@ -205,7 +205,7 @@ export const CollectionRecord = z.object({
         detail: z.string().default(""),
       }),
     )
-    .default([]),
+    .default(() => []),
   reviewTrigger: z.string().default(""),
   openedAt: z.string().nullable().default(null),
   updatedAt: z.string(),
@@ -219,7 +219,7 @@ export type CollectionRecord = z.infer<typeof CollectionRecord>;
 // — that reference is what the entanglement check resolves.
 export const GateVerdict = z.object({
   verdict: z.enum(["pending", "pass", "fail", "evidence-insufficient"]).default("pending"),
-  artifactRefs: z.array(z.string()).default([]),
+  artifactRefs: z.array(z.string()).default(() => []),
   confidence: z.enum(["high", "medium", "low"]).nullable().default(null),
   finding: z.string().default(""),
   assessedAt: z.string().nullable().default(null),
@@ -236,9 +236,9 @@ const P2Verdict = GateVerdict.extend({
 });
 
 const Preconditions = z.object({
-  p1: GateVerdict.default(GateVerdict.parse({})),
-  p2: P2Verdict.default(P2Verdict.parse({})),
-  p3: GateVerdict.default(GateVerdict.parse({})),
+  p1: GateVerdict.default(() => GateVerdict.parse({})),
+  p2: P2Verdict.default(() => P2Verdict.parse({})),
+  p3: GateVerdict.default(() => GateVerdict.parse({})),
 });
 
 const SecondVoice = z.object({
@@ -266,12 +266,12 @@ const Terrain = z.object({
     ])
     .default("pending"),
   diagnosisEvidence: z.string().default(""),
-  artifactRefs: z.array(z.string()).default([]),
+  artifactRefs: z.array(z.string()).default(() => []),
 });
 
 const CompetitorDecode = z.object({
   competitor: z.string(),
-  artifactRefs: z.array(z.string()).default([]),
+  artifactRefs: z.array(z.string()).default(() => []),
   beliefs: z
     .array(
       z.object({
@@ -280,11 +280,11 @@ const CompetitorDecode = z.object({
         vulnerability: z.string().default(""),
       }),
     )
-    .default([]),
+    .default(() => []),
 });
 
 const Gate1Section = GateVerdict.extend({
-  decodes: z.array(CompetitorDecode).default([]),
+  decodes: z.array(CompetitorDecode).default(() => []),
   descriptiveDefault: z.string().default(""),
   cohort: z.string().default(""),
   concentration: z.enum(["pending", "competitive", "concentrated"]).default("pending"),
@@ -313,8 +313,8 @@ const PainProfile = z.object({
 });
 
 const Gate3Section = GateVerdict.extend({
-  ownedAudit: z.array(OwnedAuditRow).default([]),
-  painProfile: PainProfile.default(PainProfile.parse({})),
+  ownedAudit: z.array(OwnedAuditRow).default(() => []),
+  painProfile: PainProfile.default(() => PainProfile.parse({})),
 });
 
 const AudienceRow = z.object({
@@ -328,7 +328,7 @@ const AudienceRow = z.object({
     .default("unknown"),
   evidence: z.string().default(""),
   confidence: z.enum(["high", "medium", "low", "unknown"]).default("unknown"),
-  artifactRefs: z.array(z.string()).default([]),
+  artifactRefs: z.array(z.string()).default(() => []),
 });
 
 const Gate4Section = GateVerdict.extend({
@@ -350,10 +350,10 @@ const RiskRow = z.object({
   evidence: z.string().default(""),
   severity: z.enum(["manageable", "material", "critical"]).nullable().default(null),
   mitigationRouting: z.enum(["m03", "m04", "m11", "external"]).nullable().default(null),
-  acknowledgment: RiskAcknowledgment.default(RiskAcknowledgment.parse({})),
+  acknowledgment: RiskAcknowledgment.default(() => RiskAcknowledgment.parse({})),
 });
 
-const Gate5Section = z.object({ risks: z.array(RiskRow).default([]) });
+const Gate5Section = z.object({ risks: z.array(RiskRow).default(() => []) });
 
 const Gate6a = GateVerdict.extend({ implication: z.string().default("") });
 
@@ -364,17 +364,17 @@ const Gate6b = z.object({
 });
 
 const Gate6Section = z.object({
-  a: Gate6a.default(Gate6a.parse({})),
-  b: Gate6b.default(Gate6b.parse({})),
+  a: Gate6a.default(() => Gate6a.parse({})),
+  b: Gate6b.default(() => Gate6b.parse({})),
 });
 
 const EntanglementSection = z.object({
   pass: z.boolean().nullable().default(null),
-  problems: z.array(z.string()).default([]),
+  problems: z.array(z.string()).default(() => []),
 });
 
 const ContrarianSection = z.object({
-  flags: z.array(z.string()).default([]),
+  flags: z.array(z.string()).default(() => []),
   clear: z.boolean().nullable().default(null),
 });
 
@@ -383,7 +383,7 @@ const SynthesisSection = z.object({
     .enum(["pending", "provisional_a", "validated_a", "outcome_b", "outcome_c"])
     .default("pending"),
   statement: z.string().default(""),
-  acknowledgedRisks: z.array(z.string()).default([]),
+  acknowledgedRisks: z.array(z.string()).default(() => []),
 });
 
 const RuntimeState = z.object({
@@ -434,47 +434,47 @@ export const ReconLog = z.object({
   }),
 
   // 1 — Builder preconditions: P1 capability, P2 standing (graduated), P3 alignment.
-  preconditions: Preconditions.default(Preconditions.parse({})),
+  preconditions: Preconditions.default(() => Preconditions.parse({})),
 
   // 1b — Second-Voice Diagnostic (informational, not a gate).
-  secondVoice: SecondVoice.default(SecondVoice.parse({})),
+  secondVoice: SecondVoice.default(() => SecondVoice.parse({})),
 
   // 2 — Terrain Pre-Check + Cyclical-vs-Structural diagnosis.
-  terrain: Terrain.default(Terrain.parse({})),
+  terrain: Terrain.default(() => Terrain.parse({})),
 
   // 3 — Gate 1: Descriptive Default per cohort.
-  gate1: Gate1Section.default(Gate1Section.parse({})),
+  gate1: Gate1Section.default(() => Gate1Section.parse({})),
 
   // 4 — Gate 2: Default is Vulnerable (defender's case + evidence rebuttal).
-  gate2: Gate2Section.default(Gate2Section.parse({})),
+  gate2: Gate2Section.default(() => Gate2Section.parse({})),
 
   // 5 — Gate 3: customer pain traced to Default; 5a owned-evidence audit first.
-  gate3: Gate3Section.default(Gate3Section.parse({})),
+  gate3: Gate3Section.default(() => Gate3Section.parse({})),
 
   // 5c — Audience Access Evidence (typed input for Module 06; never channel picks).
-  audienceAccess: z.array(AudienceRow).default([]),
+  audienceAccess: z.array(AudienceRow).default(() => []),
 
   // 6 — Gate 4: willingness to pay at sustainable price.
-  gate4: Gate4Section.default(Gate4Section.parse({})),
+  gate4: Gate4Section.default(() => Gate4Section.parse({})),
 
   // 7 — Gate 5 (Condition Gate): R1–R4 + signed acknowledgments. Cannot fail-route.
-  gate5: Gate5Section.default(Gate5Section.parse({})),
+  gate5: Gate5Section.default(() => Gate5Section.parse({})),
 
   // 8 — Gate 6a + 6b: Hidden Truth evidenced + vacuum traces to THIS truth.
-  gate6: Gate6Section.default(Gate6Section.parse({})),
+  gate6: Gate6Section.default(() => Gate6Section.parse({})),
 
   // 9 — Entanglement: Gates 2/3/6a on distinct sources.
-  entanglement: EntanglementSection.default(EntanglementSection.parse({})),
+  entanglement: EntanglementSection.default(() => EntanglementSection.parse({})),
 
   // 10 — Contrarian-trap audit.
-  contrarianTrap: ContrarianSection.default(ContrarianSection.parse({})),
+  contrarianTrap: ContrarianSection.default(() => ContrarianSection.parse({})),
 
   // 11 — Synthesis + outcome.
-  synthesis: SynthesisSection.default(SynthesisSection.parse({})),
+  synthesis: SynthesisSection.default(() => SynthesisSection.parse({})),
 
   // 12 — Risk flags + runtime state.
-  riskFlags: z.array(z.string()).default([]),
-  state: RuntimeState.default(RuntimeState.parse({})),
+  riskFlags: z.array(z.string()).default(() => []),
+  state: RuntimeState.default(() => RuntimeState.parse({})),
 });
 
 export type ReconLog = z.infer<typeof ReconLog>;
@@ -543,7 +543,7 @@ export const BuilderInputBody = z.object({
       diverge: z.string().default(""),
       signal: z.string().default(""),
     })
-    .default({
+    .default(() => ({
       present: null,
       name: "",
       role: "",
@@ -551,7 +551,7 @@ export const BuilderInputBody = z.object({
       converge: "",
       diverge: "",
       signal: "",
-    }),
+    })),
   ownedAudit: z
     .array(
       z.object({
@@ -562,7 +562,7 @@ export const BuilderInputBody = z.object({
         artifactRef: z.string().nullable().default(null),
       }),
     )
-    .default([]),
+    .default(() => []),
 });
 
 export type BuilderInputBody = z.infer<typeof BuilderInputBody>;

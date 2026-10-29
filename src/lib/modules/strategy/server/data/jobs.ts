@@ -131,6 +131,11 @@ export class StrategyJobs {
     const { rows } = await this.pool.query("SELECT * FROM strategy_job WHERE id=$1", [jobId]);
     return rows[0] ? mapJob(rows[0]) : null;
   }
+  /** Trusted dispatch metadata is read from the persisted session. */
+  async moduleForJob(jobId: string): Promise<string | null> {
+    const {rows}=await this.pool.query('SELECT s.stage FROM strategy_job j JOIN strategy_session s ON s.organisation_id=j.organisation_id AND s.brand_id=j.brand_id AND s.engagement_id=j.engagement_id AND s.id=j.session_id WHERE j.id=$1',[jobId]);
+    return rows[0]?.stage??null;
+  }
   async get(scope: StrategyScope, jobId: string): Promise<DurableJob | null> {
     assertStrategyScope(scope, ["generate"]);
     return this.transaction(scope, async (db) => {
@@ -184,9 +189,9 @@ export class StrategyJobs {
       await this.assertPins(db, scope, input.pins);
       const stage = input.command.stage;
       if (
-        current.rows[0].stage === "m04" &&
-        typeof stage === "string" &&
-        m04DraftStages.has(stage)
+        (current.rows[0].stage === "m04" && typeof stage === "string" && m04DraftStages.has(stage)) ||
+        (current.rows[0].stage === "m01" && stage === "m01" && input.command.module === "m01") ||
+        (current.rows[0].stage === "m02" && stage === "m02" && input.command.module === "m02")
       ) {
         const active = await db.query(
           `SELECT * FROM strategy_job

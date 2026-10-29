@@ -10,9 +10,9 @@ try {
  const denied=await api.post(target.base,{data:{action:'seal',sessionId:target.recordId,expectedRevision:loaded.session.revision,commandId:randomUUID()}});check(denied.status()===403,'Brand admin without explicit approver cannot approve');
  await pool.query('UPDATE strategy_access_grant SET actions=$2,is_approver=true WHERE id=$1',[test.grantId,grant.actions]);
  const created=await api.post(target.base,{data:{action:'create',commandId:randomUUID()}});check(created.ok(),'Create next synthetic working session');const record=await created.json();
- await pool.query('UPDATE creem_subscription SET status=$2 WHERE "referenceId"=$1',[grant.user_id,'cancelled']);
+ await pool.query('UPDATE subscription SET status=$2 WHERE "referenceId"=$1',[grant.user_id,'canceled']);
  const unpaid=await api.post(target.base,{data:{action:'draft',stage:'context',sessionId:record.id,expectedRevision:record.revision,commandId:randomUUID()}});check(unpaid.status()===403,'Expired entitlement denies generation');
- await pool.query('UPDATE creem_subscription SET status=$2 WHERE "referenceId"=$1',[grant.user_id,'active']);
+ await pool.query('UPDATE subscription SET status=$2 WHERE "referenceId"=$1',[grant.user_id,'active']);
  await pool.query("UPDATE brand_member SET status='revoked' WHERE brand_id=$1 AND user_id=$2",[grant.brand_id,grant.user_id]);check((await api.get(target.handoff)).status()===403,'Brand assignment revocation denies export');
  await pool.query("UPDATE brand_member SET status='active' WHERE brand_id=$1 AND user_id=$2",[grant.brand_id,grant.user_id]);
  const membership=(await pool.query('DELETE FROM member WHERE "organizationId"=$1 AND "userId"=$2 RETURNING *',[grant.organisation_id,grant.user_id])).rows[0];check((await api.get(target.handoff)).status()===403,'Organisation membership revocation denies export');

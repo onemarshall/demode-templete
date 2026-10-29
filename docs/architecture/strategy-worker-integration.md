@@ -1,5 +1,7 @@
 # M04 provider and worker integration
 
+**28 October completion:** Viability Check is complete as a locally verified Auth module. See [the consolidated completion checkpoint](m04-module-completion.md) for the seven-section live run, fixes, review limits and cleanup. Earlier dated sections below are historical evidence. No production rollout occurred.
+
 **Current checkpoint: live development verification passed.** One real context draft was saved, reviewed, approved and sealed with six supporting fixture sections. Directus, export, browser display and revoked-access checks passed. No production deployment or existing-database migration occurred. See the final verification section below.
 
 27 October 2026. Auth now contains the real OpenRouter-compatible provider adapter, versioned Trigger task entry points, SQL-backed checkpoint delivery and bounded recovery. The local integration uses the actual HTTP adapters and task handler in a separate plain Node process. No production deployment or existing Auth database migration has occurred.

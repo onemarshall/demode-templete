@@ -164,13 +164,15 @@ export function createStrategyOutboxDispatcher(ports: {
             "m04.checkpoint",
             "m04.revise",
             "m01.checkpoint",
+            "m02.checkpoint",
+            "m02.successor",
             "m01.successor",
             "m04.successor",
           ].includes(event.kind)
         ) {
           const isSuccessor = event.kind.endsWith(".successor");
           const restartFrom = isSuccessor
-            ? event.kind === "m01.successor"
+            ? event.kind === "m02.successor" ? "setup" : event.kind === "m01.successor"
               ? "plan"
               : "context"
             : String(event.payload.restartFrom ?? event.payload.stage);

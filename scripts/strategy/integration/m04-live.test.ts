@@ -11,16 +11,18 @@ describe('M04 live harness safety', () => {
   test('requires explicit live mode and a bounded call count', () => {
     expect(() => parseOptions(['--max-calls', '1'])).toThrow('--max-calls requires explicit --live');
     expect(() => parseOptions(['--live', '--max-calls', '8', '--env-file', '/tmp/private.env', '--new-run', 'one'])).toThrow('New runs cannot exceed the original 7-call budget');
+    expect(() => parseOptions(['--live', '--max-calls', '9', '--env-file', '/tmp/private.env', '--new-run', 'one'])).toThrow('New runs cannot exceed the original 7-call budget');
     expect(parseOptions(['--live', '--max-calls', '7', '--env-file', '/tmp/private.env', '--new-run', 'one']).live).toBe(true);
     expect(parseOptions(['--confirm-review', '--run', 'one', '--resume']).live).toBe(false);
     expect(parseOptions(['--present-only', '--run', 'one', '--resume']).presentOnly).toBe(true);
     expect(() => parseOptions(['--confirm-review', '--run', 'one', '--live', '--max-calls', '7', '--env-file', '/tmp/private.env'])).toThrow('separate zero-provider-call steps');
     expect(parseOptions(['--run', 'one', '--resume', '--live', '--max-calls', '8', '--env-file', '/tmp/private.env', '--retry-stage', 'financial-grounding', '--review-reason', 'Correct invalid economic input contract', '--extend-budget', '1'])).toMatchObject({ retryStage: 'financial-grounding', extendBudget: 1, maxCalls: 8 });
+    expect(parseOptions(['--run', 'one', '--resume', '--live', '--max-calls', '9', '--env-file', '/tmp/private.env', '--retry-stage', 'recommendation', '--review-reason', 'Retry terminal output-cap failure', '--extend-budget', '1'])).toMatchObject({ retryStage: 'recommendation', extendBudget: 1, maxCalls: 9 });
     expect(() => parseOptions(['--run', 'one', '--resume', '--live', '--max-calls', '7', '--env-file', '/tmp/private.env', '--retry-stage', 'financial-grounding'])).toThrow('non-empty --review-reason');
     expect(() => parseOptions(['--run', 'one', '--resume', '--live', '--max-calls', '7', '--env-file', '/tmp/private.env', '--retry-stage'])).toThrow('must name a M04 data stage');
     expect(() => parseOptions(['--run', 'one', '--resume', '--live', '--max-calls', '7', '--env-file', '/tmp/private.env', '--review-reason', 'because'])).toThrow('requires --retry-stage');
     expect(() => parseOptions(['--run', 'one', '--resume', '--live', '--max-calls', '7', '--env-file', '/tmp/private.env', '--extend-budget', '1'])).toThrow('requires --retry-stage');
-    expect(() => parseOptions(['--run', 'one', '--resume', '--live', '--max-calls', '7', '--env-file', '/tmp/private.env', '--retry-stage', 'financial-grounding', '--review-reason', 'because', '--extend-budget', '1'])).toThrow('requires --max-calls 8');
+    expect(() => parseOptions(['--run', 'one', '--resume', '--live', '--max-calls', '7', '--env-file', '/tmp/private.env', '--retry-stage', 'financial-grounding', '--review-reason', 'because', '--extend-budget', '1'])).toThrow('requires --max-calls 8 or 9');
     expect(() => parseOptions(['--run', 'one', '--resume', '--live', '--max-calls', '8', '--env-file', '/tmp/private.env', '--retry-stage', 'financial-grounding', '--review-reason', 'because', '--confirm-review'])).toThrow('separate from confirmation');
   });
   test('review packets preserve the exact candidate and expose source identity issues', () => {
@@ -97,7 +99,7 @@ describe('M04 live harness safety', () => {
       reviewAudit: { [stage]: { originalGeneratedHash: safeHash(oldDraft), changedFields: [], provenance: 'human-edited-review-packet', sourcePinnedIdentityCorrection: false } },
       confirmed: {}, callBudget: 7, reservedCalls: 7, createdAt: 'now',
     };
-    const prepared = prepareStageRetry({ checkpoint, stage, reviewReason: 'Economic input contract validation failed', session: { stage, drafts: { [stage]: oldDraft }, confirmations: {} }, previousJob: { id: 'job-old', status: 'succeeded' }, activeJobs: [], extendBudget: 1, maxCalls: 8, now: 'retry-time' });
+    const prepared = prepareStageRetry({ checkpoint, stage, reviewReason: 'Economic input contract validation failed', session: { stage, drafts: { [stage]: oldDraft }, confirmations: {} }, previousJob: { id: 'job-old', status: 'succeeded', inputRevision: 20 }, activeJobs: [], extendBudget: 1, maxCalls: 8, now: 'retry-time' });
     expect(checkpoint.jobs[stage].jobId).toBe('job-old');
     expect(prepared.checkpoint.previousAttempts?.[stage]?.[0]).toMatchObject({ job: { jobId: 'job-old', providerRunId: 'run_old' }, completed: { draftHash: safeHash(oldDraft) }, commandId: 'draft-old', confirmCommandId: 'confirm-old', jobStatus: 'succeeded', reviewReason: 'Economic input contract validation failed' });
     expect(prepared.checkpoint.jobs[stage]).toBeUndefined();
@@ -116,7 +118,7 @@ describe('M04 live harness safety', () => {
     const stage = 'financial-grounding';
     const draft = { generated: true };
     const base: any = { version: 2, runName: 'r', jobs: { [stage]: { jobId: 'job-old', inputRevision: 1, providerRunId: 'run_old', reserved: true } }, completed: { [stage]: { revision: 2, generatedRevision: 2, draftHash: safeHash(draft) } }, commandIds: {}, confirmCommandIds: {}, confirmed: {}, callBudget: 7, reservedCalls: 1, createdAt: 'now' };
-    const input: any = { checkpoint: base, stage, reviewReason: 'Review failed grounding', session: { stage, drafts: { [stage]: draft }, confirmations: {} }, previousJob: { id: 'job-old', status: 'succeeded' }, activeJobs: [], maxCalls: 7 };
+    const input: any = { checkpoint: base, stage, reviewReason: 'Review failed grounding', session: { stage, drafts: { [stage]: draft }, confirmations: {} }, previousJob: { id: 'job-old', status: 'succeeded', inputRevision: 1 }, activeJobs: [], maxCalls: 7 };
     expect(() => prepareStageRetry({ ...input, checkpoint: { ...base, confirmed: { [stage]: 3 } } })).toThrow('confirmed stage');
     expect(() => prepareStageRetry({ ...input, session: { ...input.session, stage: 'human-load' } })).toThrow('current stage');
     expect(() => prepareStageRetry({ ...input, session: { ...input.session, seal: { id: 'sealed' } } })).toThrow('sealed');
@@ -128,7 +130,7 @@ describe('M04 live harness safety', () => {
     const stage = 'financial-grounding';
     const draft = { invalid: true };
     const checkpoint: any = { version: 2, runName: 'retry', jobs: { [stage]: { jobId: 'job-old', inputRevision: 4, providerRunId: 'run_old', reserved: true } }, completed: { [stage]: { revision: 5, generatedRevision: 5, draftHash: safeHash(draft) } }, commandIds: {}, confirmCommandIds: {}, confirmed: {}, callBudget: 7, reservedCalls: 7, createdAt: 'now' };
-    const args: any = { checkpoint, stage, reviewReason: 'Correct rejected contract', session: { stage, drafts: { [stage]: draft }, confirmations: {} }, previousJob: { id: 'job-old', status: 'succeeded' }, activeJobs: [], maxCalls: 7 };
+    const args: any = { checkpoint, stage, reviewReason: 'Correct rejected contract', session: { stage, drafts: { [stage]: draft }, confirmations: {} }, previousJob: { id: 'job-old', status: 'succeeded', inputRevision: 4 }, activeJobs: [], maxCalls: 7 };
     expect(() => prepareStageRetry(args)).toThrow('budget exhausted');
     const first = prepareStageRetry({ ...args, extendBudget: 1, maxCalls: 8, now: 'once' }).checkpoint;
     expect(() => prepareStageRetry({ ...args, checkpoint: first, extendBudget: 1, maxCalls: 8 })).toThrow('cannot be repeated');
@@ -150,11 +152,62 @@ describe('M04 live harness safety', () => {
     const stage = 'financial-grounding';
     const draft = { invalid: true };
     const checkpoint: any = { version: 2, runName: 'five-used', jobs: { [stage]: { jobId: 'job-old', inputRevision: 4, providerRunId: 'run_old', reserved: true } }, completed: { [stage]: { revision: 5, generatedRevision: 5, draftHash: safeHash(draft) } }, commandIds: {}, confirmCommandIds: {}, confirmed: {}, callBudget: 7, reservedCalls: 5, createdAt: 'now' };
-    const prepared = prepareStageRetry({ checkpoint, stage, reviewReason: 'Correct invalid financial contract', session: { stage, drafts: { [stage]: draft }, confirmations: {} }, previousJob: { id: 'job-old', status: 'succeeded' }, activeJobs: [], extendBudget: 1, maxCalls: 8, now: 'once' });
+    const prepared = prepareStageRetry({ checkpoint, stage, reviewReason: 'Correct invalid financial contract', session: { stage, drafts: { [stage]: draft }, confirmations: {} }, previousJob: { id: 'job-old', status: 'succeeded', inputRevision: 4 }, activeJobs: [], extendBudget: 1, maxCalls: 8, now: 'once' });
     expect(prepared.checkpoint.reservedCalls).toBe(5);
     expect(prepared.checkpoint.callBudget).toBe(8);
     expect(reserveProviderCall(prepared.checkpoint, stage, 6)).toMatchObject({ newlyReserved: true, reservation: { inputRevision: 6 } });
     expect(prepared.checkpoint.reservedCalls).toBe(6);
+  });
+  test('terminal failed recommendation retry archives failure without inventing a candidate and permits only explicit 8-to-9 extension', () => {
+    const stage = 'recommendation';
+    const checkpoint: any = {
+      version: 2, runName: 'failed-recommendation',
+      jobs: { [stage]: { jobId: 'job-cap-failed', inputRevision: 14, providerRunId: 'run_cap_failed', reserved: true } },
+      completed: {}, commandIds: { [stage]: 'draft-cap-command' }, confirmCommandIds: {}, confirmed: {},
+      callBudget: 8, reservedCalls: 8,
+      budgetExtensions: [{ from: 7, to: 8, reason: 'Prior reviewed replacement', at: 'earlier' }],
+      createdAt: 'now',
+    };
+    const args: any = {
+      checkpoint, stage, reviewReason: 'Retry terminal recommendation output-cap failure',
+      session: { stage, revision: 14, drafts: {}, confirmations: {} },
+      previousJob: { id: 'job-cap-failed', status: 'failed', inputRevision: 14, lastError: 'output limit reached' },
+      activeJobs: [], maxCalls: 9, extendBudget: 1, now: 'retry-nine',
+    };
+    const prepared = prepareStageRetry(args).checkpoint;
+    const archived = prepared.previousAttempts?.[stage]?.[0];
+    expect(archived).toMatchObject({
+      job: { jobId: 'job-cap-failed', inputRevision: 14, providerRunId: 'run_cap_failed' },
+      commandId: 'draft-cap-command', failureKind: 'terminal-job-retried', jobStatus: 'failed',
+      jobError: 'output limit reached', reviewReason: args.reviewReason,
+    });
+    expect(archived).not.toHaveProperty('completed');
+    expect(prepared.completed[stage]).toBeUndefined();
+    expect(prepared.jobs[stage]).toBeUndefined();
+    expect(prepared.reservedCalls).toBe(8);
+    expect(prepared.callBudget).toBe(9);
+    expect(prepared.budgetExtensions).toEqual([
+      { from: 7, to: 8, reason: 'Prior reviewed replacement', at: 'earlier' },
+      { from: 8, to: 9, reason: args.reviewReason, at: 'retry-nine' },
+    ]);
+    expect(reserveProviderCall(prepared, stage, 14)).toMatchObject({ newlyReserved: true, reservation: { inputRevision: 14 } });
+    expect(prepared.reservedCalls).toBe(9);
+    expect(() => prepareStageRetry({ ...args, checkpoint: prepared })).toThrow('cannot be repeated');
+  });
+  test('failed-job retry requires exact current input revision and cannot reuse a failed retry attempt', () => {
+    const stage = 'recommendation';
+    const checkpoint: any = { version: 2, runName: 'failed-recommendation', jobs: { [stage]: { jobId: 'job-failed', inputRevision: 14, providerRunId: 'run_failed', reserved: true } }, completed: {}, commandIds: {}, confirmCommandIds: {}, confirmed: {}, callBudget: 8, reservedCalls: 6, createdAt: 'now' };
+    const args: any = { checkpoint, stage, reviewReason: 'Retry terminal recommendation failure', session: { stage, revision: 14, drafts: {}, confirmations: {} }, previousJob: { id: 'job-failed', status: 'failed', inputRevision: 14, lastError: null }, activeJobs: [], maxCalls: 8 };
+    expect(prepareStageRetry(args).checkpoint.previousAttempts?.[stage]?.[0]).not.toHaveProperty('completed');
+    expect(() => prepareStageRetry({ ...args, session: { ...args.session, revision: 15 } })).toThrow('input revision must match');
+    expect(() => prepareStageRetry({ ...args, session: { ...args.session, drafts: { [stage]: { unsupported: true } } } })).toThrow('candidate exists');
+    expect(() => prepareStageRetry({ ...args, checkpoint: { ...checkpoint, confirmed: { [stage]: 15 } } })).toThrow('confirmed stage');
+    expect(() => prepareStageRetry({ ...args, session: { ...args.session, stage: 'awareness-and-weighing' } })).toThrow('current stage');
+    const prepared = prepareStageRetry(args).checkpoint;
+    const retryJob = { jobId: 'retry-failed', inputRevision: 14, providerRunId: 'run_retry_failed', reserved: true as const };
+    const failedAgain = { ...prepared, jobs: { ...prepared.jobs, [stage]: retryJob } };
+    expect(() => prepareStageRetry({ ...args, checkpoint: failedAgain, previousJob: { id: retryJob.jobId, status: 'failed', inputRevision: 14 } })).toThrow('already ended without a candidate');
+    expect(() => prepareStageRetry({ ...args, checkpoint: prepared, extendBudget: 1, maxCalls: 9 })).toThrow('cannot be repeated');
   });
   test('lost confirmation acknowledgement reconciles only the exact current committed confirmation', () => {
     const candidate = { decisionOwner: 'Owner', authorityRef: 'Pinned', plannedOffer: 'Model wording' };

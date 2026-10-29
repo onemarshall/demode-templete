@@ -52,10 +52,10 @@ export const SectorProvenance = z.object({
   recordId: z.string(),
   evidenceStrength: z.string().optional(),
   evidenceClass: z.string().optional(),
-  sourceRefs: z.array(z.string()).default([]),
+  sourceRefs: z.array(z.string()).default(() => []),
   scope: z.string().optional(),
   // The row itself, preserved verbatim.
-  row: z.record(z.string(), z.unknown()).default({}),
+  row: z.record(z.string(), z.unknown()).default(() => ({})),
 });
 
 export type SectorProvenance = z.infer<typeof SectorProvenance>;
@@ -83,6 +83,7 @@ export const Artifact = z.object({
   consent: z.string().default("public artifact"),
   status: ArtifactStatus.default("gathered"),
   error: z.string().optional(),
+  httpStatus: z.number().int().min(0).max(599).optional(),
   // Per-artifact gathering cost — treg credits, request counts (Q12).
   cost: z.object({ units: z.number(), unit: z.string() }).optional(),
   note: z.string().optional(),
@@ -92,7 +93,7 @@ export const Artifact = z.object({
 export type Artifact = z.infer<typeof Artifact>;
 
 export const ArtifactStore = z.object({
-  artifacts: z.array(Artifact).default([]),
+  artifacts: z.array(Artifact).default(() => []),
 });
 
 export type ArtifactStore = z.infer<typeof ArtifactStore>;

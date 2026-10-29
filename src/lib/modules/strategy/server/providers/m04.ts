@@ -5,6 +5,7 @@ import { Reply } from "../stages/m04/chat";
 import { draftMessages, draftResponseSchema, parseDraftCandidate } from "../stages/m04/synthesis";
 import type { M04Session } from "../stages/m04/contracts";
 import type { M04ServicePorts } from "../stages/m04/service";
+import { boundedCompletion } from "./completion";
 
 type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 type DiagnosticPhase = "start" | "headers" | "completed" | "failed";
@@ -22,7 +23,6 @@ export type M04ProviderDiagnostic = {
   schemaIssues?: Array<{ code: string; path: Array<string | number> }>;
 };
 type DiagnosticFn = (diagnostic: M04ProviderDiagnostic) => void;
-const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const ConfigSchema = z.object({
   apiKey: z.string().min(1),
   model: z.string().min(1).default(M04_DEFAULT_SYNTHESIS_MODEL),
@@ -41,149 +41,27 @@ const ConfigSchema = z.object({
 });
 export type M04ProviderConfig = z.input<typeof ConfigSchema>;
 
-const CompletionSchema = z.object({
-  id: z.unknown().optional(),
-  choices: z.array(z.object({
-    message: z.object({ content: z.string().nullable().optional() }),
-    finish_reason: z.string().nullable().optional(),
-  })).optional(),
-  usage: z.unknown().optional(),
-});
-
 class SafeProviderError extends Error {
-  constructor(name: string, message: string) {
-    super(message);
-    this.name = name;
-  }
-}
-
-function generationId(value: unknown): string | undefined {
-  return typeof value === "string" && value.length <= 128 && /^[A-Za-z0-9._:-]+$/.test(value) ? value : undefined;
-}
-
-function failureKind(error: unknown): FailureKind {
-  const name = error instanceof Error ? error.name : "";
-  return name.startsWith("M04Provider") ? (name.slice("M04Provider".length, -5).replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`).replace(/^_/, "") as FailureKind) : "response";
+  constructor(name: string, message: string) { super(message); this.name = name; }
 }
 
 function providerErrorName(kind: FailureKind): string {
   return `M04Provider${kind.split("_").map((part) => part[0]!.toUpperCase() + part.slice(1)).join("")}Error`;
 }
 
-async function readBoundedBody(response: Response, signal: AbortSignal): Promise<string> {
-  const length = response.headers.get("content-length");
-  if (length && Number(length) > MAX_RESPONSE_BYTES) throw new Error("AI provider response exceeded the size limit");
-  if (!response.body) throw new Error("AI provider returned no response body");
-  const reader = response.body.getReader();
-  const cancelOnAbort = () => {
-    void reader.cancel().catch(() => {});
-  };
-  signal.addEventListener("abort", cancelOnAbort, { once: true });
-  if (signal.aborted) cancelOnAbort();
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      total += value.byteLength;
-      if (total > MAX_RESPONSE_BYTES) {
-        await reader.cancel();
-        throw new Error("AI provider response exceeded the size limit");
-      }
-      chunks.push(value);
-    }
-  } finally {
-    signal.removeEventListener("abort", cancelOnAbort);
-    reader.releaseLock();
-  }
-  const bytes = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  try {
-    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-  } catch {
-    throw new Error("AI provider returned an invalid response");
-  }
-}
-
 /** OpenRouter-compatible adapter for the M04 service ports. */
 export function createM04Providers(configInput: M04ProviderConfig): Pick<M04ServicePorts, "generate" | "chat"> {
   const config = ConfigSchema.parse(configInput);
-  const fetcher: FetchFn = config.fetch ?? globalThis.fetch;
   const diagnose = (event: M04ProviderDiagnostic) => {
     try { config.onDiagnostic?.(event); } catch { /* Observability must not affect generation. */ }
   };
 
   async function complete(messages: unknown[], model: string, maxTokens: number, options?: { responseFormat?: unknown; provider?: unknown; stream?: boolean }) {
-    const controller = new AbortController();
-    let timeout: ReturnType<typeof setTimeout> | undefined;
-    const startedAt = Date.now();
-    const body = JSON.stringify({
-      model,
-      max_tokens: maxTokens,
-      response_format: options?.responseFormat ?? { type: "json_object" },
-      ...(options?.provider === undefined ? {} : { provider: options.provider }),
-      ...(options?.stream === undefined ? {} : { stream: options.stream }),
-      ...(config.reasoningEffort === undefined ? {} : { reasoning: { effort: config.reasoningEffort } }),
-      messages,
-    });
-    const requestBytes = new TextEncoder().encode(body).byteLength;
-    let status: number | undefined;
-    let generation: string | undefined;
-    diagnose({ phase: "start", model, maxTokens, ...(config.reasoningEffort === undefined ? {} : { reasoningEffort: config.reasoningEffort }), requestBytes, elapsedMs: 0 });
-    const operation = async () => {
-      let response: Response;
-      try {
-        response = await fetcher(config.endpoint, {
-          method: "POST",
-          headers: {
-            authorization: `Bearer ${config.apiKey}`,
-            "content-type": "application/json",
-          },
-          signal: controller.signal,
-          redirect: "error",
-          body,
-        });
-      } catch {
-        throw new SafeProviderError(providerErrorName(controller.signal.aborted ? "timeout" : "request"), "AI provider request failed or timed out");
-      }
-      status = response.status;
-      diagnose({ phase: "headers", model, requestBytes, elapsedMs: Date.now() - startedAt, status });
-      if (response.redirected || (response.status >= 300 && response.status < 400))
-        throw new SafeProviderError(providerErrorName("redirect"), "AI provider redirect was rejected");
-      if (!response.ok) throw new SafeProviderError(providerErrorName("http"), "AI provider request failed");
-      let responseBody: z.infer<typeof CompletionSchema>;
-      try {
-        responseBody = CompletionSchema.parse(JSON.parse(await readBoundedBody(response, controller.signal)));
-      } catch {
-        throw new SafeProviderError(providerErrorName(controller.signal.aborted ? "timeout" : "response"), "AI provider returned an invalid response");
-      }
-      generation = generationId(responseBody.id);
-      const choice = responseBody.choices?.[0];
-      if (choice?.finish_reason === "length") throw new SafeProviderError(providerErrorName("truncated"), "AI response was truncated; retry with a narrower request");
-      if (!choice?.message.content) throw new SafeProviderError(providerErrorName("no_content"), "AI provider returned no usable response");
-      let value: unknown;
-      try { value = JSON.parse(choice.message.content); } catch { throw new SafeProviderError(providerErrorName("content_json"), "AI provider returned invalid JSON"); }
-      return { value, usage: responseBody.usage, status, generationId: generation, startedAt, requestBytes };
-    };
-    const deadline = new Promise<never>((_resolve, reject) => {
-      timeout = setTimeout(() => {
-        controller.abort();
-        reject(new SafeProviderError(providerErrorName("timeout"), "AI provider request failed or timed out"));
-      }, config.timeoutMs);
-    });
-    try {
-      return await Promise.race([operation(), deadline]);
-    } catch (error) {
-      diagnose({ phase: "failed", model, requestBytes, elapsedMs: Date.now() - startedAt, ...(status === undefined ? {} : { status }), failureKind: failureKind(error), ...(generation ? { generationId: generation } : {}) });
-      throw error;
-    } finally {
-      if (timeout !== undefined) clearTimeout(timeout);
-    }
+    const result = await boundedCompletion({ apiKey: config.apiKey, endpoint: config.endpoint, timeoutMs: config.timeoutMs, fetch: config.fetch, errorPrefix: "M04Provider", reportCompleted: false, onDiagnostic: (event) => {
+      if (event.phase === "completed") return;
+      diagnose({ phase: event.phase, model: event.model, maxTokens, ...(event.requestBytes === undefined ? {} : { requestBytes: event.requestBytes }), ...(event.elapsedMs === undefined ? {} : { elapsedMs: event.elapsedMs }), ...(event.status === undefined ? {} : { status: event.status }), ...(event.failureKind === undefined ? {} : { failureKind: event.failureKind as FailureKind }), ...(event.generationId === undefined ? {} : { generationId: event.generationId }), ...(event.phase === "start" && config.reasoningEffort !== undefined ? { reasoningEffort: config.reasoningEffort } : {}) });
+    } }, { messages, model, maxTokens, responseFormat: options?.responseFormat, provider: options?.provider, stream: options?.stream, reasoningEffort: config.reasoningEffort });
+    return { ...result, startedAt: result.startedAt };
   }
 
   return {

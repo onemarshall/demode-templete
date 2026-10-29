@@ -31,8 +31,8 @@ try {
  await pool.query('INSERT INTO personal_organisation_owner(organisation_id,owner_user_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[org,user.id]);
  await pool.query('INSERT INTO brand(id,organisation_id,name,slug,created_by) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING',[brand,org,'Synthetic integration brand','synthetic',user.id]);
  await pool.query("INSERT INTO brand_member(id,brand_id,user_id,role,status,grant_source,granted_by) VALUES($1,$2,$3,'brand_admin','active','administrative',$3) ON CONFLICT DO NOTHING",[`strategy-assignment-${suffix}`,brand,user.id]);
- await pool.query('INSERT INTO creem_subscription(id,"productId","referenceId",status,"periodEnd") VALUES($1,$2,$3,$4,now()+interval \'1 day\') ON CONFLICT DO NOTHING',[`strategy-subscription-${suffix}`,'synthetic-test-only',user.id,'active']);
- await pool.query('UPDATE creem_subscription SET status=$2,"periodEnd"=now()+interval \'1 day\' WHERE "referenceId"=$1',[user.id,'active']);
+ await pool.query('INSERT INTO subscription(id,plan,"referenceId",status,"periodEnd") VALUES($1,$2,$3,$4,now()+interval \'1 day\') ON CONFLICT DO NOTHING',[`strategy-subscription-${suffix}`,'synthetic-test-only',user.id,'active']);
+ await pool.query('UPDATE subscription SET status=$2,"periodEnd"=now()+interval \'1 day\' WHERE "referenceId"=$1',[user.id,'active']);
  await pool.query('INSERT INTO strategy_brand_binding(organisation_id,brand_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[org,brand]);
  await pool.query('INSERT INTO strategy_engagement(organisation_id,brand_id,id,label,created_by) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING',[org,brand,test.engagementId,'Synthetic integration engagement',user.id]);
  await pool.query("INSERT INTO strategy_access_grant(id,organisation_id,brand_id,engagement_id,user_id,actions,is_approver,authority_role) VALUES($1,$2,$3,$4,$5,ARRAY['read','edit','approve','generate','export','manage'],true,$6) ON CONFLICT(id) DO UPDATE SET revoked_at=NULL",[test.grantId,org,brand,test.engagementId,user.id,test.actor.role]);

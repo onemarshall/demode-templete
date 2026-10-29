@@ -34,6 +34,8 @@ export interface M04Command {
   };
 }
 export interface M04ServicePorts {
+  /** Explicit resource release pinned by a durable generation job. */
+  methodRelease?: string;
   repository: StrategyRepository;
   /** Host-resolved business authority, never supplied by browser input. */
   actor(scope: StrategyScope): Promise<Actor>;
@@ -49,6 +51,7 @@ export interface M04ServicePorts {
   }): Promise<{ candidate: unknown; model: string; usage?: unknown }>;
 }
 export function createM04Service(ports: M04ServicePorts) {
+  const methodRelease = ports.methodRelease ?? strategyMethodRelease;
   const repo = ports.repository;
   async function source(scope: StrategyScope) {
     const record = await repo.getSource(scope, M04_SOURCE_SLOT);
@@ -87,7 +90,7 @@ export function createM04Service(ports: M04ServicePorts) {
         const result = fn(s, current.body as CurrentM04Source, actor) ?? { payload: s };
         s.history.push({
           action: "authenticated-command",
-          methodRelease: strategyMethodRelease,
+          methodRelease,
           actorId: scope.actorId,
           commandId: command.commandId,
           at: new Date().toISOString(),
@@ -166,7 +169,7 @@ export function createM04Service(ports: M04ServicePorts) {
         (record) => {
           const s = createM04(record.body as CurrentM04Source, actor);
           s.revision = 1;
-          s.history.push({ action: "method-release", methodRelease: strategyMethodRelease });
+          s.history.push({ action: "method-release", methodRelease });
           return { id: s.sessionId, stage: "m04", payload: s };
         },
         M04_SOURCE_SLOT,
@@ -242,7 +245,7 @@ export function createM04Service(ports: M04ServicePorts) {
         const result = sealM04(s, current, actor, randomUUID()),
           versionId = s.seal!.versionId;
         const methodProvenance = JSON.stringify({
-          methodRelease: strategyMethodRelease,
+          methodRelease,
           stage: "m04",
           sourceHash: s.sourceHash,
           sealHash: result.hash,
@@ -306,7 +309,7 @@ export function createM04Service(ports: M04ServicePorts) {
             command.reason,
           );
           next.revision = 1;
-          next.history.push({ action: "method-release", methodRelease: strategyMethodRelease });
+          next.history.push({ action: "method-release", methodRelease });
           return {
             successor: { id: next.sessionId, stage: "m04", payload: next },
             outbox: [
@@ -415,7 +418,7 @@ export function createM04Service(ports: M04ServicePorts) {
           current.history.push({
             action: "chat-turn",
             candidateProvided: candidate !== undefined,
-            methodRelease: strategyMethodRelease,
+            methodRelease,
             stage: command.stage,
             messages: added,
             model: reply.model,
@@ -455,7 +458,7 @@ export function createM04Service(ports: M04ServicePorts) {
         current.drafts[command.stage] = candidate;
         current.history.push({
           action: "model-draft",
-          methodRelease: strategyMethodRelease,
+          methodRelease,
           stage: command.stage,
           model: response.model,
           usage: response.usage ?? null,

@@ -12,7 +12,7 @@ import {
   type M01Session,
   type M01Input,
 } from "./session";
-import { PlanSchema, intakeMessages } from "./preparation";
+import { PlanSchema, intakeMessages, PlanGenerationContract } from "./preparation";
 import { conversationMessages, readTranscript, type TranscriptLine } from "./conversation";
 import {
   synthesise,
@@ -32,6 +32,19 @@ import {
 } from "./handoff";
 import { checkpointEvent } from "./checkpoints";
 export const M01_SOURCE_SLOT = "m01-input";
+function normalizedEventId(event: unknown): string | undefined {
+  if (!event || typeof event !== "object" || Array.isArray(event)) return;
+  const value = (event as Record<string, unknown>).event_id;
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+function eventContent(event: unknown): string {
+  const canonical = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(canonical);
+    if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([key, child]) => [key, canonical(child)]));
+    return value;
+  };
+  return JSON.stringify(canonical(event));
+}
 export interface M01Command {
   sessionId: string;
   expectedRevision: number;
@@ -39,6 +52,8 @@ export interface M01Command {
   jobLease?: { jobId: string; fence: number };
 }
 export interface M01Ports {
+  /** Explicit resource release pinned by a durable generation job. */
+  methodRelease?: string;
   repository: StrategyRepository;
   /** Verify conviction-source attribution using the mutation transaction and lock
    * any host-owned attribution/grant rows until the approval commits. */
@@ -55,6 +70,7 @@ export interface M01Ports {
   };
 }
 export function createM01Service(ports: M01Ports) {
+  const methodRelease = ports.methodRelease ?? strategyMethodRelease;
   const repo = ports.repository;
   async function loadRecord(scope: StrategyScope, id: string) {
     const record = await repo.getSession<M01Session>(scope, id);
@@ -93,7 +109,7 @@ export function createM01Service(ports: M01Ports) {
         s.history.push({
           action: operation,
           actorId: scope.actorId,
-          methodRelease: strategyMethodRelease,
+          methodRelease,
           at: s.updatedAt,
         });
         return {
@@ -133,7 +149,7 @@ export function createM01Service(ports: M01Ports) {
           s.history.push({
             action: "created",
             actorId: scope.actorId,
-            methodRelease: strategyMethodRelease,
+            methodRelease,
             at: s.createdAt,
           });
           return { id: s.sessionId, stage: "m01", payload: s };
@@ -161,7 +177,7 @@ export function createM01Service(ports: M01Ports) {
     async prepare(scope: StrategyScope, command: M01Command) {
       const { source, model } = await generation(scope, command),
         messages = intakeMessages(source.parts, source.engagement);
-      const response = await model.call(messages[0].content, messages[1].content);
+      const response = await model.call(messages[0].content, messages[1].content, PlanGenerationContract);
       const plan = {
         ...PlanSchema.parse(response),
         engagement: source.engagement || undefined,
@@ -182,15 +198,33 @@ export function createM01Service(ports: M01Ports) {
       if (!command.events.length || command.events.length > 500)
         throw new Error("Supply between 1 and 500 transcript events");
       return mutate(scope, command, "transcript", (s) => {
-        for (const event of command.events)
+        const seen = new Map<string, string>();
+        for (const line of s.transcript) {
+          const id = normalizedEventId(line.event);
+          if (id) seen.set(id, eventContent(line.event));
+        }
+        for (const event of command.events) {
+          const id = normalizedEventId(event);
+          if (id) {
+            const content = eventContent(event), prior = seen.get(id);
+            if (prior !== undefined) {
+              if (prior !== content) throw new Error("Transcript event id was reused with different content");
+              continue;
+            }
+            seen.set(id, content);
+          }
           s.transcript.push({ at: new Date().toISOString(), event });
+        }
       });
     },
     async turn(scope: StrategyScope, command: M01Command & { message: string | null }) {
       const { s, model } = await generation(scope, command);
       if (!s.plan) throw new Error("This run has no interview plan.");
-      // Exact original message ordering retained; latest-message omission is a recorded legacy defect.
-      const reply = (await model.chat(conversationMessages(s.plan, s.note, s.chat))).trim();
+      // Include the pending user input in model context before committing it once.
+      const currentMessages = command.message
+        ? [...s.chat, { role: "user" as const, content: command.message, at: new Date().toISOString() }]
+        : s.chat;
+      const reply = (await model.chat(conversationMessages(s.plan, s.note, currentMessages))).trim();
       if (!reply) throw new Error("The interviewer returned nothing — try again.");
       const now = new Date().toISOString(),
         events: TranscriptLine[] = [];
@@ -217,7 +251,7 @@ export function createM01Service(ports: M01Ports) {
         throw new Error("There's barely a conversation yet — answer a few questions first.");
       const outputs = await synthesise(s.plan, lines, s.note, model.call, model.name);
       return mutate(scope, command, "synthesise", (current) => ({
-        payload: Object.assign(current, { outputs }),
+        payload: Object.assign(current, { outputs, setTwoDraft: null }),
         outbox: [checkpointEvent(current.sessionId, "conversation", current.revision + 1)],
       }));
     },
@@ -245,6 +279,7 @@ export function createM01Service(ports: M01Ports) {
           a.key === command.anchorKey ? { ...a, sentence } : a,
         );
         next.outputs.anchorStatus[command.anchorKey] = "candidate";
+        next.setTwoDraft = null;
       });
     },
     async reviseManifesto(scope: StrategyScope, command: M01Command & { note: string }) {
@@ -263,6 +298,7 @@ export function createM01Service(ports: M01Ports) {
         if (!next.outputs) throw new Error("Nothing to revise.");
         next.outputs.outputs.manifesto = manifesto;
         next.outputs.status.manifesto = "candidate";
+        next.setTwoDraft = null;
       });
     },
     async reviseMatrix(scope: StrategyScope, command: M01Command & { note: string }) {
@@ -300,6 +336,7 @@ export function createM01Service(ports: M01Ports) {
       return mutate(scope, command, "edit-anchor", (s) => {
         if (!s.outputs) throw new Error("Nothing to edit.");
         editAnchor(s.outputs, command.anchorKey, command.sentence);
+        s.setTwoDraft = null;
       });
     },
     async derive(scope: StrategyScope, command: M01Command) {
@@ -362,7 +399,7 @@ export function createM01Service(ports: M01Ports) {
           {
             kind: "method-provenance",
             content: JSON.stringify({
-              methodRelease: strategyMethodRelease,
+              methodRelease,
               stage: "m01",
               sourceHash: s.sourceHash,
               outputsHash: handoff.outputsHash,

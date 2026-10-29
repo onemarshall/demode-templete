@@ -34,13 +34,14 @@ export interface StrategyCheckpointGateway {
 
 /** Explicit Node host adapter; no task instance enters the web application bundle. */
 export interface TriggerDeliveryConfiguration {accessToken:string;baseURL?:string;branch?:string}
-export function createTriggerM04Gateway(configuration?:TriggerDeliveryConfiguration): StrategyJobGateway {
+export function createTriggerStrategyGateway(taskId:string,configuration?:TriggerDeliveryConfiguration): StrategyJobGateway {
+  if(!["auth-strategy-m04-session-v2","auth-strategy-m01-session-v1","auth-strategy-m02-session-v1"].includes(taskId))throw new Error("Unsupported Strategy task");
   return {
     async dispatch({ jobId, idempotencyKey }) {
       const { tasks, idempotencyKeys } = await import("@trigger.dev/sdk");
       const key = await idempotencyKeys.create(idempotencyKey, { scope: "global" });
       const handle = await tasks.trigger(
-        "auth-strategy-m04-session-v2",
+        taskId,
         { version: 1, jobId },
         { idempotencyKey: key },
         configuration?{clientConfig:{accessToken:configuration.accessToken,baseURL:configuration.baseURL,previewBranch:configuration.branch}}:undefined,
@@ -49,3 +50,8 @@ export function createTriggerM04Gateway(configuration?:TriggerDeliveryConfigurat
     },
   };
 }
+
+export const createTriggerM04Gateway=(configuration?:TriggerDeliveryConfiguration)=>createTriggerStrategyGateway("auth-strategy-m04-session-v2",configuration);
+export const createTriggerM01Gateway=(configuration?:TriggerDeliveryConfiguration)=>createTriggerStrategyGateway("auth-strategy-m01-session-v1",configuration);
+
+export const createTriggerM02Gateway=(configuration?:TriggerDeliveryConfiguration)=>createTriggerStrategyGateway("auth-strategy-m02-session-v1",configuration);
