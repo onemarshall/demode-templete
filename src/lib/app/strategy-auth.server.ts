@@ -1,6 +1,6 @@
 /** Web activation composes Strategy with real Better Auth. Fixture mode changes
  * model/delivery ports only; it never supplies a principal, permission or source. */
-import {createTriggerM04Gateway,createTriggerM01Gateway,createTriggerM02Gateway,createTriggerM03Gateway,createTriggerBFGateway,createTriggerM05Gateway,createTriggerM06Gateway,createTriggerM07Gateway,createTriggerM08Gateway,createTriggerM09Gateway,createTriggerM10Gateway,createTriggerCDGateway,createTriggerM11Gateway} from '#lib/modules/strategy/server/jobs/gateway.js';
+import {createTriggerM04Gateway,createTriggerM01Gateway,createTriggerM02Gateway,createTriggerM03Gateway,createTriggerBFGateway,createTriggerM05Gateway,createTriggerM06Gateway,createTriggerM07Gateway,createTriggerM08Gateway,createTriggerM09Gateway,createTriggerM10Gateway,createTriggerCDGateway,createTriggerM11Gateway,createTriggerM12Gateway} from '#lib/modules/strategy/server/jobs/gateway.js';
 import {strategyDeliveryConfiguration,strategyM01VoiceConfiguration} from './strategy-configuration.server';
 import {dev} from '$app/env';
 import {createM01VoiceProvider} from '#lib/modules/strategy/server/providers/m01-voice.js';
@@ -25,7 +25,7 @@ export async function initializeAuthStrategy():Promise<void> {
   const delivery=strategyDeliveryConfiguration(configuration);
   if(!delivery)throw new Error('Strategy delivery credentials are not configured');
   const voiceConfig=strategyM01VoiceConfiguration(configuration);
-  configured=await createAuthStrategyRuntime({voice:voiceConfig?createM01VoiceProvider(voiceConfig):undefined,m01Gateway:createTriggerM01Gateway(delivery),m02Gateway:createTriggerM02Gateway(delivery),m03Gateway:createTriggerM03Gateway(delivery),bfGateway:createTriggerBFGateway(delivery),m05Gateway:createTriggerM05Gateway(delivery),m06Gateway:createTriggerM06Gateway(delivery),m07Gateway:createTriggerM07Gateway(delivery),m08Gateway:createTriggerM08Gateway(delivery),m09Gateway:createTriggerM09Gateway(delivery),m10Gateway:createTriggerM10Gateway(delivery),cdGateway:createTriggerCDGateway(delivery),m11Gateway:createTriggerM11Gateway(delivery),gateway:createTriggerM04Gateway(delivery),directus:{url:env.STRATEGY_DIRECTUS_URL??'',token:env.STRATEGY_DIRECTUS_READER_TOKEN??''},resolvePrincipal:async event=>{
+  configured=await createAuthStrategyRuntime({voice:voiceConfig?createM01VoiceProvider(voiceConfig):undefined,m01Gateway:createTriggerM01Gateway(delivery),m02Gateway:createTriggerM02Gateway(delivery),m03Gateway:createTriggerM03Gateway(delivery),bfGateway:createTriggerBFGateway(delivery),m05Gateway:createTriggerM05Gateway(delivery),m06Gateway:createTriggerM06Gateway(delivery),m07Gateway:createTriggerM07Gateway(delivery),m08Gateway:createTriggerM08Gateway(delivery),m09Gateway:createTriggerM09Gateway(delivery),m10Gateway:createTriggerM10Gateway(delivery),cdGateway:createTriggerCDGateway(delivery),m11Gateway:createTriggerM11Gateway(delivery),m12Gateway:createTriggerM12Gateway(delivery),gateway:createTriggerM04Gateway(delivery),directus:{url:env.STRATEGY_DIRECTUS_URL??'',token:env.STRATEGY_DIRECTUS_READER_TOKEN??''},resolvePrincipal:async event=>{
    const session=await auth.api.getSession({headers:event.request.headers});return session?.user?.id??null;
   }});
  })();
@@ -58,3 +58,5 @@ export function authStrategyM10Host(){if(!configured)throw new StrategyAccessErr
 export function authStrategyCDHost(){if(!configured)throw new StrategyAccessError();return configured.cdHost;}
 
 export function authStrategyM11Host(){if(!configured)throw new StrategyAccessError();return configured.m11Host;}
+
+export function authStrategyM12Host(){if(!configured)throw new StrategyAccessError();return configured.m12Host;}
