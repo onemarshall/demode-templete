@@ -2,13 +2,15 @@
 	import * as Select from "#lib/components/ui/select/index.js";
 	import { Button } from "#lib/components/ui/button/index.js";
 	import * as Card from "#lib/components/ui/card/index.js";
-	import type { M04Field } from "#lib/modules/strategy/shared/fields/m04.js";
-	import RecursiveFieldEditor from "./M04FieldEditor.svelte";
+	import type { Field, FieldComputed, FieldDerive } from "#lib/modules/strategy/shared/fields/types.js";
+	import RecursiveFieldEditor from "./StageFieldEditor.svelte";
 
-	let { fields, value = {}, onChange, depth = 0 }: {
-		fields: readonly M04Field[];
+	let { fields, value = {}, onChange, derive, computed, depth = 0 }: {
+		fields: readonly Field[];
 		value?: Record<string, unknown>;
 		onChange: (next: Record<string, unknown>) => void;
+		derive?: FieldDerive;
+		computed?: FieldComputed;
 		depth?: number;
 	} = $props();
 
@@ -21,33 +23,22 @@
 		} else if (field?.optional && nextValue === "") delete next[key];
 		else next[key] = nextValue;
 		if (field?.mirrorBoolean) next[field.mirrorBoolean] = nextValue === "applicable";
-		if (key === "input_type" && nextValue === "unknown") next.value_or_range = null;
-		if (key === "modelQuestions" && Array.isArray(nextValue)) {
-			const answers = nextValue as string[];
-			const yes = answers.filter((answer) => answer === "yes").length;
-			next.complexity = answers.length !== 4 || answers.some((answer) => answer === "unknown") ? "unknown" : yes >= 3 ? "high" : yes > 0 ? "mixed" : "low";
-		}
+		derive?.(key, nextValue, next);
 		onChange(next);
 	};
-	const add = (field: M04Field) => {
+	const add = (field: Field) => {
 		const current = Array.isArray(value[field.key]) ? [...(value[field.key] as unknown[])] : [];
 		current.push(field.kind === "object-list" ? {} : "");
 		set(field.key, current);
 	};
-	const setObject = (field: M04Field, nextValue: Record<string, unknown> | null) => set(field.key, nextValue);
-	const remove = (field: M04Field, index: number) => {
+	const setObject = (field: Field, nextValue: Record<string, unknown> | null) => set(field.key, nextValue);
+	const remove = (field: Field, index: number) => {
 		const current = [...((value[field.key] as unknown[]) ?? [])];
 		current.splice(index, 1);
 		set(field.key, current);
 	};
-	const computedValue = (field: M04Field, current: unknown) => {
-		if (field.key === "allowedOutputs" && Array.isArray(current)) {
-			if (!current.length) return "No additional output authority";
-			return current.map((item) => typeof item === "string" && item.startsWith("reduced-") ? `Named reduced capability: ${item.slice("reduced-".length).replaceAll("-", " ")}` : String(item)).join(", ");
-		}
-		if (field.key === "memoHash" && typeof current === "string") return current ? "Exact recommendation version recorded" : "Present the exact recommendation before recording a decision";
-		return String(current ?? "unknown");
-	};
+	const computedValue = (field: Field, current: unknown) =>
+		computed?.(field.key, current) ?? String(current ?? "unknown");
 </script>
 
 <div class="space-y-5">
@@ -60,11 +51,11 @@
 					<div class="flex gap-2">{#if field.nullable}<Button type="button" variant="outline" size="sm" onclick={() => setObject(field, null)}>Clear / not applicable</Button>{/if}<Button type="button" variant="outline" size="sm" onclick={() => setObject(field, (current && typeof current === "object" && !Array.isArray(current) ? current : {}) as Record<string, unknown>)}>{current && typeof current === "object" ? "Edit details" : "Enter details"}</Button></div>
 				</div>
 				{#if current && typeof current === "object" && !Array.isArray(current) && field.itemFields}
-					<Card.Root><Card.Content class="p-4"><RecursiveFieldEditor fields={field.itemFields} value={current as Record<string, unknown>} depth={depth + 1} onChange={(next) => setObject(field, next)} /></Card.Content></Card.Root>
+					<Card.Root><Card.Content class="p-4"><RecursiveFieldEditor fields={field.itemFields} value={current as Record<string, unknown>} depth={depth + 1} onChange={(next) => setObject(field, next)} {derive} {computed} /></Card.Content></Card.Root>
 				{:else if field.nullable && current === null}
 					<p class="rounded-md border border-dashed p-4 text-sm text-muted-foreground">Not applicable / no override recorded.</p>
 				{:else if field.itemFields}
-					<Card.Root><Card.Content class="p-4"><RecursiveFieldEditor fields={field.itemFields} value={{}} depth={depth + 1} onChange={(next) => setObject(field, next)} /></Card.Content></Card.Root>
+					<Card.Root><Card.Content class="p-4"><RecursiveFieldEditor fields={field.itemFields} value={{}} depth={depth + 1} onChange={(next) => setObject(field, next)} {derive} {computed} /></Card.Content></Card.Root>
 				{/if}
 			{:else if field.kind === "object-list"}
 				{@const rows = Array.isArray(current) ? (current as unknown[]) : []}
@@ -98,7 +89,7 @@
 							{#if field.itemFields}
 								<RecursiveFieldEditor fields={field.itemFields} value={(row && typeof row === "object" ? row : {}) as Record<string, unknown>} depth={depth + 1} onChange={(next: Record<string, unknown>) => {
 									const target = [...((Array.isArray(current) ? current : []) as unknown[])]; target[index] = next; set(field.key, target);
-								}} />
+								}} {derive} {computed} />
 							{:else}
 								<p class="text-sm text-muted-foreground">Add details for this item below.</p>
 							{/if}
@@ -128,8 +119,8 @@
 			{:else if field.kind === "select-list"}
 				<div class="space-y-3">
 					<div><span class="text-sm font-medium">{field.label}</span>{#if field.help}<p class="text-sm text-muted-foreground">{field.help}</p>{/if}</div>
-					{#each ["Inventory / physical production", "Per-unit variable cost model", "Pricing as a primary lever", "Recurring or multi-period economics"] as question, index (index)}
-						<label class="grid items-center gap-3 sm:grid-cols-[1fr_14rem]"><span class="text-sm">{index + 1}. {question}</span><Select.Root type="single" value={Array.isArray(current) ? String(current[index] ?? "unknown") : "unknown"} onValueChange={(next) => { const values = Array.isArray(current) ? [...current] : []; values[index] = next; set(field.key, values); }}><Select.Trigger class="w-full"><Select.Value /></Select.Trigger><Select.Content>{#each field.options ?? [] as option (option.value)}<Select.Item value={option.value}>{option.label}</Select.Item>{/each}</Select.Content></Select.Root></label>
+					{#each (field.options ?? []) as option, index (option.value)}
+						<label class="grid items-center gap-3 sm:grid-cols-[1fr_14rem]"><span class="text-sm">{index + 1}. {option.label}</span><Select.Root type="single" value={Array.isArray(current) ? String(current[index] ?? "unknown") : "unknown"} onValueChange={(next) => { const values = Array.isArray(current) ? [...current] : []; values[index] = next; set(field.key, values); }}><Select.Trigger class="w-full"><Select.Value /></Select.Trigger><Select.Content>{#each field.options ?? [] as choice (choice.value)}<Select.Item value={choice.value}>{choice.label}</Select.Item>{/each}</Select.Content></Select.Root></label>
 					{/each}
 				</div>
 			{:else if field.kind === "computed"}

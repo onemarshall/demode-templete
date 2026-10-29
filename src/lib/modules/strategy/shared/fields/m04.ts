@@ -606,3 +606,39 @@ export const FIELD_DEFINITIONS: Record<string, M04StageDefinition> = {
     ],
   },
 };
+
+/** Module-specific post-set behaviour, consumed by the shared StageFieldEditor. */
+export function deriveM04(key: string, nextValue: unknown, next: Record<string, unknown>) {
+  if (key === "input_type" && nextValue === "unknown") next.value_or_range = null;
+  if (key === "modelQuestions" && Array.isArray(nextValue)) {
+    const answers = nextValue as string[];
+    const yes = answers.filter((answer) => answer === "yes").length;
+    next.complexity =
+      answers.length !== 4 || answers.some((answer) => answer === "unknown")
+        ? "unknown"
+        : yes >= 3
+          ? "high"
+          : yes > 0
+            ? "mixed"
+            : "low";
+  }
+}
+
+/** Module-specific display for computed fields. */
+export function computedM04(key: string, current: unknown): string | undefined {
+  if (key === "allowedOutputs" && Array.isArray(current)) {
+    if (!current.length) return "No additional output authority";
+    return current
+      .map((item) =>
+        typeof item === "string" && item.startsWith("reduced-")
+          ? `Named reduced capability: ${item.slice("reduced-".length).replaceAll("-", " ")}`
+          : String(item),
+      )
+      .join(", ");
+  }
+  if (key === "memoHash" && typeof current === "string")
+    return current
+      ? "Exact recommendation version recorded"
+      : "Present the exact recommendation before recording a decision";
+  return undefined;
+}

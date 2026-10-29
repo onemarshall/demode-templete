@@ -2,6 +2,8 @@
   import { onMount, untrack } from 'svelte';
   import { replaceState } from '$app/navigation';
   import Stepper from '#lib/modules/strategy/components/Stepper.svelte';
+  import StageFieldEditor from '#lib/modules/strategy/components/StageFieldEditor.svelte';
+  import { M05_STAGE_DEFINITIONS } from '#lib/modules/strategy/shared/fields/m05.js';
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
@@ -19,8 +21,8 @@
   let message = $state('');
   let viewStep = $state(0);
   let pendingJob = $state<string | null>(null);
-  let editor = $state('');
-  let editorStage = $state('');
+  let draft = $state<Record<string, unknown>>({});
+  let draftStage = $state('');
   let routeChoice = $state('full');
   let routeReason = $state('');
   let decision = $state<any>({ response: 'accept', approverName: '', approverRole: '', approverRef: '', exactResponse: '', revisionNote: '', returnStage: 'identity', declineReason: '' });
@@ -39,11 +41,11 @@
     if (!record) return;
     const stage = record.session.stage;
     if (!dataStages.includes(stage)) return;
-    if (editorStage === stage && editor.trim()) return;
-    const draft = record.session.drafts?.[stage]?.candidate;
+    if (draftStage === stage) return;
+    const candidate = record.session.drafts?.[stage]?.candidate;
     const confirmed = record.session.data?.[stage];
-    editor = JSON.stringify(draft ?? confirmed ?? {}, null, 2);
-    editorStage = stage;
+    draft = structuredClone(candidate ?? confirmed ?? {});
+    draftStage = stage;
   }
 
   $effect(() => { const loaded = $state.snapshot(record) as Loaded | null; if (loaded) { documents = loaded.documents ?? []; syncEditor(); } });
@@ -62,7 +64,7 @@
     const result = await response.json();
     if (!response.ok) throw new Error(result.error ?? 'Unable to load Brand Strategy');
     replaceState(url, {});
-    if (id) { record = result; documents = result.documents ?? []; editorStage = ''; viewStep = activeStep; }
+    if (id) { record = result; documents = result.documents ?? []; draftStage = ''; viewStep = activeStep; }
     else { sessions = result.sessions ?? []; sourceReady = result.sourceReady; record = null; }
   }
 
@@ -105,11 +107,8 @@
     finally { busy = false; }
   }
 
-  function parseEditor() {
-    try { return JSON.parse(editor); } catch { throw new Error('The record is not valid JSON.'); }
-  }
-  function confirmStage() { void send('confirm', { stage: currentStage, payload: parseEditor() }); }
-  function saveDraft() { void send('save', { stage: currentStage, payload: parseEditor() }); }
+  function confirmStage() { void send('confirm', { stage: currentStage, payload: draft }); }
+  function saveDraft() { void send('save', { stage: currentStage, payload: draft }); }
   function reviseStage() { void send('revise', { stage: currentStage }); }
   function confirmRoute() { void send('confirm-route', { route: routeChoice, reason: routeReason }); }
   function submitDecision() {
@@ -162,8 +161,12 @@
     {:else if isDataStage}
       <section class="space-y-3 rounded border p-5">
         <h2 class="text-xl">{currentStage}</h2>
-        <p class="text-sm">Edit the record, save it as a draft, or confirm it. Confirmation validates the whole record and advances the stage.</p>
-        <textarea class="h-96 w-full rounded border p-2 font-mono text-xs" bind:value={editor} spellcheck="false"></textarea>
+        <p class="text-sm">{M05_STAGE_DEFINITIONS[currentStage]?.purpose ?? 'Edit the record, save it as a draft, or confirm it.'} Confirmation validates the whole record and advances the stage.</p>
+        {#if M05_STAGE_DEFINITIONS[currentStage]}
+          <StageFieldEditor fields={M05_STAGE_DEFINITIONS[currentStage].fields} value={draft} onChange={(next) => draft = next} />
+        {:else}
+          <p role="alert">No editor is defined for this stage.</p>
+        {/if}
         <div class="flex flex-wrap gap-2">
           <button disabled={busy || !canEdit} onclick={() => send('draft', { stage: currentStage })}>Suggest draft</button>
           <button disabled={busy || !canEdit} onclick={saveDraft}>Save draft</button>

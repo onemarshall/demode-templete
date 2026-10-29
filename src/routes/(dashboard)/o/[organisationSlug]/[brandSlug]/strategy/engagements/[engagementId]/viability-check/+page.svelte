@@ -2,8 +2,8 @@
  import { untrack, onMount } from 'svelte';
  import { replaceState } from '$app/navigation';
  import Stepper from '#lib/modules/strategy/components/Stepper.svelte';
- import M04FieldEditor from '#lib/modules/strategy/components/M04FieldEditor.svelte';
- import { FIELD_DEFINITIONS } from '#lib/modules/strategy/shared/fields/m04.js';
+ import StageFieldEditor from '#lib/modules/strategy/components/StageFieldEditor.svelte';
+ import { FIELD_DEFINITIONS, deriveM04, computedM04 } from '#lib/modules/strategy/shared/fields/m04.js';
  import type { PageData } from './$types';
  let {data}:{data:PageData}=$props();
  type Session={sessionId:string;revision:number;stage:string;status:string;data:Record<string,unknown>;drafts:Record<string,unknown>;confirmations:Record<string,unknown>;presented?:{hash:string}|null;seal?:unknown;history?:{action?:string;stage?:string;messages?:{role:string;content:string}[];candidateProvided?:boolean;model?:string;methodRelease?:string;sourceHash?:string;at?:string}[]};
@@ -99,7 +99,7 @@
     {#if confirmedStage}<p class="rounded border p-3" role="status"><strong>Confirmed record.</strong> This step is read-only. Reopen it to make changes.</p>
     {:else if candidateProvenance}<p class="rounded border p-3"><strong>Suggested candidate.</strong> Review and confirm this suggestion yourself.</p><details><summary>Draft source details</summary><p>Model: {candidateProvenance.model??'configured model'}{#if candidateProvenance.methodRelease} · Method version: {candidateProvenance.methodRelease}{/if}{#if candidateProvenance.sourceHash} · Uses this check’s pinned source bundle{/if}.</p></details>
     {:else if hasSavedDraft}<p class="rounded border p-3"><strong>Saved working draft.</strong> This has not been confirmed.</p>{/if}
-    <fieldset disabled={!hydrated||confirmedStage||Boolean(session.seal)}><legend class="sr-only">{FIELD_DEFINITIONS[stage].label} fields</legend><M04FieldEditor fields={FIELD_DEFINITIONS[stage].fields} value={draft} onChange={edit}/></fieldset>
+    <fieldset disabled={!hydrated||confirmedStage||Boolean(session.seal)}><legend class="sr-only">{FIELD_DEFINITIONS[stage].label} fields</legend><StageFieldEditor fields={FIELD_DEFINITIONS[stage].fields} value={draft} onChange={edit} derive={deriveM04} computed={computedM04}/></fieldset>
     {#if stage==='human-decision' && session.data.recommendation}
      <section class="space-y-2 rounded border p-4" aria-labelledby="presented-recommendation-title">
       <h3 id="presented-recommendation-title" class="text-lg font-medium">Exact recommendation for human review</h3>
