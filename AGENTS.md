@@ -64,3 +64,19 @@ unaffected. It needs a **fresh** database each time; drop and recreate it
 between runs. The fake engine is a loopback HTTP server inside the test, so
 `DIAGNOSTIC_ENGINE_URL` is pointed at it for the duration and never at a real
 engine.
+
+```bash
+# Disposable proof of the Phase 1 schema container: the `diagnostic` and
+# `content` schemas exist, are empty, and cannot shadow an app table.
+docker run -d --rm --name montsel-schema-verify \
+  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_schema_verify \
+  -p 127.0.0.1:55443:5432 postgres:16
+MONTSEL_SCHEMA_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55443/montsel_schema_verify \
+  bun scripts/diagnostic/verify-schemas.ts
+```
+
+The `diagnostic` schema carries the engine's own ledger
+(`diagnostic.schema_migrations`), separate from the application's
+`public.schema_migrations`; `content` carries none, because Directus owns its
+migration state. Neither schema joins the application's `search_path`.
+
