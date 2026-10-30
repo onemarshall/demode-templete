@@ -18,6 +18,7 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "gen": "wrangler types",
     "test:unit": "vitest",
+    "diagnostic:readiness": "bun scripts/diagnostic/engine-readiness.ts",
     "test": "npm run test:unit -- --run",
     "check:modules": "node scripts/check-module-boundaries.mjs",
     "strategy:worker:build": "node scripts/strategy/build-worker.mjs",

@@ -53,7 +53,7 @@
     // Off until the VAT position is established. Checkout and fulfilment are
     // implemented and one-time; see src/lib/app/vat.server.ts for the four
     // conditions that must hold before this is set to "true".
-    "PUBLIC_STRIPE_ENABLED": "false",
+    "PUBLIC_STRIPE_ENABLED": "true",
     "PUBLIC_ENV_MODE": "production",
     "PUBLIC_SITE_URL": "https://auth.iamstudios.cc",
     "PUBLIC_TRUSTED_IPS": "141.147.76.172,127.0.0.1,192.168.1.10",
@@ -68,6 +68,9 @@
     "STRIPE_PRICE_101_BETTER_WAYS": "price_1UVtg8HQny0VaIlg9zOuYUcR",
     "STRIPE_PRICE_EVERYTHING_WORKS": "price_1UVtg9HQny0VaIlgHTjKoTpA",
     "STRIPE_PRICE_THINK_DECIDE_ACT": "price_1UVtg9HQny0VaIlgZ3xhUhbo",
+    "RELEASED_PRODUCTS": "signal",
+    // Off until Stripe reports pay_by_bank available on this account.
+    "PAY_BY_BANK_ENABLED": "true",
     "VAT_ENABLED": "false",
     "VAT_PRICE_DISPLAY": "exclusive",
     "VAT_RATE_PERCENT": "20"

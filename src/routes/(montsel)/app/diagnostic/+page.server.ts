@@ -39,7 +39,12 @@ export const load: PageServerLoad = async (event) => {
 		fullOwned,
 		owned,
 		// Unowned diagnostics are optional discovery, never action buttons.
-		unowned: diagnostic.filter((entry) => entry.access === 'not_owned'),
+		// Full Diagnostic is planned and has no runtime route, so it is not
+		// offered as a purchasable card.
+		unowned: diagnostic.filter(
+			(entry) =>
+				entry.access === 'not_owned' && entry.product.key !== 'diagnostic.full'
+		),
 		stages: fullOwned
 			? FULL_STAGES.map((key) => {
 					const entry = diagnostic.find((candidate) => candidate.product.key === key);

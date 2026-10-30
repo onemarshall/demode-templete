@@ -1,11 +1,10 @@
 /**
- * Published artefact → `output` + `output_version` (plan Workstream 5).
+ * Published artefact → `output` + `output_version` (+ section manifest).
  *
- * This is an ingestion boundary, not a user operation: an operator imports
- * bytes the engine already published, so there is no brand context to brand.
- * Tenancy is still enforced, by the caller naming an explicit
- * `(organisationId, brandId)` pair and by the composite foreign keys that
- * refuse any pair the `brand` table does not own.
+ * This is an ingestion boundary, not a user operation: an operator or a trusted
+ * worker imports bytes the engine already published. Tenancy is enforced by the
+ * caller naming an explicit `(organisationId, brandId)` pair and by the
+ * composite foreign keys that refuse any pair the `brand` table does not own.
  *
  * Two refusals are deliberate:
  *
@@ -15,30 +14,48 @@
  * - Identical bytes never land twice. `output_version_content_hash_unique`
  *   makes that a database rule, and this function turns the collision into a
  *   readable refusal instead of a constraint error.
+ *
+ * `importPublishedBytes` is the HTTP path used by the app. The path-based
+ * adapter remains for local operator use; it is not the Cloudflare path.
  */
 
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { getDB } from '#lib/platform/database/db.js';
 import { isProductKey, type ProductKey } from '#lib/modules/products/shared/registry.js';
 
 const CONTENT_HASH = /^[a-f0-9]{64}$/;
 
-export interface ArtefactImport {
+export interface ImportedSection {
+	key: string;
+	heading: string;
+	order: number;
+	contentHash?: string | null;
+}
+
+export interface BytesImport {
 	organisationId: string;
 	brandId: string;
 	/** Stable per delivered artefact so a re-run targets the same output. */
 	outputId: string;
 	productKey: ProductKey;
 	title: string;
-	/** The engine's published file. Read only; this function never writes it. */
-	artefactPath: string;
+	/** The exact published bytes. */
+	content: string | Uint8Array;
 	/** `report_publications.content_hash` recorded by the engine. */
 	expectedContentHash: string;
 	/** The engine production run's public id, for lineage. */
 	enginePublicationRef?: string | null;
 	/** Present makes the output shareable at `/share/<slug>`. */
 	shareSlug?: string | null;
+	/** The engine's section manifest, used to anchor client comments. */
+	sections?: ImportedSection[];
+}
+
+export interface ArtefactImport extends Omit<BytesImport, 'content' | 'sections'> {
+	/** The engine's published file. Read only; this function never writes it. */
+	artefactPath: string;
+	sections?: ImportedSection[];
 }
 
 export type ArtefactImportResult =
@@ -55,7 +72,7 @@ function required(value: string, field: string): string {
 	return trimmed;
 }
 
-export async function importPublishedArtefact(input: ArtefactImport): Promise<ArtefactImportResult> {
+function validateIdentity(input: Omit<BytesImport, 'content' | 'sections'>) {
 	const organisationId = required(input.organisationId, 'organisationId');
 	const brandId = required(input.brandId, 'brandId');
 	const outputId = required(input.outputId, 'outputId');
@@ -65,15 +82,19 @@ export async function importPublishedArtefact(input: ArtefactImport): Promise<Ar
 		throw new Error(`Unknown product key: ${String(input.productKey)}`);
 	if (!CONTENT_HASH.test(expectedContentHash))
 		throw new Error('expectedContentHash must be 64 lowercase hex characters.');
+	return { organisationId, brandId, outputId, title, expectedContentHash };
+}
 
-	// Read and verify before touching the database: a mismatch is not a partial import.
-	const bytes = await readFile(input.artefactPath);
+export async function importPublishedBytes(input: BytesImport): Promise<ArtefactImportResult> {
+	const { organisationId, brandId, outputId, title, expectedContentHash } = validateIdentity(input);
+	const bytes =
+		typeof input.content === 'string' ? Buffer.from(input.content, 'utf8') : input.content;
 	const actualContentHash = contentHash(bytes);
 	if (actualContentHash !== expectedContentHash)
 		throw new Error(
 			`Artefact content does not match its recorded hash (expected ${expectedContentHash}, found ${actualContentHash}). Nothing was imported.`,
 		);
-	const content = bytes.toString('utf8');
+	const content = Buffer.from(bytes).toString('utf8');
 
 	const db = await getDB();
 	const client = await db.connect();
@@ -130,12 +151,13 @@ export async function importPublishedArtefact(input: ArtefactImport): Promise<Ar
 			[outputId],
 		);
 		const versionNumber = next.rows[0]?.versionNumber ?? 1;
+		const versionId = randomUUID();
 		await client.query(
 			`INSERT INTO "output_version" ("id", "organisation_id", "brand_id", "output_id",
 			                               "version_number", "content_markdown", "content_hash", "engine_publication_ref")
 			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 			[
-				crypto.randomUUID(),
+				versionId,
 				organisationId,
 				brandId,
 				outputId,
@@ -145,6 +167,24 @@ export async function importPublishedArtefact(input: ArtefactImport): Promise<Ar
 				input.enginePublicationRef ?? null
 			],
 		);
+
+		for (const section of input.sections ?? []) {
+			await client.query(
+				`INSERT INTO "output_version_section"
+				   ("id", "output_version_id", "section_key", "heading", "section_order", "content_hash")
+				 VALUES ($1, $2, $3, $4, $5, $6)
+				 ON CONFLICT ("output_version_id", "section_key") DO NOTHING`,
+				[
+					randomUUID(),
+					versionId,
+					section.key,
+					section.heading,
+					section.order,
+					section.contentHash ?? null
+				],
+			);
+		}
+
 		await client.query('COMMIT');
 		return { status: 'imported', outputId, versionNumber, contentHash: expectedContentHash };
 	} catch (error) {
@@ -153,4 +193,15 @@ export async function importPublishedArtefact(input: ArtefactImport): Promise<Ar
 	} finally {
 		client.release();
 	}
+}
+
+export async function importPublishedArtefact(input: ArtefactImport): Promise<ArtefactImportResult> {
+	// Refuse an unknown product key before touching the filesystem.
+	validateIdentity(input);
+	const bytes = await readFile(input.artefactPath);
+	return importPublishedBytes({
+		...input,
+		content: bytes,
+		sections: input.sections
+	});
 }

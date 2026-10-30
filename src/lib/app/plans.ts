@@ -10,6 +10,13 @@ export interface Plan {
 	features: string[];
 	cta: string;
 	popular: boolean;
+	/**
+	 * Pay by Bank is preferred for higher-value software. It is only shown when
+	 * Stripe reports the method available; card always remains an option.
+	 */
+	payByBankPreferred: boolean;
+	/** Route B: a business buyer may request a Stripe invoice instead of checkout. */
+	invoiceAvailable: boolean;
 }
 
 /**
@@ -38,7 +45,9 @@ export const PLANS: Plan[] = [
 			'Review limits and exclusions'
 		],
 		cta: 'Buy Signal',
-		popular: false
+		popular: false,
+		payByBankPreferred: false,
+		invoiceAvailable: false,
 	},
 	{
 		id: 'gap',
@@ -55,7 +64,9 @@ export const PLANS: Plan[] = [
 			'Next warranted step'
 		],
 		cta: 'Buy Gap',
-		popular: false
+		popular: false,
+		payByBankPreferred: true,
+		invoiceAvailable: true,
 	},
 	{
 		id: 'direction',
@@ -72,7 +83,9 @@ export const PLANS: Plan[] = [
 			'What can proceed and what should wait'
 		],
 		cta: 'Buy Direction',
-		popular: false
+		popular: false,
+		payByBankPreferred: true,
+		invoiceAvailable: true,
 	},
 	{
 		id: 'full-diagnostic',
@@ -89,7 +102,9 @@ export const PLANS: Plan[] = [
 			'Joined next-step and handoff section'
 		],
 		cta: 'Buy Full Diagnostic',
-		popular: true
+		popular: true,
+		payByBankPreferred: true,
+		invoiceAvailable: true,
 	},
 	{
 		id: 'strategy',
@@ -107,7 +122,9 @@ export const PLANS: Plan[] = [
 			'90 days of access'
 		],
 		cta: 'Buy Strategy',
-		popular: false
+		popular: false,
+		payByBankPreferred: true,
+		invoiceAvailable: true,
 	},
 	{
 		id: '101-better-ways-to-think',
@@ -119,7 +136,9 @@ export const PLANS: Plan[] = [
 		description: 'Short-form ideas that improve how you think',
 		features: ['101 practical thinking moves', 'Written for immediate use'],
 		cta: 'Buy the book',
-		popular: false
+		popular: false,
+		payByBankPreferred: false,
+		invoiceAvailable: false,
 	},
 	{
 		id: 'everything-works-nothing-fits',
@@ -131,7 +150,9 @@ export const PLANS: Plan[] = [
 		description: 'The business worldview and connected strategy behind Langfell',
 		features: ['The full argument', 'Connected strategic implications'],
 		cta: 'Buy the book',
-		popular: false
+		popular: false,
+		payByBankPreferred: false,
+		invoiceAvailable: false,
 	},
 	{
 		id: 'think-decide-act',
@@ -148,7 +169,9 @@ export const PLANS: Plan[] = [
 			'Your own decisions and action plan'
 		],
 		cta: 'Buy Think, Decide & Act',
-		popular: false
+		popular: false,
+		payByBankPreferred: false,
+		invoiceAvailable: false,
 	},
 	{
 		id: 'visual-contract',
@@ -164,7 +187,9 @@ export const PLANS: Plan[] = [
 			'Language for briefing and reviewing design'
 		],
 		cta: 'Get started free',
-		popular: false
+		popular: false,
+		payByBankPreferred: false,
+		invoiceAvailable: false,
 	}
 ];
 
@@ -187,6 +212,28 @@ export const PRODUCT_KEY_BY_PLAN: Record<string, string> = {
 	strategy: 'strategy',
 	'think-decide-act': 'tool.think_act_decide'
 };
+
+/**
+ * Which products may be sold, from `RELEASED_PRODUCTS`.
+ *
+ * Release is an environment decision, not a product property: staging should be
+ * able to release what production has not. An empty or missing value means
+ * nothing is sellable, so a misconfiguration fails closed rather than opening
+ * the catalogue.
+ */
+export function parseReleasedProducts(value: string | undefined | null): Set<string> {
+	if (!value) return new Set();
+	return new Set(
+		value
+			.split(',')
+			.map((entry) => entry.trim().toLowerCase())
+			.filter(Boolean)
+	);
+}
+
+export function isPlanReleased(planId: string, released: Set<string>): boolean {
+	return released.has(planId.toLowerCase());
+}
 
 export function getPlan(id: string | undefined | null): Plan | undefined {
 	if (!id) return undefined;

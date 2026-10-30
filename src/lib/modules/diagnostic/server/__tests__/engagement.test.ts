@@ -91,6 +91,12 @@ function brandRows(): void {
 					}
 				]
 			};
+		if (sql.includes('FROM "product_entitlement"'))
+			return {
+				rows: [
+					{ entitlementId: 'ent-a', purchaseId: 'pur-a', source: 'purchase' }
+				]
+			};
 		return { rows: [] };
 	});
 }
@@ -140,7 +146,7 @@ describe('startEngagement', () => {
 
 	it('refuses a variant that has no intake yet', async () => {
 		const ctx = await context();
-		await expect(startEngagement(ctx, { productKey: 'diagnostic.gap', intake })).rejects.toThrow(
+		await expect(startEngagement(ctx, { productKey: 'diagnostic.full', intake })).rejects.toThrow(
 			/Unknown diagnostic variant/
 		);
 	});
@@ -192,6 +198,8 @@ describe('startEngagement', () => {
 			if (sql.includes('FROM "diagnostic_engagement"') && sql.includes('FOR UPDATE'))
 				return { rows: [] };
 			if (sql.includes('INSERT INTO "diagnostic_engagement"')) return { rows: [engagementRow] };
+			if (sql.includes('FROM "product_entitlement"'))
+				return { rows: [{ entitlementId: 'ent-a', purchaseId: 'pur-a', source: 'purchase' }] };
 			return { rows: [] };
 		});
 
@@ -240,6 +248,8 @@ describe('startEngagement', () => {
 					]
 				};
 			if (sql.includes('FROM "diagnostic_engagement"')) return { rows: [engagementRow] };
+			if (sql.includes('FROM "product_entitlement"'))
+				return { rows: [{ entitlementId: 'ent-a', purchaseId: 'pur-a', source: 'purchase' }] };
 			return { rows: [] };
 		});
 

@@ -22,6 +22,7 @@ export const PRODUCT_KEYS = [
 export type ProductKey = (typeof PRODUCT_KEYS)[number];
 
 export type ProductFamily = 'diagnostic' | 'strategy' | 'tool';
+export type ProductSalesMode = 'self_service' | 'consultancy' | 'planned';
 export type PricingMode = 'free' | 'paid';
 export type ProductLifecycle = 'planned' | 'available' | 'retired';
 export type OutputFormat = 'web_page' | 'report' | 'document';
@@ -49,6 +50,8 @@ export interface ProductDescriptor {
 	learnMorePath: string;
 	pricingMode: PricingMode;
 	lifecycle: ProductLifecycle;
+	/** Public sales mode. Consultancy is internal and never a checkout product. */
+	salesMode?: ProductSalesMode;
 	supportsProjects: boolean;
 	supportsResume: boolean;
 	outputTypes: readonly OutputFormat[];
@@ -69,6 +72,7 @@ export const PRODUCTS: readonly ProductDescriptor[] = [
 		learnMorePath: '/auth/pricing',
 		pricingMode: 'paid',
 		lifecycle: 'available',
+		salesMode: 'self_service',
 		supportsProjects: false,
 		supportsResume: true,
 		outputTypes: ['report'],
@@ -86,6 +90,7 @@ export const PRODUCTS: readonly ProductDescriptor[] = [
 		learnMorePath: '/auth/pricing',
 		pricingMode: 'paid',
 		lifecycle: 'available',
+		salesMode: 'self_service',
 		supportsProjects: false,
 		supportsResume: true,
 		outputTypes: ['report'],
@@ -103,6 +108,7 @@ export const PRODUCTS: readonly ProductDescriptor[] = [
 		learnMorePath: '/auth/pricing',
 		pricingMode: 'paid',
 		lifecycle: 'available',
+		salesMode: 'self_service',
 		supportsProjects: false,
 		supportsResume: true,
 		outputTypes: ['report'],
@@ -120,6 +126,7 @@ export const PRODUCTS: readonly ProductDescriptor[] = [
 		learnMorePath: '/auth/pricing',
 		pricingMode: 'paid',
 		lifecycle: 'available',
+		salesMode: 'planned',
 		supportsProjects: false,
 		supportsResume: true,
 		outputTypes: ['report'],

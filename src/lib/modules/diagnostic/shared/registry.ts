@@ -1,11 +1,10 @@
 /**
- * Diagnostic variant registry (plan Workstream 5).
+ * Diagnostic variant registry.
  *
- * Route belongs to the variant, not the family: `diagnostic.gap` is a
- * self-service product only once its intake exists, while
- * `diagnostic.gap.consultancy` sells the same family through a strategist.
- * Adding a variant is one entry here plus a `product` row; it never touches an
- * existing variant.
+ * Route belongs to the variant, not the family: a Montsel variant is sold
+ * self-service, while a Langfell capability is delivered inside a consultancy
+ * engagement. Adding a variant is one entry here plus a `product` row; it never
+ * touches an existing variant.
  *
  * This is the intake authority, not the presentation authority. Display
  * metadata and navigation stay in `products/shared/registry.ts`.
@@ -25,7 +24,6 @@ export type ReportDepth = (typeof REPORT_DEPTHS)[number];
 export const FAMILIES = ['signal', 'gap', 'direction', 'full'] as const;
 export type DiagnosticFamily = (typeof FAMILIES)[number];
 
-/** ISO-3166-1 alpha-2 shape, or a URL. The engine fetches the subject itself. */
 const subjectUrl = z
 	.string()
 	.trim()
@@ -34,11 +32,10 @@ const subjectUrl = z
 	.refine((value) => /^https?:\/\//i.test(value), 'Enter a full http:// or https:// address.');
 
 /**
- * Signal reads existing public material. These four fields are not decoration:
- * the engine's context request requires a commissioned decision, an owner, a
- * reader and a timing, and refuses a run without them.
+ * Every family needs the decision frame. The engine refuses a run without a
+ * commissioned decision, an owner, a reader and a timing.
  */
-export const signalIntakeSchema = z.object({
+const decisionFrame = {
 	subjectUrl,
 	commissionedDecision: z
 		.string()
@@ -47,14 +44,54 @@ export const signalIntakeSchema = z.object({
 		.max(600),
 	decisionOwner: z.string().trim().min(2).max(120),
 	intendedReader: z.string().trim().min(2).max(120),
-	decisionTiming: z.string().trim().min(2).max(120),
+	decisionTiming: z.string().trim().min(2).max(120)
+};
+
+export const signalIntakeSchema = z.object({
+	...decisionFrame,
 	declaredScope: z
 		.array(z.string().trim().min(1).max(80))
 		.max(12)
 		.default([])
 });
 
+/**
+ * Gap needs industry, buyer and intent evidence. It is not a thin-material
+ * Signal, so the intake asks for the evidence the method actually uses.
+ */
+export const gapIntakeSchema = z.object({
+	...decisionFrame,
+	sectorRef: z.string().trim().min(1).max(200),
+	geography: z.string().trim().min(2).max(80),
+	buyerInput: z.string().trim().min(10).max(4000),
+	organisationalIntent: z.string().trim().min(10).max(4000),
+	availableProof: z.string().trim().min(10).max(4000),
+	evidenceScope: z.string().trim().min(3).max(600)
+});
+
+/**
+ * Direction tests one supplied proposal. The proposal and its version are
+ * required; a missing proposal is not permission to generate one.
+ */
+export const directionIntakeSchema = z.object({
+	...decisionFrame,
+	sectorRef: z.string().trim().min(1).max(200),
+	buyerInput: z.string().trim().min(10).max(4000),
+	decisionContext: z.string().trim().min(10).max(2000),
+	proposedDirection: z.string().trim().min(20).max(8000),
+	proposalVersion: z.string().trim().min(1).max(80),
+	constraints: z.string().trim().min(10).max(4000),
+	claimSupport: z.string().trim().min(10).max(4000),
+	expectedCommitment: z.string().trim().min(5).max(2000),
+	currentEvidence: z.string().trim().min(10).max(4000),
+	readinessEvidence: z.string().trim().min(10).max(4000),
+	evidenceScope: z.string().trim().min(3).max(600)
+});
+
 export type SignalIntake = z.infer<typeof signalIntakeSchema>;
+export type GapIntake = z.infer<typeof gapIntakeSchema>;
+export type DirectionIntake = z.infer<typeof directionIntakeSchema>;
+export type DiagnosticIntake = SignalIntake | GapIntake | DirectionIntake;
 
 export interface DiagnosticVariant {
 	/** Product key. Matches `product.key`. */
@@ -69,10 +106,9 @@ export interface DiagnosticVariant {
 }
 
 /**
- * The initial release: Signal self-service, with the consultancy variants
- * arriving as their own keys in the consultancy phase. Automated Gap and
- * Direction are absent on purpose — they need the intake UI for their declared
- * family inputs, not a flag.
+ * Montsel's self-service families. Langfell capabilities use the same family
+ * and method but are created inside a consultancy engagement; they are not
+ * separate public products.
  */
 export const VARIANTS: readonly DiagnosticVariant[] = [
 	{
@@ -82,6 +118,22 @@ export const VARIANTS: readonly DiagnosticVariant[] = [
 		depth: 'automated',
 		sellable: true,
 		name: 'Signal reading'
+	},
+	{
+		key: 'diagnostic.gap',
+		family: 'gap',
+		deliveryRoute: 'montsel_self_service',
+		depth: 'automated',
+		sellable: true,
+		name: 'Gap diagnostic'
+	},
+	{
+		key: 'diagnostic.direction',
+		family: 'direction',
+		deliveryRoute: 'montsel_self_service',
+		depth: 'automated',
+		sellable: true,
+		name: 'Direction review'
 	}
 ];
 
@@ -90,9 +142,24 @@ export function getVariant(key: string): DiagnosticVariant | undefined {
 }
 
 /** The intake parser for a variant, or null when the variant has no intake yet. */
-export function parseIntake(key: string, payload: unknown): SignalIntake | null {
+export function parseIntake(key: string, payload: unknown): DiagnosticIntake | null {
 	const variant = getVariant(key);
 	if (!variant?.sellable) return null;
-	if (variant.family !== 'signal') return null;
-	return signalIntakeSchema.parse(payload);
+	switch (variant.family) {
+		case 'signal':
+			return signalIntakeSchema.parse(payload);
+		case 'gap':
+			return gapIntakeSchema.parse(payload);
+		case 'direction':
+			return directionIntakeSchema.parse(payload);
+		default:
+			return null;
+	}
+}
+
+/** The schema for a family, used by the route action before it calls the engine. */
+export function intakeSchemaFor(family: DiagnosticFamily) {
+	if (family === 'gap') return gapIntakeSchema;
+	if (family === 'direction') return directionIntakeSchema;
+	return signalIntakeSchema;
 }

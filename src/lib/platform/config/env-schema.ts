@@ -283,6 +283,10 @@ const authFeaturesEnvSchema = z.object({
 	// Organizations (Montsel tenancy foundation)
 	AUTH_ORGANIZATION_PLUGIN: envBoolean.default(false),
 	MONTSEL_RECOVERY_TOKEN: z.string().min(32).optional(),
+	// Diagnostic engine. Server-only; never expose these as PUBLIC_*.
+	DIAGNOSTIC_ENGINE_URL: z.string().url().optional(),
+	DIAGNOSTIC_ENGINE_TOKEN: z.string().min(32).optional(),
+	DIAGNOSTIC_ENGINE_TIMEOUT_MS: positiveNumber.default(30000),
 	AUTH_ADMIN_DEFAULT_ROLE: z.string().default('user'),
 	AUTH_ADMIN_ROLES: stringArray.default(['admin']),
 	AUTH_ADMIN_USER_IDS: stringArray.optional(),
@@ -462,6 +466,12 @@ const stripeEnvSchema = z.object({
  * VAT stays off until the owner has confirmed registration, recreated the
  * prices with an explicit tax_behavior and added a Stripe Tax registration.
  */
+const payByBankEnvSchema = z.object({
+	PAY_BY_BANK_ENABLED: z.string().optional(),
+	/** Comma-separated plan ids that may be sold. Empty means nothing is. */
+	RELEASED_PRODUCTS: z.string().optional()
+});
+
 const vatEnvSchema = z.object({
 	VAT_ENABLED: z.string().optional(),
 	VAT_RATE_PERCENT: z.string().optional(),
@@ -583,6 +593,7 @@ export const fullEnvSchema = z.object({
 	...redisEnvSchema.shape,
 	...securityAnalyticsEnvSchema.shape,
 	...stripeEnvSchema.shape,
+	...payByBankEnvSchema.shape,
 	...vatEnvSchema.shape,
 	...publicAuthFeaturesSchema.shape,
 	...publicSocialFlagsSchema.shape,

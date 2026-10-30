@@ -1,6 +1,6 @@
 # Pricing Plans
 
-Product catalogue for the Stripe integration. Use these plan ids with `authClient.subscription.upgrade({ plan })`. Stripe price ids live in `STRIPE_PRICE_*` environment variables.
+Product catalogue for the Stripe integration. Plan ids are passed to `createCheckout({ productId })`; Stripe price ids live in `STRIPE_PRICE_*` environment variables. Nothing here is recurring.
 
 **Status: catalogue approved, checkout implemented, billing disabled.** Prices are one-time, GBP, and approved in the Langfell commercial authority at `01-Library/02-Business/03-Offers/01-Pricing-and-Outcomes`. No product is available for purchase.
 
@@ -41,6 +41,66 @@ These must never appear as Stripe products. They are scoped by proposal, invoice
 
 ---
 
+## Payment methods
+
+Payment method does not determine product type. Every Montsel product is
+self-service; the rail is only about how the money moves.
+
+| Products | Payment |
+| --- | --- |
+| Books and practical products | Card checkout |
+| Signal £395 | Card; Pay by Bank when available |
+| Gap £995 and above | Pay by Bank preferred; card always available |
+
+### Bank payment status: enabled (test mode)
+
+Both bank rails were enabled in the Dashboard on 29 October 2026 and the API now confirms them:
+
+| Method | Configuration | Capability |
+| --- | --- | --- |
+| `pay_by_bank` | `available: true` | `pay_by_bank_payments` active |
+| `customer_balance` (Bank Transfers) | `available: true` | `gb_bank_transfer_payments`, `sepa_bank_transfer_payments`, `us_bank_transfer_payments`, `us_bank_account_ach_payments` active |
+
+Enabling "Bank Transfers" granted **five** capabilities, not one, which covers UK, SEPA and US routes.
+
+Verified behaviour:
+
+- **Checkout** offers `card`, `pay_by_bank`, `link`. With a customer attached it would also offer `customer_balance`, so the session filters it out — see below.
+- **Invoices** carry `payment_settings.payment_method_types: ['customer_balance', 'card']`, set explicitly rather than inherited.
+
+**Test mode only.** The only connected account reports `livemode: false`. Live mode has its own Dashboard toggle and must be enabled and re-verified separately before `PAY_BY_BANK_ENABLED` is set to `true`.
+
+### Why Checkout excludes `customer_balance`
+
+Bank transfer is a delayed-notification method: 0–3 business days before funds clear. It cannot support the instant access the software products promise. So Checkout filters to `card` and `pay_by_bank`, and bank transfer is offered on the invoice rail instead.
+
+The filter uses `allowed_payment_method_types`, which narrows Stripe's dynamically computed set. `payment_method_types` no longer works for Checkout Sessions.
+
+### Checkout does not accept `payment_method_types`
+
+Stripe removed that parameter for Checkout Sessions. Methods are resolved from
+Dashboard settings, so the application must not try to pin them. Card stays
+available as the fallback by default.
+
+### Indicative fees
+
+Reference rates, not account-specific. Verify against your own rate card.
+
+| Method | Rate | £395 | £995 | £1,495 | £2,495 | £4,995 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| UK card | 1.5% + 20p | £6.13 | £15.13 | £22.63 | £37.63 | £75.13 |
+| Pay by Bank | 0.5% + 20p, capped £5 | £2.18 | £5.00 | £5.00 | £5.00 | £5.00 |
+
+At £4,995 the difference is roughly £70 per sale. That is the whole commercial
+argument for Pay by Bank, and it only materialises once the method is enabled.
+
+### Release gating
+
+`plans.ts` carries `released` per product, currently `false` everywhere.
+`createCheckout` returns 409 for an unreleased product, so a catalogue entry is
+never mistaken for permission to sell. Flip a product to `released: true` only
+alongside the release decision it belongs to.
+
 ## Environment variables
 
 ```
@@ -75,17 +135,20 @@ These are **test-mode** ids. A live account will produce different ids; do not c
 
 ---
 
-## What the payments task must still do
+## What remains before enabling payment
 
-1. Change checkout from `mode: "subscription"` to `mode: "payment"`.
-2. Remove `subscription_data` from the session and handle one-time completion.
-3. Establish VAT treatment per product, including e-books and the Think, Decide & Act format.
-4. Build entitlement and fulfilment: report delivery for diagnostics, file delivery for books.
-5. Implement the Direction pre-purchase eligibility check and the refund path for an unsuitable purchase.
-6. Replace the `?subscription=success` return handling with a purchase-based equivalent.
-7. Publish refund and digital-cancellation terms before enabling checkout.
+1. **VAT position.** Four conditions in `src/lib/app/vat.server.ts`. Prices are
+   `tax_behavior: unspecified`, so enabling Stripe Tax needs new prices.
+2. **Pay by Bank eligibility.** Stripe-side; see above.
+3. **Book fulfilment.** No file delivery exists. Books record a sale but
+   deliver nothing.
+4. **Direction eligibility check.** The pre-purchase check is specified in the
+   commercial authority but not implemented.
+5. **Terms review.** `/auth/terms` implements the UK reg. 37 consent mechanism;
+   the wording still wants a solicitor's eye.
 
-The subscription table and webhook handler remain in place. If no product is ever recurring, decide whether to retire them rather than leaving dead configuration.
+The subscription table and its reads remain in place for account export and
+deletion. Nothing is recurring, so they will stay empty.
 
 ---
 

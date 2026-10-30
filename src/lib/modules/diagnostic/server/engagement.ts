@@ -16,6 +16,7 @@ import { createHash } from 'node:crypto';
 import { getDB } from '#lib/platform/database/db.js';
 import { assertOperationContext, type OperationContext } from '#lib/modules/tenancy/server/context.js';
 import { getVariant, parseIntake, type SignalIntake } from '../shared/registry.js';
+import { requireStartPayment } from './payments.js';
 
 const iso = (value: Date | string): string => (value instanceof Date ? value.toISOString() : value);
 
@@ -28,7 +29,12 @@ export type EngagementStatus =
 	| 'in_delivery'
 	| 'delivered'
 	| 'declined'
-	| 'withdrawn';
+	| 'withdrawn'
+	| 'awaiting_input'
+	| 'quality_hold'
+	| 'retrying'
+	| 'failed'
+	| 'ready';
 
 export interface Engagement {
 	id: string;
@@ -48,6 +54,21 @@ export interface Engagement {
 	decisionTiming: string | null;
 	currency: string | null;
 	amountMinor: number | null;
+	purchaseId: string | null;
+	entitlementId: string | null;
+	engineJobId: string | null;
+	engineSessionId: number | null;
+	engineDecisionRecordVersionId: number | null;
+	sectorIntelligenceRef: string | null;
+	sectorIntelligenceVersionId: number | null;
+	qualityReceipt: Record<string, unknown> | null;
+	retryCount: number;
+	nextRetryAt: string | null;
+	failureCode: string | null;
+	failureDetail: string | null;
+	deliveredAt: string | null;
+	scopeApprovedAt: string | null;
+	scopeApprovedBy: string | null;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -69,6 +90,21 @@ interface EngagementRow {
 	decisionTiming: string | null;
 	currency: string | null;
 	amountMinor: number | null;
+	purchaseId: string | null;
+	entitlementId: string | null;
+	engineJobId: string | null;
+	engineSessionId: number | null;
+	engineDecisionRecordVersionId: number | null;
+	sectorIntelligenceRef: string | null;
+	sectorIntelligenceVersionId: number | null;
+	qualityReceipt: Record<string, unknown> | null;
+	retryCount: number;
+	nextRetryAt: Date | string | null;
+	failureCode: string | null;
+	failureDetail: string | null;
+	deliveredAt: Date | string | null;
+	scopeApprovedAt: Date | string | null;
+	scopeApprovedBy: string | null;
 	createdAt: Date | string;
 	updatedAt: Date | string;
 }
@@ -79,10 +115,22 @@ const COLUMNS = `"id", "work_item_id" AS "workItemId", "product_key" AS "product
 	        "engine_run_ref" AS "engineRunRef", "commissioned_decision" AS "commissionedDecision",
 	        "decision_owner" AS "decisionOwner", "intended_reader" AS "intendedReader",
 	        "decision_timing" AS "decisionTiming", "currency", "amount_minor" AS "amountMinor",
+	        "purchase_id" AS "purchaseId", "entitlement_id" AS "entitlementId",
+	        "engine_job_id" AS "engineJobId", "engine_session_id" AS "engineSessionId",
+	        "engine_decision_record_version_id" AS "engineDecisionRecordVersionId",
+	        "sector_intelligence_ref" AS "sectorIntelligenceRef",
+	        "sector_intelligence_version_id" AS "sectorIntelligenceVersionId",
+	        "quality_receipt" AS "qualityReceipt", "retry_count" AS "retryCount",
+	        "next_retry_at" AS "nextRetryAt", "failure_code" AS "failureCode",
+	        "failure_detail" AS "failureDetail", "delivered_at" AS "deliveredAt",
+	        "scope_approved_at" AS "scopeApprovedAt", "scope_approved_by" AS "scopeApprovedBy",
 	        "created_at" AS "createdAt", "updated_at" AS "updatedAt"`;
 
 const toEngagement = (row: EngagementRow): Engagement => ({
 	...row,
+	nextRetryAt: row.nextRetryAt ? iso(row.nextRetryAt) : null,
+	deliveredAt: row.deliveredAt ? iso(row.deliveredAt) : null,
+	scopeApprovedAt: row.scopeApprovedAt ? iso(row.scopeApprovedAt) : null,
 	createdAt: iso(row.createdAt),
 	updatedAt: iso(row.updatedAt)
 });
@@ -122,6 +170,14 @@ export async function startEngagement(
 
 	const intake = parseIntake(payload.productKey, payload.intake);
 	if (!intake) throw new Error(`${variant.name} has no intake yet.`);
+
+	// Self-service work starts only after a live entitlement, backed by an
+	// activated purchase where the entitlement came from a purchase. An issued
+	// invoice or an initiated payment does not satisfy this.
+	const payment =
+		variant.deliveryRoute === 'montsel_self_service'
+			? await requireStartPayment(ctx, variant.key)
+			: null;
 
 	const workItemId = deriveWorkItemId(ctx.brandId, variant.key, intake);
 	const db = await getDB();
@@ -163,8 +219,9 @@ export async function startEngagement(
 			                                      "product_key", "family", "depth", "delivery_route",
 			                                      "status", "intake", "requested_by",
 			                                      "commissioned_decision", "decision_owner",
-			                                      "intended_reader", "decision_timing")
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'enquired', $9, $10, $11, $12, $13, $14)
+			                                      "intended_reader", "decision_timing",
+			                                      "purchase_id", "entitlement_id")
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'enquired', $9, $10, $11, $12, $13, $14, $15, $16)
 			 RETURNING ${COLUMNS}`,
 			[
 				engagementId,
@@ -180,7 +237,9 @@ export async function startEngagement(
 				intake.commissionedDecision,
 				intake.decisionOwner,
 				intake.intendedReader,
-				intake.decisionTiming
+				intake.decisionTiming,
+				payment?.purchaseId ?? null,
+				payment?.entitlementId ?? null
 			],
 		);
 		await client.query('COMMIT');

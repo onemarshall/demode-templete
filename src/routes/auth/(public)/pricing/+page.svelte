@@ -2,7 +2,8 @@
 	import { authClient } from "#lib/modules/auth/client/client.js";
 	import { goto } from "$app/navigation";
 	import { PLANS as plans } from "#lib/app/plans.js";
-	import { createCheckout } from "#lib/modules/billing/remote/checkout.remote.js";
+	import { createCheckout, requestInvoice } from "#lib/modules/billing/remote/checkout.remote.js";
+	import { checkDiagnosticEligibility } from "#lib/modules/billing/remote/eligibility.remote.js";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();
@@ -10,6 +11,8 @@
 	const session = authClient.useSession();
 	const isAuthed = $derived(!!$session.data?.user);
 	const sessionLoading = $derived($session.isPending ?? false);
+
+	const released = $derived(new Set(data.releasedProducts));
 
 	const software = $derived(plans.filter((p) => ["signal", "gap", "direction", "full-diagnostic", "strategy"].includes(p.id)));
 	const books = $derived(plans.filter((p) => !software.some((s) => s.id === p.id)));
@@ -21,6 +24,63 @@
 	let consent = $state(false);
 	let guestPlanId = $state<string | null>(null);
 	let guestEmail = $state("");
+	// Gap and Direction need a short eligibility check before checkout. It is
+	// repeated at engagement start because sector coverage can change.
+	let eligibility = $state<
+		Record<string, { website: string; sectorRef: string; hasProposal: boolean }>
+	>(
+		Object.fromEntries(
+			["gap", "direction"].map((id) => [
+				id,
+				{ website: "", sectorRef: "", hasProposal: false },
+			]),
+		),
+	);
+	let eligibilityResult = $state<
+		Record<string, { result: string; reasons: string[] } | null>
+	>({});
+	let checking = $state<string | null>(null);
+	const needsEligibility = (planId: string) => planId === "gap" || planId === "direction";
+	const eligibilityComplete = (planId: string) => {
+		if (!needsEligibility(planId)) return true;
+		const entry = eligibility[planId];
+		return Boolean(
+			entry?.website &&
+				entry?.sectorRef &&
+				(planId !== "direction" || entry.hasProposal) &&
+				eligibilityResult[planId]?.result === "eligible",
+		);
+	};
+
+	async function checkEligibilityFor(planId: string) {
+		const entry = eligibility[planId];
+		if (!entry) return;
+		checking = planId;
+		eligibilityResult[planId] = null;
+		try {
+			const result = await checkDiagnosticEligibility({
+				productId: planId,
+				website: entry.website,
+				sectorRef: entry.sectorRef,
+				hasProposal: entry.hasProposal,
+			});
+			eligibilityResult[planId] = {
+				result: result.result,
+				reasons: result.reasons,
+			};
+		} catch (cause) {
+			eligibilityResult[planId] = {
+				result: "ineligible",
+				reasons: [
+					cause instanceof Error
+						? cause.message
+						: "Eligibility could not be checked.",
+				],
+			};
+		} finally {
+			checking = null;
+		}
+	}
 
 	const vatSuffix = $derived(
 		!data.vatEnabled ? "" : data.vatDisplay === "inclusive" ? "incl. VAT" : "excl. VAT",
@@ -53,15 +113,56 @@
 		await startCheckout(guestPlanId);
 	}
 
+	async function startInvoice(planId: string) {
+		loading = planId;
+		error = null;
+		try {
+			const entry = eligibility[planId];
+			const result = await requestInvoice({
+				productId: planId,
+				email: isAuthed ? undefined : guestEmail,
+				cancellationConsent: true,
+				...(needsEligibility(planId) && entry
+					? {
+							website: entry.website,
+							sectorRef: entry.sectorRef,
+							hasProposal: entry.hasProposal,
+						}
+					: {}),
+			});
+			// The order page carries the invoice number, amount, status and a link
+			// to the hosted invoice. Sending the buyer straight to Stripe would
+			// lose the order context.
+			goto(`/auth/purchase/success?order=${result.orderId}`);
+		} catch (err) {
+			error =
+				err && typeof err === "object" && "body" in err
+					? String((err.body as { message?: string }).message ?? "Failed to request invoice")
+					: err instanceof Error
+						? err.message
+						: "An unexpected error occurred";
+		} finally {
+			loading = null;
+		}
+	}
+
 	async function startCheckout(planId: string) {
 		loading = planId;
 		error = null;
 
 		try {
+			const entry = eligibility[planId];
 			const result = await createCheckout({
 				productId: planId,
 				email: isAuthed ? undefined : guestEmail,
 				cancellationConsent: true,
+				...(needsEligibility(planId) && entry
+					? {
+							website: entry.website,
+							sectorRef: entry.sectorRef,
+							hasProposal: entry.hasProposal,
+						}
+					: {}),
 			});
 			window.location.href = result.url;
 		} catch (err) {
@@ -140,6 +241,11 @@
 					<p class="text-xs text-gray-500">
 						One-time purchase{vatSuffix ? `, ${vatSuffix}` : ""}
 					</p>
+					{#if plan.payByBankPreferred && data.payByBankAvailable}
+						<p class="mt-1 text-xs text-gray-500">
+							Pay securely from your bank account, or by card.
+						</p>
+					{/if}
 					<ul class="mt-4 space-y-2 text-sm text-gray-600 flex-1">
 						{#each plan.features as feature}
 							<li class="flex gap-2">
@@ -148,14 +254,86 @@
 							</li>
 						{/each}
 					</ul>
-					<button
-						type="button"
-						class="mt-6 w-full rounded-md bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 disabled:opacity-50"
-						disabled={loading === plan.id || (plan.price > 0 && !consent)}
-						onclick={() => handleCheckout(plan.id, plan.price === 0)}
-					>
-						{loading === plan.id ? "Opening checkout…" : plan.cta}
-					</button>
+					{#if needsEligibility(plan.id)}
+						<div class="mt-4 flex flex-col gap-2 rounded-md border border-gray-200 p-3">
+							<p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Eligibility</p>
+							<input
+								class="h-9 rounded-md border border-gray-300 px-3 text-sm"
+								type="url"
+								placeholder="https://your-site.com"
+								bind:value={eligibility[plan.id].website}
+								oninput={() => (eligibilityResult[plan.id] = null)}
+								aria-label={`Website for ${plan.name}`}
+							/>
+							<select
+								class="h-9 rounded-md border border-gray-300 px-3 text-sm"
+								bind:value={eligibility[plan.id].sectorRef}
+								onchange={() => (eligibilityResult[plan.id] = null)}
+								aria-label={`Sector for ${plan.name}`}
+							>
+								<option value="">Choose an approved sector</option>
+								{#each data.sectors as sector (sector.ref)}
+									<option value={sector.ref}>{sector.name}</option>
+								{/each}
+							</select>
+							{#if plan.id === "direction"}
+								<label class="flex items-start gap-2 text-xs text-gray-600">
+									<input type="checkbox" bind:checked={eligibility[plan.id].hasProposal}
+									onchange={() => (eligibilityResult[plan.id] = null)} />
+									I have a proposed direction ready to test.
+								</label>
+							{/if}
+							<button
+								type="button"
+								class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+								disabled={checking === plan.id ||
+									!eligibility[plan.id].website ||
+									!eligibility[plan.id].sectorRef ||
+									(plan.id === "direction" && !eligibility[plan.id].hasProposal)}
+								onclick={() => checkEligibilityFor(plan.id)}
+							>
+								{checking === plan.id ? "Checking…" : "Check eligibility"}
+							</button>
+							{#if eligibilityResult[plan.id]}
+								<p
+									class={`text-xs ${eligibilityResult[plan.id]?.result === "eligible" ? "text-green-700" : "text-red-600"}`}
+								>
+									{eligibilityResult[plan.id]?.result === "eligible"
+										? "Eligible to buy with these inputs."
+										: eligibilityResult[plan.id]?.reasons.join(" ")}
+								</p>
+							{/if}
+							{#if !data.eligibilityAvailable}
+								<p class="text-xs text-red-600">Eligibility cannot be confirmed right now.</p>
+							{:else if data.sectors.length === 0}
+								<p class="text-xs text-red-600">No approved sector research is available yet.</p>
+							{/if}
+						</div>
+					{/if}
+					{#if released.has(plan.id)}
+						<button
+							type="button"
+							class="mt-6 w-full rounded-md bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 disabled:opacity-50"
+							disabled={loading === plan.id || (plan.price > 0 && !consent) || !eligibilityComplete(plan.id)}
+							onclick={() => handleCheckout(plan.id, plan.price === 0)}
+						>
+							{loading === plan.id ? "Opening checkout…" : plan.cta}
+						</button>
+					{:else}
+						<p class="mt-6 rounded-md border border-gray-200 px-4 py-2 text-center text-sm text-gray-500">
+							Coming soon
+						</p>
+					{/if}
+					{#if released.has(plan.id) && plan.invoiceAvailable}
+						<button
+							type="button"
+							class="mt-2 w-full rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+							disabled={loading === plan.id || !consent || !eligibilityComplete(plan.id)}
+							onclick={() => startInvoice(plan.id)}
+						>
+							{loading === plan.id ? "Preparing invoice…" : "Request an invoice"}
+						</button>
+					{/if}
 				</div>
 			{/each}
 		</div>
@@ -177,15 +355,26 @@
 						<p class="text-xs text-gray-500">
 						One-time purchase{vatSuffix ? `, ${vatSuffix}` : ""}
 					</p>
+					{#if plan.payByBankPreferred && data.payByBankAvailable}
+						<p class="mt-1 text-xs text-gray-500">
+							Pay securely from your bank account, or by card.
+						</p>
 					{/if}
-					<button
-						type="button"
-						class="mt-6 w-full rounded-md border border-gray-900 px-4 py-2 text-gray-900 hover:bg-gray-50 disabled:opacity-50"
-						disabled={loading === plan.id || (plan.price > 0 && !consent)}
-						onclick={() => handleCheckout(plan.id, plan.price === 0)}
-					>
-						{loading === plan.id ? "Opening checkout…" : plan.cta}
-					</button>
+					{/if}
+					{#if released.has(plan.id)}
+						<button
+							type="button"
+							class="mt-6 w-full rounded-md border border-gray-900 px-4 py-2 text-gray-900 hover:bg-gray-50 disabled:opacity-50"
+							disabled={loading === plan.id || (plan.price > 0 && !consent)}
+							onclick={() => handleCheckout(plan.id, plan.price === 0)}
+						>
+							{loading === plan.id ? "Opening checkout…" : plan.cta}
+						</button>
+					{:else}
+						<p class="mt-6 rounded-md border border-gray-200 px-4 py-2 text-center text-sm text-gray-500">
+							Coming soon
+						</p>
+					{/if}
 				</div>
 			{/each}
 		</div>
