@@ -203,7 +203,31 @@ display them. That is the reason G10 is a gate rather than a check.
 
 ---
 
-## 9. What this log does not claim
+## 9. What to do next, in order
+
+Each item is blocked by something specific, and the block is named so it can be
+removed rather than worked around.
+
+1. **Separate the engine into its own repository** (§6.1). Everything downstream
+   of A0 waits on this. No code change is possible on the engine until it is
+   done, because a tag has to mean one product.
+2. **Take the engine's baseline test count on a disposable database.** The suite
+   has never been run here; it reaches the operator's local stack, which the
+   product forbids. This is a half-day for whoever owns the harness.
+3. **Decide the `sector-synthesis` split** (§6.2). One decision, then a small
+   refactor: move `parse.ts` and `to-sector-intelligence.ts` to the contract
+   module and leave the three authoring files behind.
+4. **Decide the vendoring scope** (§6.3). Twenty-one files with a PDF engine, or
+   the narrower subgraph without one.
+5. **Then Phase 2 can start**, and with it G1, G2 and G5.
+6. **G4, G8 and G10 need infrastructure**: a staging environment, a VPS with a
+   restorable dump, and the `pre-port` build deployed against the same database.
+   None of these can be satisfied by code in this repository.
+7. **G7 share tokens** land after G10, for the reason in §8.
+
+---
+
+## 10. What this log does not claim
 
 - No gate other than G9 is passed.
 - No engine code was modified, ported, frozen or tagged.
