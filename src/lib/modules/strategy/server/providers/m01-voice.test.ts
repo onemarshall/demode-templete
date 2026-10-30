@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { createM01VoiceProvider } from "./m01-voice";
 
 describe("M01 voice provider", () => {

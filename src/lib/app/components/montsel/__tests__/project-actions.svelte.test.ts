@@ -7,9 +7,16 @@ import ProjectActions from '../project-actions.svelte';
  * Regression guard for a real bug: putting `class` after `{...props}` on the
  * child anchor replaced the menu item's own sizing, so "Open" rendered several
  * times taller than "Delete".
+ *
+ * The guard compares the two items' class lists rather than their heights. This
+ * environment does not load the compiled stylesheet, so every utility class is
+ * inert: the anchor renders inline at 18px and the item as a 28px block, and a
+ * height comparison fails on that alone while telling you nothing about the bug.
+ * Identical class lists are the property that survives into a styled page, and a
+ * class added after the spread breaks them immediately.
  */
 describe('project actions menu', () => {
-	it('renders Open at the same height as Delete', async () => {
+	it('gives Open the same item classes as Delete, so the row height matches', async () => {
 		render(ProjectActions, {
 			title: 'Test',
 			href: '/app/tools/visual-contract/abc',
@@ -25,11 +32,10 @@ describe('project actions menu', () => {
 		const deleteItem = menuItems.find((item) => item.textContent?.includes('Delete'));
 		expect(deleteItem).toBeDefined();
 
-		const linkHeight = (link as HTMLElement).getBoundingClientRect().height;
-		const deleteHeight = (deleteItem as HTMLElement).getBoundingClientRect().height;
-
-		expect(linkHeight).toBeGreaterThan(0);
-		expect(Math.abs(linkHeight - deleteHeight)).toBeLessThan(1);
+		// The child snippet replaces the item element, so the anchor *is* the item
+		// and its sizing arrives through `props`.
+		expect(menuItems).toContain(link);
+		expect((link as HTMLElement).className).toBe((deleteItem as HTMLElement).className);
 	});
 
 	it('keeps the item sizing classes on the link', async () => {

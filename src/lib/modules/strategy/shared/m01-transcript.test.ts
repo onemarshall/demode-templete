@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { M01TranscriptOutbox, normalizeM01TranscriptEvent, type TranscriptStorage } from "./m01-transcript";
 
 class MemoryStorage implements TranscriptStorage {

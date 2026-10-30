@@ -78,7 +78,10 @@ describe('hooks.server auth headers', () => {
 		mocks.redis.ttl.mockResolvedValue(60);
 	});
 
-	it('adds Server-Timing and x-response-time to /api/auth responses', async () => {
+	// `import('../hooks.server')` transforms the whole hook graph, which takes
+	// longer than the 5s default on a loaded machine and is not the behaviour
+	// under test.
+	it('adds Server-Timing and x-response-time to /api/auth responses', { timeout: 30_000 }, async () => {
 		const { handle } = await import('../hooks.server');
 		type HandleArgs = Parameters<Handle>[0];
 
@@ -98,7 +101,7 @@ describe('hooks.server auth headers', () => {
 		expect(response.headers.get('x-response-time')).toContain('ms');
 	});
 
-	it('returns 429 with Retry-After and x-ratelimit-* headers when temp-blocked', async () => {
+	it('returns 429 with Retry-After and x-ratelimit-* headers when temp-blocked', { timeout: 30_000 }, async () => {
 		mocks.storage.get.mockResolvedValue('1');
 		mocks.storage.ttl.mockResolvedValue(42);
 

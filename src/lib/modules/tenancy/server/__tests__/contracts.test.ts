@@ -12,11 +12,11 @@ function sourceFiles(directory: string): string[] {
 }
 
 describe("brand access contracts", () => {
-  it("pins the Better Auth organisation adapter assumptions to installed 1.7.12 schema", () => {
+  it("pins the Better Auth organisation adapter assumptions to installed 1.7.14 schema", () => {
     const installed = JSON.parse(
       readFileSync(join(process.cwd(), "node_modules/better-auth/package.json"), "utf8"),
     ) as { version: string };
-    expect(installed.version).toBe("1.7.12");
+    expect(installed.version).toBe("1.7.14");
     const schema = organization().schema;
     expect(Object.keys(schema.organization.fields)).toEqual(
       expect.arrayContaining(["name", "slug", "logo", "createdAt", "metadata"]),
@@ -46,7 +46,10 @@ describe("brand access contracts", () => {
         (file) =>
           !file.includes("/src/lib/modules/tenancy/server/") &&
           !file.includes("/__tests__/") &&
-          !/\.(?:test|spec)\./.test(file),
+          !/\.(?:test|spec)\./.test(file) &&
+          // Generated prompt-resource bundles hold authored prose, not queries.
+          // A scan of them reports "FROM Brand Mirror Integration" as SQL.
+          !/\.generated\.ts$/.test(file),
       );
     const scopedSql =
       /\b(?:FROM|JOIN|UPDATE|INSERT\s+INTO|DELETE\s+FROM)\s+["']?(?:brand|brand_member|audit_event|foundation|strategy|campaign|content_item|asset)\b/i;

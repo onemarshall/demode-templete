@@ -41,7 +41,7 @@ describe('access state', () => {
 		expect(entry.action).toEqual({
 			kind: 'start',
 			label: 'Start Visual Contract',
-			href: '/app/workflow/tool.visual_contract'
+			href: '/app/tools/visual-contract'
 		});
 	});
 

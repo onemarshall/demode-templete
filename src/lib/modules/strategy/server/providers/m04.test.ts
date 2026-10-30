@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { z } from "zod";
 import { createM04Providers } from "./m04";
 import { STAGE_SCHEMAS } from "../stages/m04/contracts";

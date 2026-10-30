@@ -1,4 +1,4 @@
-import {describe,expect,test} from 'bun:test';
+import {describe,expect,test} from "vitest";
 import {z} from 'zod';
 import {draftMessages,draftResponseSchema} from './synthesis';
 import {STAGE_SCHEMAS,type M04Session} from './contracts';
