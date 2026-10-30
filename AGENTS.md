@@ -51,3 +51,16 @@ MONTSEL_ENGAGEMENT_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55
 
 Both scripts share `scripts/diagnostic/disposable-db.ts`, which refuses any
 database not named exactly as the caller declares and not on loopback.
+
+```bash
+# Disposable proof of the Signal delivery lifecycle against a fake engine.
+# No Stripe, no customer data, no production database, no real engine.
+docker run -d --rm --name montsel-signal-verify   -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_signal_delivery_verify   -p 127.0.0.1:55442:5432 postgres:16
+MONTSEL_SIGNAL_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55442/montsel_signal_delivery_verify   bunx vitest run src/lib/modules/diagnostic/server/__tests__/diagnostic-delivery.integration.test.ts --project server
+```
+
+The suite skips when that variable is absent, so the default test run is
+unaffected. It needs a **fresh** database each time; drop and recreate it
+between runs. The fake engine is a loopback HTTP server inside the test, so
+`DIAGNOSTIC_ENGINE_URL` is pointed at it for the duration and never at a real
+engine.

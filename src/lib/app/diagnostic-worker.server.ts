@@ -1,18 +1,19 @@
 /**
  * Node composition for the diagnostic worker.
  *
- * The Trigger.dev task calls this. It configures the shared Postgres pool and
- * runs the same orchestration the app uses, so there is one bridge to the
- * engine rather than a worker-only copy.
+ * The Trigger.dev tasks call this. It configures the shared Postgres pool and
+ * runs the same automation the app uses, so there is one bridge to the engine
+ * rather than a worker-only copy.
  */
 
 import { getServerEnv } from '#lib/platform/config/server.server.js';
 import { configureDatabase } from '#lib/platform/database/db.js';
 import {
-	startDiagnosticRun,
-	syncDiagnosticRun,
-	type SyncRunResult
-} from '#lib/modules/diagnostic/server/orchestration.js';
+	advanceEngagement,
+	reconcileSelfServiceEngagements,
+	type AdvanceResult,
+	type ReconcileSummary
+} from '#lib/modules/diagnostic/server/automation.js';
 
 let initialized: Promise<void> | undefined;
 
@@ -31,41 +32,27 @@ async function initialize(): Promise<void> {
 	return initialized;
 }
 
-const TERMINAL_ENGAGEMENT = new Set([
-	'delivered',
-	'failed',
-	'quality_hold',
-	'ready',
-	'withdrawn'
-]);
-const TERMINAL_INTAKE = new Set([
-	'needs_analysis_review',
-	'needs_decision_record',
-	'held',
-	'published',
-	'review_required'
-]);
-
-export async function runDiagnosticIntake(
-	engagementId: string
-): Promise<SyncRunResult & { timedOut?: boolean }> {
+/**
+ * Drive one commissioned engagement as far as the application legitimately can.
+ *
+ * This replaces the poll-only worker. Polling alone could not release an
+ * approved report, could not recover an engagement whose dispatch was lost,
+ * and did not tell the buyer the report was ready.
+ */
+export async function runDiagnosticAutomation(engagementId: string): Promise<AdvanceResult> {
 	await initialize();
-	const started = await startDiagnosticRun(engagementId);
-	let last: SyncRunResult = {
-		engagementId,
-		status: started.status,
-		intake: null
-	};
-	const deadline = Date.now() + 25 * 60_000;
-	while (Date.now() < deadline) {
-		const synced = await syncDiagnosticRun(engagementId);
-		last = synced;
-		if (
-			TERMINAL_ENGAGEMENT.has(synced.status.engagement) ||
-			TERMINAL_INTAKE.has(synced.intake?.status ?? '')
-		)
-			return synced;
-		await new Promise((resolve) => setTimeout(resolve, 5_000));
-	}
-	return { ...last, timedOut: true };
+	return advanceEngagement(engagementId);
+}
+
+/**
+ * Sweep the self-service queue. Safe to run on a schedule: every step is
+ * idempotent and terminal engagements are excluded by the query.
+ */
+export async function reconcileDiagnosticEngagements(limit = 25): Promise<ReconcileSummary> {
+	await initialize();
+	return reconcileSelfServiceEngagements({
+		limit,
+		deadlineMs: 120_000,
+		intervalMs: 5_000
+	});
 }

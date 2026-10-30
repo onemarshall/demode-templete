@@ -14,7 +14,9 @@ import { Pool } from 'pg';
 import type { BetterAuthOptions } from 'better-auth';
 import { getMigrations } from 'better-auth/db/migration';
 
-export const PROJECT_ROOT = resolve(import.meta.dir, '..', '..');
+// `import.meta.dir` is Bun-only. Vitest runs the same harness from the repo
+// root, where `process.cwd()` is the equivalent anchor.
+export const PROJECT_ROOT = import.meta.dir ? resolve(import.meta.dir, '..', '..') : process.cwd();
 
 export interface DisposableDatabase {
 	pool: Pool;
@@ -92,7 +94,10 @@ export async function prepareDisposableDatabase(
 		);
 	}
 
-	const output = execFileSync(process.execPath, ['scripts/database/migrate.ts'], {
+	// The migration runner is a Bun script (`import.meta.dir`, TS entry). Spawn
+	// Bun explicitly so the harness also works when driven from Vitest, where
+	// `process.execPath` is Node.
+	const output = execFileSync('bun', ['scripts/database/migrate.ts'], {
 		cwd: PROJECT_ROOT,
 		env: { ...process.env, BETTER_DATABASE_URL: databaseUrl },
 		encoding: 'utf8',

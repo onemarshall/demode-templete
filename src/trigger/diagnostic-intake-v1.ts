@@ -1,6 +1,6 @@
 import { metadata, schemaTask } from '@trigger.dev/sdk';
 import { z } from 'zod';
-import { runDiagnosticIntake } from '../lib/app/diagnostic-worker.server';
+import { runDiagnosticAutomation } from '../lib/app/diagnostic-worker.server';
 
 export const diagnosticIntakeV1PayloadSchema = z
 	.object({ version: z.literal(1), engagementId: z.string().min(1) })
@@ -23,13 +23,14 @@ export const diagnosticIntakeV1 = schemaTask({
 	},
 	run: async ({ engagementId }) => {
 		metadata.set('schemaVersion', 1);
-		const result = await runDiagnosticIntake(engagementId);
-		metadata.set('status', result.status.engagement);
+		const result = await runDiagnosticAutomation(engagementId);
+		metadata.set('outcome', result.outcome);
+		metadata.set('status', result.engagement.status);
 		return {
 			engagementId,
-			status: result.status.engagement,
-			intakeStatus: result.intake?.status ?? null,
-			timedOut: result.timedOut ?? false
+			outcome: result.outcome,
+			status: result.engagement.status,
+			reason: 'reason' in result ? result.reason : null
 		};
 	}
 });

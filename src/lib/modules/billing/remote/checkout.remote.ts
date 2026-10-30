@@ -10,6 +10,7 @@ import { priceIdForPlan } from "#lib/app/stripe-plans.server.js";
 import { PRODUCT_KEY_BY_PLAN } from "#lib/app/plans.js";
 import { getPlan, isPlanReleased, parseReleasedProducts } from "#lib/app/plans.js";
 import { checkEligibility } from "#lib/modules/diagnostic/server/eligibility.js";
+import { requiresCheckoutEligibility } from "#lib/modules/diagnostic/shared/registry.js";
 import { getVatConfig } from "#lib/app/vat.server.js";
 import { createInvoice } from "#lib/modules/billing/server/invoice.js";
 import {
@@ -93,8 +94,10 @@ export const createCheckout = command(checkoutSchema, async (data) => {
   // A customer must not pay for a diagnostic that cannot be delivered with the
   // available inputs or approved sector coverage. This is a short pre-check,
   // not the full intake; it is repeated when the engagement starts.
+  // The requirement is a property of the variant, not a product-key list: a new
+  // diagnostic cannot inherit the wrong default by being left out of a literal.
   const productKey = PRODUCT_KEY_BY_PLAN[productId];
-  if (productKey === "diagnostic.gap" || productKey === "diagnostic.direction") {
+  if (requiresCheckoutEligibility(productKey)) {
     const eligibility = await checkEligibility(productKey, {
       website: data.website,
       sectorRef: data.sectorRef,
@@ -353,10 +356,7 @@ export const requestInvoice = command(invoiceSchema, async (data) => {
   if (!priceId) error(400, "Unknown or unpriced product");
 
   const invoiceProductKey = PRODUCT_KEY_BY_PLAN[data.productId];
-  if (
-    invoiceProductKey === "diagnostic.gap" ||
-    invoiceProductKey === "diagnostic.direction"
-  ) {
+  if (requiresCheckoutEligibility(invoiceProductKey)) {
     const eligibility = await checkEligibility(invoiceProductKey, {
       website: data.website,
       sectorRef: data.sectorRef,

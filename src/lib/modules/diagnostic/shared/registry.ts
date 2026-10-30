@@ -101,6 +101,15 @@ export interface DiagnosticVariant {
 	depth: ReportDepth;
 	/** Sold to a customer today. A variant that is not sellable has no intake. */
 	sellable: boolean;
+	/**
+	 * Whether checkout must prove deliverability before taking payment.
+	 *
+	 * `not_required` is only correct where the sole input is collected inside
+	 * the paid intake. Signal's decision frame — including its `subjectUrl` — is
+	 * gathered after payment, so a pre-purchase check would have nothing to
+	 * examine and would refuse every Signal purchase.
+	 */
+	checkoutEligibility: 'required' | 'not_required';
 	/** Naming rule enforced in copy, not in code: what this variant is called. */
 	name: string;
 }
@@ -117,6 +126,7 @@ export const VARIANTS: readonly DiagnosticVariant[] = [
 		deliveryRoute: 'montsel_self_service',
 		depth: 'automated',
 		sellable: true,
+		checkoutEligibility: 'not_required',
 		name: 'Signal reading'
 	},
 	{
@@ -125,6 +135,7 @@ export const VARIANTS: readonly DiagnosticVariant[] = [
 		deliveryRoute: 'montsel_self_service',
 		depth: 'automated',
 		sellable: true,
+		checkoutEligibility: 'required',
 		name: 'Gap diagnostic'
 	},
 	{
@@ -133,12 +144,25 @@ export const VARIANTS: readonly DiagnosticVariant[] = [
 		deliveryRoute: 'montsel_self_service',
 		depth: 'automated',
 		sellable: true,
+		checkoutEligibility: 'required',
 		name: 'Direction review'
 	}
 ];
 
 export function getVariant(key: string): DiagnosticVariant | undefined {
 	return VARIANTS.find((variant) => variant.key === key);
+}
+
+/**
+ * Whether a purchase of this product must pass the deliverability check first.
+ *
+ * Fail closed: any `diagnostic.` key without a variant that explicitly opts out
+ * is gated. That is what stops a priced-but-unbuildable product — Full
+ * Diagnostic today — from taking money while it has no route to start work.
+ */
+export function requiresCheckoutEligibility(productKey: string | null | undefined): boolean {
+	if (!productKey || !productKey.startsWith('diagnostic.')) return false;
+	return getVariant(productKey)?.checkoutEligibility !== 'not_required';
 }
 
 /** The intake parser for a variant, or null when the variant has no intake yet. */

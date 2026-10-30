@@ -5,7 +5,10 @@ import { getProduct, isProductKey } from '#lib/modules/products/shared/registry.
 import { getEngagement } from '#lib/modules/diagnostic/server/engagement.js';
 import { syncDiagnosticRun } from '#lib/modules/diagnostic/server/orchestration.js';
 import { readOutputReport } from '#lib/modules/diagnostic/server/report.js';
-import { labelForEngagement } from '#lib/modules/diagnostic/server/status.js';
+import {
+	isTerminalEngagement,
+	labelForEngagement
+} from '#lib/modules/diagnostic/server/status.js';
 import {
 	addClientMessage,
 	createThread,
@@ -15,8 +18,6 @@ import {
 } from '#lib/modules/diagnostic/server/comments.js';
 import { getDB } from '#lib/platform/database/db.js';
 
-const TERMINAL = new Set(['delivered', 'failed', 'quality_hold', 'withdrawn', 'ready']);
-
 export const load: PageServerLoad = async (event) => {
 	const { ctx } = await resolveActiveBrand(event);
 	let engagement = await getEngagement(ctx, event.params.engagementId);
@@ -25,7 +26,9 @@ export const load: PageServerLoad = async (event) => {
 	// Refresh from the engine when a job exists and the engagement is not in a
 	// terminal state. The Trigger task does the same work; this makes the page
 	// honest immediately after a return visit.
-	if (engagement.engineJobId && !TERMINAL.has(engagement.status)) {
+	// A settled engagement has nothing left to sync. `retrying` is deliberately
+	// unsettled, so a page visit retries an import the worker could not complete.
+	if (engagement.engineJobId && !isTerminalEngagement(engagement.status)) {
 		try {
 			await syncDiagnosticRun(engagement.id, {
 				organisationId: ctx.organisationId,

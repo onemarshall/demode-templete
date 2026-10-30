@@ -22,7 +22,12 @@ import {
 	type EngineIntakeView
 } from './engine.js';
 import { importPublishedBytes, type ImportedSection } from './import.js';
-import { statusFromIntake, type DeliveryStatus } from './status.js';
+import {
+	retryingStatus,
+	statusForEngagement,
+	statusFromIntake,
+	type DeliveryStatus
+} from './status.js';
 
 export interface EngagementScope {
 	organisationId: string;
@@ -303,18 +308,82 @@ export async function syncDiagnosticRun(
 	if (intake.status !== 'published' || !runPublicId)
 		return { engagementId, status: mapped, intake };
 
-	const outputId = await importDeliveredReport(engagement, runPublicId);
-	return { engagementId, status: mapped, intake, ...(outputId ? { outputId } : {}) };
+	// The report is published. Import is the only step that may set `delivered`,
+	// and it may still refuse. A refusal must be visible and retryable rather
+	// than leaving the engagement looking finished.
+	let outcome: ImportOutcome;
+	try {
+		outcome = await importDeliveredReport(engagement, runPublicId);
+	} catch (error) {
+		const detail = error instanceof Error ? error.message : String(error);
+		const code = /hash/i.test(detail)
+			? 'hash_mismatch'
+			: /publication/i.test(detail)
+				? 'missing_publication'
+				: 'import_failed';
+		await updateEngagement({
+			engagementId,
+			status: 'retrying',
+			failureCode: code,
+			failureDetail: detail
+		});
+		await recordEvent({
+			engagementId,
+			engineRunId: runPublicId,
+			status: code,
+			stage: 'import',
+			message: detail
+		});
+		return { engagementId, status: retryingStatus(detail), intake };
+	}
+
+	if (outcome.status === 'quality_hold')
+		return {
+			engagementId,
+			status: statusForEngagement('quality_hold', outcome.reason, 'attention'),
+			intake
+		};
+
+	return {
+		engagementId,
+		status: statusForEngagement(
+			'delivered',
+			'The report was published, passed its quality checks and imported with a verified hash.',
+			'success'
+		),
+		intake,
+		outputId: outcome.outputId
+	};
 }
+
+/**
+ * The checks a quality receipt failed. Empty means the run may be imported.
+ *
+ * Pure, and exported, so the refusal rule can be tested without an engine.
+ */
+export function failedQualityChecks(receipt: {
+	checks: Array<{ key: string; passed: boolean; detail: string }>;
+}): Array<{ key: string; passed: boolean; detail: string }> {
+	return receipt.checks.filter((check) => !check.passed);
+}
+
+/**
+ * `delivered` is written only after the quality receipt passes and the bytes
+ * hash-match. A quality refusal returns rather than throws, because it is a
+ * settled outcome; an import fault throws, because it is retryable.
+ */
+type ImportOutcome =
+	| { status: 'delivered'; outputId: string }
+	| { status: 'quality_hold'; reason: string };
 
 async function importDeliveredReport(
 	engagement: EngagementRow,
 	runPublicId: string
-): Promise<string | undefined> {
+): Promise<ImportOutcome> {
 	if (!isProductKey(engagement.productKey))
 		throw new Error(`Unknown product key on the engagement: ${engagement.productKey}`);
 	const quality = await getQuality(runPublicId);
-	const failed = quality.checks.filter((check) => !check.passed);
+	const failed = failedQualityChecks(quality);
 	if (failed.length > 0) {
 		await updateEngagement({
 			engagementId: engagement.id,
@@ -323,7 +392,10 @@ async function importDeliveredReport(
 			failureCode: 'quality_gate',
 			failureDetail: failed.map((check) => `${check.key}: ${check.detail}`).join(' ')
 		});
-		return undefined;
+		return {
+			status: 'quality_hold',
+			reason: failed.map((check) => `${check.key}: ${check.detail}`).join(' ')
+		};
 	}
 	if (!quality.publication)
 		throw new Error('The engine reports a published run with no publication record.');
@@ -363,5 +435,5 @@ async function importDeliveredReport(
 		stage: 'import',
 		message: 'Published report imported and hash-verified.'
 	});
-	return outputId;
+	return { status: 'delivered', outputId };
 }

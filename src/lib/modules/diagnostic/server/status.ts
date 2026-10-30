@@ -53,8 +53,11 @@ export function statusFromEngine(status: string): DeliveryStatus {
         message: 'The report is being generated.'
       };
     case 'automation_ready':
+      // Intermediate: the engine still has to release the report. Mapping this
+      // to `ready` made it indistinguishable from a published run and stopped
+      // the poll loop before publication.
       return {
-        engagement: 'ready',
+        engagement: 'in_delivery',
         label: 'Checks passed',
         tone: 'progress',
         message: 'The automated checks have passed; release is in progress.'
@@ -67,8 +70,9 @@ export function statusFromEngine(status: string): DeliveryStatus {
         message: 'The report is ready for consultant review. It is not approved or published.'
       };
     case 'approved':
+      // Intermediate: approved but not yet published.
       return {
-        engagement: 'ready',
+        engagement: 'in_delivery',
         label: 'Approved',
         tone: 'progress',
         message: 'The report is approved and awaiting publication.'
@@ -162,6 +166,72 @@ export function statusFromIntake(status: string): DeliveryStatus {
     default:
       return statusFromEngine(status);
   }
+}
+
+/**
+ * Engine and intake states after which automated processing cannot progress
+ * without an external actor. This set is the single authority: the poll loop
+ * and every re-sync predicate read it, so terminality is defined once.
+ *
+ * `automation_ready` and `approved` are deliberately absent. Both describe work
+ * the engine has yet to finish, and treating either as terminal stranded the
+ * engagement before publication.
+ *
+ * An unrecognised status is not terminal. Unknown must mean "keep waiting",
+ * never "stop".
+ */
+export const TERMINAL_INTAKE_STATUSES: ReadonlySet<string> = new Set([
+  'published',
+  'review_required',
+  'needs_analysis_review',
+  'needs_decision_record',
+  'held',
+  'validation_failed',
+  'changes_requested',
+  'failed',
+  'cancelled'
+]);
+
+export function isTerminalIntake(status: string): boolean {
+  return TERMINAL_INTAKE_STATUSES.has(status);
+}
+
+/**
+ * Engagement states after which no automated work remains.
+ *
+ * `ready` is absent on purpose: it now means only "awaiting a human" or
+ * "published, import pending", and a page visit should still be able to retry
+ * an import from it.
+ */
+export const TERMINAL_ENGAGEMENT_STATUSES: ReadonlySet<EngagementStatus> = new Set([
+  'delivered',
+  'failed',
+  'withdrawn',
+  'quality_hold',
+  'declined'
+]);
+
+export function isTerminalEngagement(status: EngagementStatus): boolean {
+  return TERMINAL_ENGAGEMENT_STATUSES.has(status);
+}
+
+/** A status whose engagement state is known directly, not derived from the engine. */
+export function statusForEngagement(
+  status: EngagementStatus,
+  message: string,
+  tone: StatusTone = 'neutral'
+): DeliveryStatus {
+  return {
+    engagement: status,
+    label: ENGAGEMENT_LABELS[status] ?? status,
+    tone,
+    message
+  };
+}
+
+/** A retryable import failure. Never `delivered`, never silently idle. */
+export function retryingStatus(message: string): DeliveryStatus {
+  return statusForEngagement('retrying', message, 'attention');
 }
 
 export const ENGAGEMENT_LABELS: Record<EngagementStatus, string> = {

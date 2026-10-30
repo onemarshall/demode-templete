@@ -102,7 +102,7 @@ export const PLANS: Plan[] = [
 			'Joined next-step and handoff section'
 		],
 		cta: 'Buy Full Diagnostic',
-		popular: true,
+		popular: false,
 		payByBankPreferred: true,
 		invoiceAvailable: true,
 	},

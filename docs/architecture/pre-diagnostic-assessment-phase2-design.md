@@ -26,15 +26,40 @@ the earlier assumption:
 Verification limits are unchanged from Phase 1: no live engine, no browser pass, no Stripe
 event, no production configuration inspected.
 
-**One additional caveat, discovered while writing this document.** The working tree is not
-clean: `git status` shows the diagnostic module, the billing remote layer, `plans.ts`, the
-pricing route, the product registry and the env schema as modified or untracked relative to
-`HEAD` (`6cde0be`). `diagnostic/server/eligibility.ts`, `engine.ts`, `orchestration.ts`,
-`payments.ts` and `consultant.ts` do not exist in `HEAD` at all. Every citation in this
-document and in the Phase 1 audit therefore describes **the working tree**, not the last
-commit. That is the correct thing to design against if this tree is what ships — but the
-design must not be assumed to describe a committed baseline, and any review should confirm
-which tree is authoritative before implementation begins.
+### 0.1 Baseline — resolved
+
+An earlier draft of this section recorded that the working tree was dirty and that the
+diagnostic module did not exist in `HEAD`. **That is no longer true and the caveat is
+withdrawn.**
+
+Verified at the time of this revision:
+
+| Check | Result |
+| --- | --- |
+| `git status --porcelain` | Empty. Working tree clean. |
+| `HEAD` | `e20f1c2` "Add the order lifecycle and the diagnostic engagement front end" |
+| Branch | `main` |
+| Phase 1 and Phase 2 documents | Committed (`git ls-files docs/architecture` lists both) |
+
+So the diagnostic module, the billing remote layer, the pricing route, the product registry
+and the env schema are now committed at `e20f1c2`, and every citation in both audits
+describes a reproducible commit rather than an uncommitted tree.
+
+**No reset, checkout, stash or cleanup was performed to reach this state.** The change came
+from the owner committing the work. That is the correct resolution: the uncommitted work was
+the work.
+
+Baseline rule for implementation: branch from `e20f1c2` or later, and record the base commit
+in the first implementation pull request. Do not rebase the diagnostic module onto an earlier
+commit, and do not treat `6cde0be` as authoritative — it does not contain the module.
+
+### 0.2 Verification performed for this review
+
+| Question | Method | Result |
+| --- | --- | --- |
+| Which tree is authoritative? | `git status`, `git log`, `git ls-files` | Clean at `e20f1c2`; see §0.1 |
+| Is `full-diagnostic` purchasable in production? | Read `wrangler.jsonc` `vars` (the deployed Worker configuration) and `.env` | **No.** `RELEASED_PRODUCTS: "signal"` in both. See §9 |
+| Can the engine publish a self-service run automatically? | Searched `.env` and `wrangler.jsonc` for `DIAGNOSTIC_ENGINE_URL` / `_TOKEN` | **Not determinable here.** Neither is present in either file. A Cloudflare secret could exist outside the repo, so absence is not proof of absence — but this environment cannot answer the question. See §2.7 |
 
 ---
 
@@ -233,6 +258,33 @@ from the type, not forbidden by a rule. A model cannot return a field the contra
 place for, and the app cannot render one. This satisfies spec §7.2 and §10 more strongly than
 a validation rule would.
 
+#### Free-text containment — the limit of typed omission
+
+Typed omission stops a model returning a verdict in a *structured* field. It does not stop it
+writing one in prose: "on balance this direction should proceed" is a `model_inference`
+sentence, and the schema will happily carry it.
+
+Three controls, in order of strength:
+
+1. **Contract.** The prompt states the prohibition explicitly and supplies the allowed
+   vocabulary for judgement language ("worth investigating", "not yet established"), naming
+   the four Direction verdicts and any numeric score as forbidden.
+2. **Validation.** Every free-text field in the response is scanned before persistence for
+   verdict vocabulary (`proceed`, `refine`, `pause`, `reset`, `should proceed`, `do not
+   proceed`) and score patterns (`\b\d{1,3}\s*(?:/|out of)\s*(?:10|100)\b`, `score of`,
+   `rated`). A hit **rejects the response** and triggers the rules-mode fallback; it is never
+   silently rewritten, because rewriting model prose changes its meaning. The pattern list is
+   a versioned constant beside `analysisVersion`.
+3. **Evaluation.** A fixed corpus of 30 intake fixtures runs on every analysis-owner change.
+   Each asserts: no verdict token in any free text; exactly three questions; every claim has
+   provenance; the recommendation is in the fixture's allowed set; no commitment figure is
+   invented. A manual read of 20 sampled briefs gates first production enablement.
+
+**Stated honestly:** regex scanning is a backstop, not a guarantee. A model can assert a
+verdict in language the patterns miss. The residual risk is accepted only because the brief is
+advisory, carries a visible limits section, and the customer retains decision authority. It
+would be wrong to describe this control as preventing verdicts.
+
 #### Error contract
 
 Reuses the existing envelope. New codes, with the app's handling:
@@ -267,8 +319,14 @@ assessment supported   pass: options.capabilities?.includes('assessment') ?? fal
 assessment bounded     pass: limits.maxInputChars > 0 && limits.maxModelCalls === 1
 ```
 
-Both fail closed. This is the single authority for "may the assessment flag be enabled in
-this environment".
+Both fail closed. The probe governs **analysis only** — §5.1 resolves the two-capability
+model, and with it the contradiction between this section and the flag inventory.
+
+- `assessment supported` false → `ASSESSMENT_ANALYSIS_ENABLED` cannot be enabled. The journey
+  still runs in rules mode (§1.5).
+- `assessment bounded` false → same.
+
+The probe never gates the journey itself, because a rules-mode brief needs no engine.
 
 ### 1.5 Fallback if the engine cannot support it
 
@@ -538,6 +596,51 @@ The critical distinction: `research_required` is **not** `ineligible`. Today
 `eligibility.ts:83` collapses both into `blocked`. The recommendation engine must be able to
 say "this is worth investigating" while the purchase gate refuses. One gate, two messages.
 
+### 3.1a Suitability and availability are separate, and rendered separately
+
+A recommendation is durable. Availability is not. They must not share a field, or the brief
+will claim a product is purchasable after research lapses, or refuse one that has just become
+available.
+
+The brief carries two independent objects:
+
+```ts
+interface AssessmentBrief {
+  recommendation: {
+    product: 'signal' | 'gap' | 'direction' | 'full';
+    rationale: string;              // why this investigation fits this decision
+    alternatives: Array<{ product: string; whyNot: string }>;
+  };
+  // Computed at read time, never stored in the brief version.
+  availability: {
+    available: boolean;
+    blocker: 'sector_research' | 'deliverability' | 'not_released' | null;
+    detail: string | null;          // "Sector research for manufacturing is in progress"
+    expectedResolution: string | null;
+  };
+}
+```
+
+Rendering rules:
+
+| Case | Brief says | CTA |
+| --- | --- | --- |
+| Recommended and available | Why this investigation fits, and what it will examine | Buy — correct price |
+| Recommended, sector research pending | Why Gap is the right investigation; which sector is being researched; that nothing is charged until it is approved | "Tell me when it is ready" — email capture only, same consent rules; **no buy button** |
+| Recommended, product not released | Why it fits; that it is not yet on sale | No CTA |
+| Not suitable | No offer, with the reason | No CTA |
+
+Two implementation consequences:
+
+1. `availability` is computed server-side on every read from the engine catalogue plus
+   `RELEASED_PRODUCTS`. Storing it would freeze a stale answer into an immutable brief.
+2. The recommendation must survive a blocker. A brief that recommends Gap and then withholds
+   the reason is worse than no recommendation, and it is the failure mode this section exists
+   to prevent.
+
+This is what makes `research_required` usable: the brief can be honest and useful on the same
+page where checkout is closed.
+
 ### 3.2 Approval standard
 
 A sector entry is `approved` only when all six hold, and the approval is recorded:
@@ -677,6 +780,44 @@ Proposed flow:
 4. The link lands on a **view**, not a login. No session is created.
 5. Rate limits: 3/hour/email, 10/hour/IP, both via `slidingWindowCheck`.
 
+#### Recovery — the board-approval case
+
+A single-use 24-hour link verifies ownership. It is the wrong tool for return: a buyer seeking
+board approval comes back days or weeks later, possibly on another device, with the link
+expired. Recovery must be durable, and it must not be a second verification.
+
+Three capabilities, deliberately distinct:
+
+| Capability | Lifetime | Purpose |
+| --- | --- | --- |
+| Verification link | 24 h, single-use | Prove control of the address, once |
+| Owner session cookie | 90 days, httpOnly, revocable | The common return path; no email needed |
+| Email re-issue ("Find your assessment") | On demand | The durable path; survives cookie loss, device change and delay |
+
+**"Find your assessment"** — `/assessment/find`:
+
+1. Enter an email. Response is always identical: "If that address has an assessment, we've sent
+   a link to it."
+2. If a verified owner exists, send a fresh 24-hour link to a **list** of that address's
+   assessments, not to a single brief.
+3. The list shows decision question, date, recommended product and status — no report content,
+   no uploaded filenames, no commitment figure. Nothing private travels in the email body or
+   subject (spec §7.6).
+4. Rate limit 3/hour/email, 10/hour/IP.
+
+Rules:
+
+- Re-issue **rotates the owner token** but must not invalidate existing share links, which are
+  a separate capability (§4.4). A board pack already circulated must keep working.
+- Re-issue must never create a second assessment or a second brief version.
+- The owner cookie is cleared on explicit sign-out, on token rotation, and on deletion.
+- Recovery is unavailable for an assessment whose owner email was never verified, because
+  there is nothing to prove control of. The draft token remains the only key, and the retention
+  policy in §4.1 is stated in the UI.
+
+This satisfies return-without-re-entry (§6 step 13) without extending the life of a
+verification token.
+
 ### 4.4 Secure sharing
 
 | Control | Design |
@@ -749,18 +890,42 @@ re-entering with the prefilled intake resumes rather than commissioning a second
 All private server flags unless marked public. All default `false` — a misconfiguration
 closes the journey, never opens it.
 
-| Flag | Gates | Notes |
-| --- | --- | --- |
-| `ASSESSMENT_ENABLED` | All `/assessment` routes | Master switch; routes 404 when off |
-| `ASSESSMENT_ANALYSIS_ENABLED` | Engine call | Off = static brief (§1.5 fallback) |
-| `ASSESSMENT_EMAIL_ENABLED` | Owner-link send | Off = draft only, no delivery |
-| `ASSESSMENT_SHARING_ENABLED` | Share issue/read | Off = no share links exist |
-| `ASSESSMENT_UPLOADS_ENABLED` | Document upload | Off = text answers only |
-| `ASSESSMENT_FOLLOWUP_ENABLED` | Reminders | Off until legal review; **not a pilot flag** |
-| `PUBLIC_ASSESSMENT_CTA_ENABLED` | Pricing card CTA copy | Public; off = today's cards |
+**Two capabilities, two flags.** An earlier draft made `ASSESSMENT_ENABLED` require the engine
+readiness probe, which contradicted the rules-mode fallback in §1.5. The contradiction is
+resolved by separating them:
 
-`ASSESSMENT_ENABLED` additionally requires the readiness probe (§1.4) to pass. A flag alone
-cannot enable a capability the engine does not advertise.
+| Flag | Gates | Depends on engine? |
+| --- | --- | --- |
+| `ASSESSMENT_ENABLED` | The journey: routes, intake, rules-mode recommendation, brief rendering, static three questions | **No** |
+| `ASSESSMENT_ANALYSIS_ENABLED` | Personalised analysis: the `/v1/assessments` call | **Yes** — readiness probe must pass |
+| `ASSESSMENT_EMAIL_ENABLED` | Owner-link send and recovery | No |
+| `ASSESSMENT_SHARING_ENABLED` | Share issue/read | No |
+| `ASSESSMENT_UPLOADS_ENABLED` | Document upload | No |
+| `ASSESSMENT_FOLLOWUP_ENABLED` | Reminders | No — off until legal review; **not a pilot flag** |
+| `PUBLIC_ASSESSMENT_CTA_ENABLED` | Pricing card CTA copy | No |
+
+Enablement order is `ASSESSMENT_ENABLED` first, `ASSESSMENT_ANALYSIS_ENABLED` later. The
+reverse is impossible by construction: analysis without a journey has nothing to serve.
+
+### 5.1a Rules mode must not claim intelligence
+
+The journey can run without the engine, but it must not pretend otherwise. When
+`ASSESSMENT_ANALYSIS_ENABLED` is off:
+
+- The brief carries `analysisSource: 'rules'` and renders a visible statement: *"This
+  assessment used our structured decision model, not a language model. It has not read your
+  documents."*
+- The three questions are composed from intake answers only, and each cites the intake field
+  it came from. No inferred claim, no document reference.
+- The recommendation is table-driven. It can still be right; it cannot be personalised prose.
+- No copy anywhere — page, email, share view — may use "AI", "intelligent", "our analysis of
+  your documents", or equivalent while analysis is off.
+- A snapshot test asserts the rules-mode label is present and the forbidden vocabulary absent
+  from every rules-mode surface.
+
+A rules-mode brief that reads as if a model had examined the proposal is the one outcome that
+would make the whole journey dishonest. It is treated as a release-blocking defect, not a copy
+nit.
 
 ### 5.2 Why flags alone are not sufficient
 
@@ -819,7 +984,9 @@ Sizes: S ≤ 1 day, M 2–3, L 4–7, XL > 7. Estimates are relative, not commit
 | 6 | Uploads (flag-gated) | 5 | M | Magic-byte rejection; size cap; redaction default | G2 |
 | 7 | `recommendation.ts` — pure, table-driven | 4 | M | Cases A–E from spec §3; `no_offer` reachable; never Full for a Direction-only question | G2 |
 | 8 | Static Decision Brief renderer + printable summary | 7 | M | Three questions always; closing question omits figures when commitment unknown | G2 |
+| 8a | Suitability/availability split in the brief; rules-mode labelling | 8 | M | Rules-mode label present and "AI"/"intelligent" absent; recommended-but-blocked renders no buy button | G2 |
 | 9 | Email owner link + single-use redemption + generic response | 4 | M | Replay rejected; enumeration indistinguishable; rate limits | **G3** |
+| 9a | Owner recovery: 90-day owner cookie + "Find your assessment" re-issue | 9 | M | Re-issue rotates owner token but leaves share links working; list leaks no content; no second assessment created | **G3** |
 | 10 | Analysis integration (engine `/v1/assessments`) | 2, 7 | L | Malformed response rejected wholesale; no score/verdict fields possible; budget enforced | **G3** |
 | 11 | Sharing: issue, redact, revoke, expiry, access log | 8, 9 | M | Documents never in shared payload; revoke 404s; HMAC salt present | G3 |
 | 12 | Checkout hand-off: `assessmentRef`, eligibility re-run, `purchase` stamping | 9, 11 | L | Client-supplied price ignored; mismatched email does not link; recommendation not enforced | **G4** |
@@ -868,6 +1035,8 @@ cannot erode during implementation:
 | **Three personalised questions** | `questions` is a zod tuple of exactly 3 (§1.3); each needs non-empty `evidenceRefs` and a `tests` value | Response with 2 or 4 is rejected; a question with no evidence ref is rejected |
 | **Independent recommendation** | `recommendation` is table-driven and pure (§6 step 7); `no_offer` and `needs_clarification` are first-class outcomes | Cases assert lower-priced and no-offer outcomes are reachable; Full is never returned for a Direction-only question |
 | **One decisive confidence-led close** | `closing.confidenceQuestion` + `usesCommitment`; the renderer branches on whether `commitment` is known | With £75,000 → numeric question; without → "Before you commit to the proposed work…" and no invented ratio |
+| **Honest about what it is** | `analysisSource: 'model' \| 'rules'` plus the rules-mode label (§5.1a) | Rules-mode surfaces carry the label and none of the intelligence vocabulary |
+| **Honest about what is available** | `recommendation` and `availability` are separate fields (§3.1a) | Recommended-but-blocked renders the reason and no buy button |
 
 The renderer, not the model, chooses the closing wording. The model supplies the question;
 the app decides whether a figure may appear. That is the only way the "no invented figure"
@@ -875,31 +1044,116 @@ rule can be enforced rather than hoped for.
 
 ---
 
-## 8. Decisions required before implementation
+## 8. Decisions
 
-| # | Decision | Blocks | Recommendation |
+### 8.1 Settled by review, 30 October 2026
+
+These are decided. They are design decisions, not evidence that the engine can deliver them —
+§2.9 and §9 record what remains to be proven.
+
+| # | Decision | Settled as | Consequence |
 | --- | --- | --- | --- |
-| 1 | Analysis owner: engine endpoint, dedicated service, or static-only for v1 | Steps 10, 16 | Engine endpoint, gated on advertised capability |
-| 2 | Synchronous vs queued assessment call | Step 10 | Synchronous, 20 s deadline, static fallback |
-| 3 | Full Diagnostic: build now or withdraw from catalogue until buildable | Steps 14–16 | Withdraw from `RELEASED_PRODUCTS` **now**; build at step 14 |
-| 4 | Does "no consultant sign-off" survive contact with the engine's publish path? | G5 | Verify at step 16 before any release |
-| 5 | Who owns the sector research queue and revalidation clock | Step 17, sector project | Engine |
-| 6 | Draft retention: 14 or 30 days | Step 3 | 14, matching Visual Contract's stated promise |
-| 7 | Share expiry default and maximum | Step 11 | 14 default, 90 max |
-| 8 | Emails must match for purchase linkage? | Step 12 | Link only on match; record the mismatch otherwise |
-| 9 | Keep `popular: true` on Full? | Step 14 | Remove — a "most complete" badge contradicts recommendation-led pricing |
-| 10 | Langfell booking provider | Step 18 | Not determinable here |
+| 1 | Analysis owner | **External diagnostic engine** | §1.3 contract; app holds no prompt or score |
+| 2 | Assessment execution | **Synchronous, 20 s deadline, clearly labelled fallback** | §1.6 resolved; fallback must be labelled, see §5.1a |
+| 3 | Full Diagnostic | **Keep planned; disable purchasing until delivery is proven** | Step 14 not started; §9 confirms it is already unreleased |
+| 4 | Consultant sign-off | **Retain the no-sign-off promise only after an automated publishing test passes** | G5 is now a promise gate, not only a product gate — see §9 |
+| 5 | Sector research | **Engine owns research, approval and revalidation** | §3.3 confirmed; no app-side catalogue |
+| 6 | Draft retention | **14 days, documented as new policy** | §4.1 retention set to 14 |
+| 7 | Share expiry | **14 days default, 90 days maximum** | §4.4 |
+| 8 | Purchase email | **Verified ownership required for automatic linkage** | §4.5 rule 2 confirmed; mismatch leaves unlinked |
+| 9 | Full popularity badge | **Remove** | Step 14 includes it; see §9 for the smaller immediate action |
+| 10 | Langfell booking | **Provider deferred** | Step 18 blocked, not blocking others |
+
+### 8.2 Still open
+
+| # | Question | Blocks | Why it cannot be closed here |
+| --- | --- | --- | --- |
+| A | Does the engine advertise an `assessment` capability, and at what latency and cost? | Step 10 | Engine is external and unreachable from this environment |
+| B | Does a `full` run produce one integrated publication, and does it pass quality gates? | Step 14 | Same |
+| C | Can a self-service engagement reach `published` without a `consultant_grant`? | **G5, and the live Signal promise** | Same — see §9 |
+| D | Does production hold engine credentials outside the repository? | Step 10, C | Cloudflare secrets are not inspectable from here |
+| E | What is the sector research turnaround that may be promised in the brief? | §3.1a copy | Operational, not architectural |
 
 ---
 
-## 9. What remains unverified
+## 9. Targeted safety change — exposure confirmed, separate approval
+
+The review asked for the `full-diagnostic` exposure to be confirmed before any change, and for
+the resulting change to be approved separately from the assessment work. Both are done.
+
+### 9.1 Exposure: not currently purchasable
+
+| Source | Value |
+| --- | --- |
+| `wrangler.jsonc:71` (`vars`, deployed Worker, `PUBLIC_ENV_MODE: "production"`) | `"RELEASED_PRODUCTS": "signal"` |
+| `.env:154` (local) | `RELEASED_PRODUCTS=signal` |
+
+`createCheckout` refuses an unreleased plan before Stripe is touched
+(`checkout.remote.ts:86–88`, 409 "This product is not available for purchase yet"), and
+`requestInvoice` does the same (`:347–349`). The pricing page renders "Coming soon" rather than
+a button for any plan not in the released set (`pricing/+page.svelte:313–326`).
+
+**Conclusion: Full Diagnostic cannot be bought today.** The defect recorded in §2.1 is real but
+**latent**. No emergency change is required, and removing it from `RELEASED_PRODUCTS` is
+unnecessary because it was never added.
+
+### 9.2 What the same configuration reveals, which is not latent
+
+Signal **is** released. That means:
+
+- Signal purchases are live, and Signal is the one product with no checkout eligibility gate
+  (§2.8.3) — so a Signal buyer reaches the intake and dispatch path today.
+- The pricing page makes the "no consultant sign-off" claim to those buyers
+  (`pricing/+page.svelte:188`).
+- The application has no path to `published` without a `consultant_grant` (§2.7).
+
+So one of two things is true right now, and this environment cannot tell which: either the
+engine publishes self-service runs automatically and the claim holds, or Signal buyers are
+stalling at `review_required` / `needs_decision_record`. **This is the highest-priority
+verification item in the whole programme, and it is live rather than latent.** It is item C in
+§8.2 and the first condition of G5.
+
+### 9.3 Two configuration contradictions worth separate review
+
+Recorded, not acted on:
+
+- `wrangler.jsonc:53–56`: the comment reads "Off until the VAT position is established …
+  before this is set to 'true'", but the value is `"PUBLIC_STRIPE_ENABLED": "true"`, with
+  `VAT_ENABLED: "false"`.
+- `wrangler.jsonc:72–73`: the comment reads "Off until Stripe reports pay_by_bank available on
+  this account", but the value is `"PAY_BY_BANK_ENABLED": "true"`.
+
+Both may be deliberate — the comments may be stale. But a comment that contradicts its value
+is a control that reads as engaged when the reader assumes it is not. They should be resolved
+by someone who knows the VAT and payment-method position, not by the assessment work.
+
+### 9.4 Proposed targeted change, for separate approval
+
+Deliberately small, and **not** started:
+
+1. **Remove `popular: true`** from the `full-diagnostic` plan (`plans.ts:105`). Display only.
+   It currently badges an unbuildable product as "Most complete", which is a nudge toward the
+   one product that cannot be delivered. No behavioural effect; no release-config change.
+2. **Add a guard test**: every key in `PRODUCT_KEY_BY_PLAN` beginning `diagnostic.` must have an
+   entry in `VARIANTS`, or the test fails with the missing key named. This is the regression
+   guard against a priced-but-unbuildable product reappearing, and it would have caught the
+   current state at the point it was introduced.
+3. **Change nothing in `RELEASED_PRODUCTS`.** It is already correct.
+
+Items 1 and 2 are safe to approve independently of the assessment programme. Neither touches
+checkout logic, schema or the release gate.
+
+---
+
+## 10. What remains unverified
 
 - Whether the engine implements or can implement `/v1/assessments`, and what its actual
   latency and cost are.
 - Whether `families` includes `full`, and whether a `full` run produces one integrated
   publication.
 - Whether a self-service engagement can reach `published` without a `consultant_grant`.
-- Whether `RELEASED_PRODUCTS` in production contains `full-diagnostic` today.
+- ~~Whether `RELEASED_PRODUCTS` in production contains `full-diagnostic` today.~~ **Resolved
+  §9.1: it does not.** Signal is the only released product.
 - Stripe test-mode checkout end to end in this tree.
 - Actual email deliverability for the configured provider.
 - Whether the prompt-injection defence holds against a real model.
