@@ -71,6 +71,26 @@ try {
 		);
 	assert((await count()) === 0, 'A refused intake still wrote an engagement.');
 
+	// 1b. A valid intake is still refused while the brand holds no entitlement.
+	// Payment precedes the write, so an unpaid request leaves nothing behind.
+	let unpaid = false;
+	try {
+		await startEngagement(pilotCtx, { productKey: 'diagnostic.signal', intake });
+	} catch (error) {
+		unpaid = /has not been paid for/.test((error as Error).message);
+	}
+	assert(unpaid, 'An engagement started without a live entitlement.');
+	assert((await count()) === 0, 'A refused payment still wrote an engagement.');
+
+	// The proof then uses an explicit grant, the supported administrative path
+	// that does not require a purchase. A purchase-sourced entitlement would need
+	// an activated order, which is a different proof.
+	await pool.query(
+		`INSERT INTO "product_entitlement" ("id", "organisation_id", "brand_id", "product_key", "source")
+		 VALUES ('ent_verify_signal', $1, $2, 'diagnostic.signal', 'grant')`,
+		[pilot.organisationId, pilot.brandId]
+	);
+
 	// 2. First submission creates the work item and the engagement.
 	const first = await startEngagement(pilotCtx, { productKey: 'diagnostic.signal', intake });
 	assert(first.status === 'started', 'The first submission did not start an engagement.');

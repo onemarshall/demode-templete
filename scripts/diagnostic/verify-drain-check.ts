@@ -17,6 +17,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
+import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
 	assert,
@@ -29,7 +30,15 @@ import {
 const DATABASE_NAME = 'montsel_drain_verify';
 const url = requireSafeDatabase(process.env.MONTSEL_DRAIN_VERIFY_DATABASE_URL, DATABASE_NAME);
 
-const database = await prepareDisposableDatabase(url, 23);
+// Derived rather than pinned, so a later migration does not turn this proof into
+// a failure that says nothing about the drain check.
+const LATEST = Math.max(
+	...readdirSync(join(PROJECT_ROOT, 'database', 'migrations'))
+		.filter((name) => name.endsWith('.sql'))
+		.map((name) => Number(/^(\d+)_/.exec(name)?.[1] ?? 0))
+);
+
+const database = await prepareDisposableDatabase(url, LATEST);
 const { pool, pilot } = database;
 
 /** The CLI, run as the cutover runs it. Returns the exit code and its output. */

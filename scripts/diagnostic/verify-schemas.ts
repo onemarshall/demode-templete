@@ -20,7 +20,7 @@
  *     shadow an app table
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
 	assert,
@@ -33,7 +33,15 @@ import {
 const DATABASE_NAME = 'montsel_schema_verify';
 const url = requireSafeDatabase(process.env.MONTSEL_SCHEMA_VERIFY_DATABASE_URL, DATABASE_NAME);
 
-const database = await prepareDisposableDatabase(url, 22);
+// Derived rather than pinned: a hard-coded version turns every later migration
+// into a failing proof that says nothing about the schemas this script checks.
+const LATEST = Math.max(
+	...readdirSync(join(PROJECT_ROOT, 'database', 'migrations'))
+		.filter((name) => name.endsWith('.sql'))
+		.map((name) => Number(/^(\d+)_/.exec(name)?.[1] ?? 0))
+);
+
+const database = await prepareDisposableDatabase(url, LATEST);
 const { pool } = database;
 
 try {
@@ -86,12 +94,12 @@ try {
 
 	// 4. The application's journal is untouched and ends at this migration.
 	assert(
-		(await scalar<number>('SELECT count(*)::int FROM "public"."schema_migrations"')) === 22,
-		'The application journal does not record exactly 22 migrations.'
+		(await scalar<number>('SELECT count(*)::int FROM "public"."schema_migrations"')) === LATEST,
+		`The application journal does not record exactly ${LATEST} migrations.`
 	);
 	assert(
-		(await scalar<number>('SELECT max(version)::int FROM "public"."schema_migrations"')) === 22,
-		'The application journal does not end at 0022.'
+		(await scalar<number>('SELECT max(version)::int FROM "public"."schema_migrations"')) === LATEST,
+		`The application journal does not end at ${LATEST}.`
 	);
 	assert(
 		(await scalar<number>(
