@@ -80,3 +80,25 @@ The `diagnostic` schema carries the engine's own ledger
 `public.schema_migrations`; `content` carries none, because Directus owns its
 migration state. Neither schema joins the application's `search_path`.
 
+```bash
+# G11: the queue-drain check. Run immediately before cutover and again before
+# any rollback, with the output captured.
+BETTER_DATABASE_URL=... bun scripts/diagnostic/drain-check.ts --out migration-log.md
+BETTER_DATABASE_URL=... bun scripts/diagnostic/drain-check.ts --rollback --out migration-log.md
+```
+
+It exits 0 only when every check is empty. A missing `diagnostic.job` table
+blocks rather than passing: an unverifiable queue is not a drained one. When an
+engagement is in flight the report prints its row, because A9.2 requires it
+recorded as stranded — the old path resumes work through `engine_job_id`.
+
+```bash
+# Disposable proof of the drain check's three states and its exit codes.
+docker run -d --rm --name montsel-drain-verify \
+  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_drain_verify \
+  -p 127.0.0.1:55444:5432 postgres:16
+MONTSEL_DRAIN_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55444/montsel_drain_verify \
+  bun scripts/diagnostic/verify-drain-check.ts
+```
+
+

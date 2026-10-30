@@ -31,6 +31,22 @@ export interface ImportedSection {
 	heading: string;
 	order: number;
 	contentHash?: string | null;
+	/** The section as structure, so the report can be rendered by design. */
+	structuredData?: unknown;
+}
+
+/**
+ * Which provider and model produced the delivered bytes (invariant 5).
+ *
+ * Optional at this boundary, because the engine's HTTP contract does not expose
+ * per-run provenance today: it reports the provider and model it is *configured*
+ * with, not the ones that wrote a given run. Once the writer runs in the
+ * application it knows both and must always supply them; the column pair is
+ * already in place so that change is a caller change, not a migration.
+ */
+export interface ReportProvenance {
+	provider: string;
+	model: string;
 }
 
 export interface BytesImport {
@@ -46,6 +62,8 @@ export interface BytesImport {
 	expectedContentHash: string;
 	/** The engine production run's public id, for lineage. */
 	enginePublicationRef?: string | null;
+	/** Which provider and model produced these bytes, when known. */
+	provenance?: ReportProvenance | null;
 	/** Present makes the output shareable at `/share/<slug>`. */
 	shareSlug?: string | null;
 	/** The engine's section manifest, used to anchor client comments. */
@@ -82,11 +100,20 @@ function validateIdentity(input: Omit<BytesImport, 'content' | 'sections'>) {
 		throw new Error(`Unknown product key: ${String(input.productKey)}`);
 	if (!CONTENT_HASH.test(expectedContentHash))
 		throw new Error('expectedContentHash must be 64 lowercase hex characters.');
-	return { organisationId, brandId, outputId, title, expectedContentHash };
+	// Both or neither: the database enforces the pair, and this turns a
+	// constraint error into a message that says which half was missing.
+	const provenance = input.provenance
+		? {
+				provider: required(input.provenance.provider, 'provenance.provider'),
+				model: required(input.provenance.model, 'provenance.model')
+			}
+		: null;
+	return { organisationId, brandId, outputId, title, expectedContentHash, provenance };
 }
 
 export async function importPublishedBytes(input: BytesImport): Promise<ArtefactImportResult> {
-	const { organisationId, brandId, outputId, title, expectedContentHash } = validateIdentity(input);
+	const { organisationId, brandId, outputId, title, expectedContentHash, provenance } =
+		validateIdentity(input);
 	const bytes =
 		typeof input.content === 'string' ? Buffer.from(input.content, 'utf8') : input.content;
 	const actualContentHash = contentHash(bytes);
@@ -154,8 +181,9 @@ export async function importPublishedBytes(input: BytesImport): Promise<Artefact
 		const versionId = randomUUID();
 		await client.query(
 			`INSERT INTO "output_version" ("id", "organisation_id", "brand_id", "output_id",
-			                               "version_number", "content_markdown", "content_hash", "engine_publication_ref")
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+			                               "version_number", "content_markdown", "content_hash", "engine_publication_ref",
+			                               "provider", "model")
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
 			[
 				versionId,
 				organisationId,
@@ -164,15 +192,17 @@ export async function importPublishedBytes(input: BytesImport): Promise<Artefact
 				versionNumber,
 				content,
 				expectedContentHash,
-				input.enginePublicationRef ?? null
+				input.enginePublicationRef ?? null,
+				provenance?.provider ?? null,
+				provenance?.model ?? null
 			],
 		);
 
 		for (const section of input.sections ?? []) {
 			await client.query(
 				`INSERT INTO "output_version_section"
-				   ("id", "output_version_id", "section_key", "heading", "section_order", "content_hash")
-				 VALUES ($1, $2, $3, $4, $5, $6)
+				   ("id", "output_version_id", "section_key", "heading", "section_order", "content_hash", "structured_data")
+				 VALUES ($1, $2, $3, $4, $5, $6, $7)
 				 ON CONFLICT ("output_version_id", "section_key") DO NOTHING`,
 				[
 					randomUUID(),
@@ -180,7 +210,8 @@ export async function importPublishedBytes(input: BytesImport): Promise<Artefact
 					section.key,
 					section.heading,
 					section.order,
-					section.contentHash ?? null
+					section.contentHash ?? null,
+					section.structuredData === undefined ? null : JSON.stringify(section.structuredData)
 				],
 			);
 		}

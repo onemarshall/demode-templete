@@ -127,6 +127,64 @@ describe('importPublishedArtefact', () => {
 		).rejects.toThrow(/Unknown product key/);
 		expect(mocks.readFile).not.toHaveBeenCalled();
 	});
+
+	it('records the provider and model that produced the bytes', async () => {
+		respond({ existingOutput: null, duplicate: null, nextVersion: 1 });
+		await importPublishedArtefact({
+			...baseInput,
+			provenance: { provider: 'openai', model: 'gpt-6.1-sol' }
+		});
+
+		const insert = mocks.query.mock.calls.find(([sql]) =>
+			String(sql).includes('INSERT INTO "output_version"'),
+		);
+		expect(insert?.[1]).toContain('openai');
+		expect(insert?.[1]).toContain('gpt-6.1-sol');
+	});
+
+	it('stores no provenance when the caller cannot know it, and still imports', async () => {
+		// Read-compatibility: the previous release ignores these columns, and the
+		// engine's contract does not expose per-run provenance yet.
+		respond({ existingOutput: null, duplicate: null, nextVersion: 1 });
+		const result = await importPublishedArtefact(baseInput);
+
+		expect(result.status).toBe('imported');
+		const insert = mocks.query.mock.calls.find(([sql]) =>
+			String(sql).includes('INSERT INTO "output_version"'),
+		);
+		expect(insert?.[1].slice(-2)).toEqual([null, null]);
+	});
+
+	it('refuses half a provenance record instead of storing an unknown model', async () => {
+		respond({ existingOutput: null, duplicate: null, nextVersion: 1 });
+		await expect(
+			importPublishedArtefact({
+				...baseInput,
+				provenance: { provider: 'openai', model: '  ' }
+			}),
+		).rejects.toThrow(/provenance\.model must be non-empty/);
+		expect(executed('INSERT INTO "output_version"')).toBe(false);
+	});
+
+	it('stores a section as structure alongside its markdown anchor', async () => {
+		respond({ existingOutput: null, duplicate: null, nextVersion: 1 });
+		await importPublishedArtefact({
+			...baseInput,
+			sections: [
+				{
+					key: 'coverage',
+					heading: 'What was reviewed',
+					order: 1,
+					structuredData: { kind: 'coverage', reviewed: 12, omitted: 2 }
+				}
+			]
+		});
+
+		const section = mocks.query.mock.calls.find(([sql]) =>
+			String(sql).includes('INSERT INTO "output_version_section"'),
+		);
+		expect(section?.[1]).toContain(JSON.stringify({ kind: 'coverage', reviewed: 12, omitted: 2 }));
+	});
 });
 
 describe('contentHash', () => {
