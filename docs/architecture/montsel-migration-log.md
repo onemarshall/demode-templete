@@ -15,7 +15,7 @@ of it.
 | Item | State |
 |---|---|
 | App repository | `onemarshall/demode-templete`, branch `main` |
-| App HEAD at this log | `2e4b68e` |
+| App HEAD at this log | `8d598f6` |
 | App working tree | clean |
 | Engine path | `~/Documents/LIFE/1_Projects/_04_Langfell/03-Product-Engines/diagnostic` |
 | Engine HEAD | `1ccc2970a` |
@@ -37,7 +37,7 @@ whole workspace.
 |---|---|---|
 | TypeScript source files | 263 | — |
 | Test files | 90 | 142 |
-| Declared test cases | 423 (static count) | 1038 (executed) |
+| Declared test cases | 423 (static count) | 1077 (executed) |
 | SQL migrations | 43 | 23 |
 | Top-level modules | 44 (the plan says 46) | — |
 | Bun-touching files | 106 | — |
@@ -48,11 +48,12 @@ would reach `DATABASE_URL` and `PROSPECTING_DATABASE_URL`, and the product's
 baseline count therefore remains outstanding and must be taken on a disposable
 database by whoever owns that harness.
 
-**The app's suite is red, and was red before this work.** 1038 tests: 996 passed,
-11 failed, 31 skipped. The failures are the same set recorded at `e20f1c2` —
-five strategy provider tests importing `bun:test` against a missing Better Auth
-schema, five Chromium/Playwright timeouts, the `access.test.ts` visual-contract
-route expectation, and `system.generated.ts` breaching the brand-SQL contract.
+**The app's suite is green.** 142 files: 140 passed, 2 skipped; 1077 tests: 1046
+passed, 31 skipped, none failed. At `e20f1c2` the same suite had 11 failures in
+15 files — five strategy tests importing `bun:test`, five browser timeouts, the
+`access.test.ts` route expectation, the tenancy SQL contract matching prose in a
+generated prompt bundle, and a Better Auth patch pin that had drifted. All are
+recorded in the commit that fixed them; none was in the diagnostic module.
 
 ---
 
@@ -173,7 +174,7 @@ when a caller supplies it.
 | G6 outreach claims rejected; descriptive-only fallback | **not built** | Phase 7 |
 | G7 share links expire, revoke, redact, log | **not built** | The mechanism does not exist. `/share/[shareSlug]` is a plain `output.share_slug` lookup gated by a `can_share` boolean: no expiry, no revocation, no hashed token, no access log. Phase 7 builds it. Deliberately not started now — see §8. |
 | G8 restore performed, row counts compared | **not done** | needs the VPS |
-| G9 types and boundaries clean | **pass** | `npm run check` clean; `vite build` succeeds |
+| G9 types and boundaries clean | **pass** | `npm run check` clean; `vite build` succeeds; app suite green |
 | G10 read-compatibility against the deployed previous release | **not done** | needs 6.1 and staging |
 | G11 queue drained and verified at cutover and rollback | **tooling done, capture pending** | `drain-check.ts` proven on a disposable database for clear, blocked and unknown, including exit codes |
 
@@ -207,5 +208,4 @@ display them. That is the reason G10 is a gate rather than a check.
 - No gate other than G9 is passed.
 - No engine code was modified, ported, frozen or tagged.
 - No staging environment, VPS, R2 bucket or Trigger.dev deployment was touched.
-- The app's suite remains red for the pre-existing reasons in §2, and none of
-  those failures is in the diagnostic module.
+- The engine's suite has never been run here; the app's is green as of `8d598f6`.
