@@ -42,6 +42,23 @@ describe('diagnostic eligibility', () => {
 		expect(check.reasons.join(' ')).toContain('approved sector intelligence');
 	});
 
+	it('keeps the requested sector on a refusal, so demand is not lost', async () => {
+		const check = await checkEligibility('diagnostic.gap', {
+			website: 'https://acme.test',
+			sectorRef: 'unapproved-sector',
+			hasBusinessContext: true
+		});
+		// `sector` is the approved sector that would be used, and there isn't one.
+		expect(check.sector).toBeNull();
+		// The request itself is the demand signal and must survive the refusal.
+		expect(check.requestedSectorRef).toBe('unapproved-sector');
+	});
+
+	it('records no requested sector when the customer named none', async () => {
+		const check = await checkEligibility('diagnostic.signal', { website: 'https://acme.test' });
+		expect(check.requestedSectorRef).toBeNull();
+	});
+
 	it('accepts Gap for an approved sector with business context', async () => {
 		const check = await checkEligibility('diagnostic.gap', {
 			website: 'https://acme.test',

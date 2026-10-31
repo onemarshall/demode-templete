@@ -15,7 +15,7 @@ of it.
 | Item | State |
 |---|---|
 | App repository | `onemarshall/demode-templete`, branch `main` |
-| App HEAD at this log | `8d598f6` |
+| App HEAD at this log | `48f48f3` |
 | App working tree | clean |
 | Engine path | `~/Documents/LIFE/1_Projects/_04_Langfell/03-Product-Engines/diagnostic` |
 | Engine HEAD | `1ccc2970a` |
@@ -39,8 +39,8 @@ the engine is a commit that cannot move and a host to run the old build on. See
 |---|---|---|
 | TypeScript source files | 263 | — |
 | Test files | 90 | 142 |
-| Declared test cases | 423 (static count) | 1077 (executed) |
-| SQL migrations | 43 | 23 |
+| Declared test cases | 423 (static count) | 1079 (executed) |
+| SQL migrations | 43 | 24 |
 | Top-level modules | 44 (the plan says 46) | — |
 | Bun-touching files | 106 | — |
 
@@ -50,12 +50,34 @@ would reach `DATABASE_URL` and `PROSPECTING_DATABASE_URL`, and the product's
 baseline count therefore remains outstanding and must be taken on a disposable
 database by whoever owns that harness.
 
-**The app's suite is green.** 142 files: 140 passed, 2 skipped; 1077 tests: 1046
+**The app's suite is green.** 142 files: 140 passed, 2 skipped; 1079 tests: 1048
 passed, 31 skipped, none failed. At `e20f1c2` the same suite had 11 failures in
 15 files — five strategy tests importing `bun:test`, five browser timeouts, the
 `access.test.ts` route expectation, the tenancy SQL contract matching prose in a
 generated prompt bundle, and a Better Auth patch pin that had drifted. All are
 recorded in the commit that fixed them; none was in the diagnostic module.
+
+### Sector coverage — 29 of 33
+
+Measured with `bun run verify sectors`, which compiles every
+`Sector-Intelligence-Synthesis.md`, imports it against a disposable database and
+asks the approval gate. It answers per sector, not per file.
+
+| Verdict | Sectors | Why |
+|---|---:|---|
+| Approvable | **29** | — |
+| Refused — `prime_first` | 1 | `deployment_status` is not one of `READY`, `SECTOR_READY`, `NAMED_COMPANY_READY` |
+| Refused — `draft` | 1 | `document_status` must be `complete` |
+| Placeholder stubs | 2 | 13-line working records with no synthesis body; the compiler correctly refuses them |
+
+The 29 matches the research register's 29 canonical syntheses and the engine's
+reported 29 approved sectors. The earlier apparent contradiction is resolved: the
+files exist, import and approve; they have simply never been loaded into a
+production database.
+
+Two slugs have more than one canonical file
+(`managed-cybersecurity-service-providers`, `private-clinics-and-specialist-healthcare-providers`),
+which should be reconciled before either is imported.
 
 ---
 
@@ -150,11 +172,22 @@ the workspace repository is acceptable provided the tag name says what it points
 at (`diagnostic/pre-port-2026-10-31`), because it names a workspace commit rather
 than an engine-only one.
 
-### 6.2 `sector-synthesis` must be split before Phase 2
+### 6.2 `sector-synthesis` must be split before the import moves in
 
 Four Port modules import `parse.ts` and `to-sector-intelligence.ts` from a module
-A1 would otherwise mark Leave. Decision 9 already implies the split. Until it is
-made, the app cannot import a sector package at all.
+A1 would otherwise mark Leave. Decision 9 already implies the split, and it is
+narrow: two contract files move, three authoring files stay behind.
+
+This matters only when the *import* moves into the application, which it must,
+because the engine is decommissioned. It does not block anything today: the
+engine's CLI performs the import and `bun run verify sector-import` proves the
+file against a disposable database.
+
+**Research authoring is settled and stays out.** The research product produces
+candidates from the desktop; the application never runs research. The earlier
+question of porting the synthesis pipeline into the app is therefore optional, and
+only worth doing if an uncovered sector must be served without the operator — see
+§6.5.
 
 ### 6.3 Vendoring is 21 files, not 3
 
@@ -162,6 +195,11 @@ The plan names three external imports. The engine imports seven entry points
 whose closure is 21 files including `pdfjs-dist`. Decide whether the PDF and
 browser subgraph comes with the port or is dropped with the collection features
 that use it.
+
+Under a provider-only capture profile — the only one that can run on a worker —
+about 15 of the 21 survive and the PDF engine leaves with the browser it exists to
+feed. What does not disappear with the browser: URL validation, sitemap discovery
+and the Treg receipt file, all of which need rewriting rather than removing.
 
 ### 6.4 Invariant 5 needs a contract, not just a column
 
@@ -218,6 +256,10 @@ display them. That is the reason G10 is a gate rather than a check.
 Each item is blocked by something specific, and the block is named so it can be
 removed rather than worked around.
 
+0. **Import the 29 approvable syntheses.** This is the only item that changes what
+   the product can sell, and it needs no port: `bun run verify sector-import
+   --candidate=<file>` proves a file, then the engine's importer and approval run
+   against the target database. Reconcile the two duplicated slugs first.
 1. **Record the engine's pre-port commit and agree the freeze** (§6.1). The commit
    is `1ccc2970a`; the freeze is a rule, not a build. Nothing structural stands in
    the way of the port.

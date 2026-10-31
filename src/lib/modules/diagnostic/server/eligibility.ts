@@ -26,6 +26,15 @@ export interface EligibilityCheck {
 	result: EligibilityResult;
 	reasons: string[];
 	sector: { ref: string; name: string } | null;
+	/**
+	 * The sector the customer asked for, whether or not it is covered.
+	 *
+	 * `sector` is the approved sector that will be used, so it is null when the
+	 * request is refused. Losing the request with it made a refusal
+	 * indistinguishable from a customer who named no sector at all — and that is
+	 * the one signal that says which sector to research next.
+	 */
+	requestedSectorRef: string | null;
 	inputsPresent: Record<string, boolean>;
 }
 
@@ -103,6 +112,7 @@ export async function checkEligibility(
 		result,
 		reasons: [...blocked, ...missing],
 		sector,
+		requestedSectorRef: input.sectorRef?.trim() ? input.sectorRef.trim() : null,
 		inputsPresent
 	};
 }
@@ -126,8 +136,8 @@ export async function recordEligibility(
 		`INSERT INTO "diagnostic_eligibility"
 		   ("id", "user_id", "organisation_id", "brand_id", "product_key",
 		    "checked_by", "sector_intelligence_ref", "sector_intelligence_version_id",
-		    "inputs_present", "result", "reasons")
-		 VALUES ($1, $2, $3, $4, $5, $2, $6, $7, $8, $9, $10)`,
+		    "requested_sector_ref", "inputs_present", "result", "reasons")
+		 VALUES ($1, $2, $3, $4, $5, $2, $6, $7, $8, $9, $10, $11)`,
 		[
 			id,
 			input.userId,
@@ -136,6 +146,7 @@ export async function recordEligibility(
 			input.productKey,
 			input.check.sector?.ref ?? null,
 			input.sectorIntelligenceVersionId ?? null,
+			input.check.requestedSectorRef,
 			JSON.stringify(input.check.inputsPresent),
 			input.check.result,
 			JSON.stringify(input.check.reasons)
