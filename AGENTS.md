@@ -70,6 +70,29 @@ A single candidate: `bun run verify sector-import --candidate=<file.json>`.
 Markdown compiles to that JSON with the engine's own
 `compile sector-synthesis --file=<synthesis.md> --out=<record.json>`.
 
+### Importing the sectors
+
+```bash
+# Compile and report without touching a database
+bun run import-sectors --target=<url> --reviewer=<name> --dry-run
+
+# A new database: apply the engine schema and the sector taxonomy first
+bun run import-sectors --target=<url> --reviewer=<name> --migrate
+
+# A prepared database: import and approve
+bun run import-sectors --target=<url> --reviewer=<name>
+```
+
+There is no default target and no environment variable that supplies one. A
+loopback target is refused without `--allow-loopback`, because the engine's own
+`.env` points at the operator's local stack. Import and approval stay separate:
+every file is imported, then approved, so a refused approval leaves an unapproved
+version rather than a half-approved sector. The reviewer is recorded on every
+version. A slug with more than one canonical file is skipped, not guessed at.
+
+`--migrate` also runs `seed-sectors`: a synthesis names a sector slug and the
+importer refuses one the taxonomy does not hold.
+
 ### What the proofs establish
 
 - **schemas** — `diagnostic` and `content` exist, are empty, hold no PUBLIC

@@ -23,7 +23,8 @@
     "check:modules": "node scripts/check-module-boundaries.mjs",
     "strategy:worker:build": "node scripts/strategy/build-worker.mjs",
     "strategy:resources": "node scripts/strategy/build-resources.mjs",
-    "verify": "bun scripts/diagnostic/verify.ts"
+    "verify": "bun scripts/diagnostic/verify.ts",
+    "import-sectors": "bun scripts/diagnostic/import-sectors.ts"
   },
   "dependencies": {
     "@better-auth/core": "^1.7.12",
