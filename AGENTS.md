@@ -101,4 +101,23 @@ MONTSEL_DRAIN_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55444/m
   bun scripts/diagnostic/verify-drain-check.ts
 ```
 
+```bash
+# Disposable proof of a sector synthesis import, and of the approval gate's
+# verdict on that file. Runs the engine's own importer as a subprocess, so no
+# engine file changes.
+docker run -d --rm --name montsel-sector-import-verify \
+  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_sector_import_verify \
+  -p 127.0.0.1:55445:5432 postgres:16
+MONTSEL_SECTOR_IMPORT_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55445/montsel_sector_import_verify \
+  MONTSEL_CANDIDATE_FILE=/path/to/candidate.json \
+  bun scripts/diagnostic/verify-sector-import.ts
+```
+
+Exit 0 means the file imports **and** the approval gate accepts it. Exit 2 means
+the import is sound but approval was refused, with the gate's reason printed —
+importability and approvability are different questions and the operator needs
+both. A sector synthesis Markdown compiles to that JSON with the engine's
+`compile sector-synthesis --file=<synthesis.md> --out=<record.json>`.
+
+
 
