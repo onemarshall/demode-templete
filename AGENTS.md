@@ -1,5 +1,10 @@
 You are able to use the Svelte MCP server, where you have access to comprehensive Svelte 5 and SvelteKit documentation. Here's how to use the available tools effectively:
 
+> Working on the diagnostic upgrade? Read `HANDOVER.md` first. It records what
+> was built, where the approved plan is now wrong, which gates have passed, and
+> the one open question. `docs/architecture/montsel-migration-log.md` is the
+> detailed record behind it.
+
 ## Available Svelte MCP Tools:
 
 ### 1. list-sections
