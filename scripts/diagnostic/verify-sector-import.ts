@@ -31,12 +31,11 @@
  *   MONTSEL_CANDIDATE_FILE   the sector synthesis JSON to import
  */
 
-import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { Pool } from 'pg';
 import { assert, requireSafeDatabase } from './disposable-db.ts';
+import { ENGINE_DIR, PRODUCT_ENGINES, runEngine } from './engine.ts';
 
 const DATABASE_NAME = 'montsel_sector_import_verify';
 const url = requireSafeDatabase(
@@ -44,11 +43,6 @@ const url = requireSafeDatabase(
 	DATABASE_NAME
 );
 
-const PRODUCT_ENGINES = resolve(
-	homedir(),
-	'Documents/LIFE/1_Projects/_04_Langfell/03-Product-Engines'
-);
-const ENGINE_DIR = process.env.MONTSEL_ENGINE_DIR ?? join(PRODUCT_ENGINES, 'diagnostic/app/cli');
 const CANDIDATE_FILE =
 	process.env.MONTSEL_CANDIDATE_FILE ??
 	join(
@@ -61,25 +55,6 @@ assert(
 	`No engine CLI at ${ENGINE_DIR}. Set MONTSEL_ENGINE_DIR.`
 );
 assert(existsSync(CANDIDATE_FILE), `No candidate file at ${CANDIDATE_FILE}. Set MONTSEL_CANDIDATE_FILE.`);
-
-/** Run the engine CLI against the disposable database and nothing else. */
-function engine(args: string[]): { code: number; out: string } {
-	try {
-		const out = execFileSync('bun', ['run', 'src/cli.ts', ...args], {
-			cwd: ENGINE_DIR,
-			env: { ...process.env, DATABASE_URL: url, MONTSEL_LOAD_DOTENV: '0' },
-			encoding: 'utf8',
-			stdio: ['ignore', 'pipe', 'pipe']
-		});
-		return { code: 0, out };
-	} catch (error) {
-		const failure = error as { status?: number; stdout?: string; stderr?: string };
-		return {
-			code: failure.status ?? -1,
-			out: `${failure.stdout ?? ''}${failure.stderr ?? ''}`
-		};
-	}
-}
 
 const candidate = JSON.parse(readFileSync(CANDIDATE_FILE, 'utf8')) as {
 	record?: { slug?: string; document_id?: string };
@@ -134,7 +109,7 @@ try {
 	]);
 
 	// 3. Import the real candidate file.
-	const imported = engine(['seed-sector-intelligence', `--file=${CANDIDATE_FILE}`]);
+	const imported = runEngine(['seed-sector-intelligence', `--file=${CANDIDATE_FILE}`], url);
 	assert(
 		imported.code === 0,
 		`The import failed (exit ${imported.code}):\n${imported.out.trim()}`
@@ -194,7 +169,7 @@ try {
 	);
 
 	// 6. Re-running the same file is a no-op, not a duplicate.
-	const repeated = engine(['seed-sector-intelligence', `--file=${CANDIDATE_FILE}`]);
+	const repeated = runEngine(['seed-sector-intelligence', `--file=${CANDIDATE_FILE}`], url);
 	assert(repeated.code === 0, `The repeat import failed:\n${repeated.out.trim()}`);
 	assert(
 		(await scalar<number>(
@@ -213,13 +188,13 @@ try {
 	// not a failure of the import — it is a candidate that is not ready, and the
 	// gate says why. Exit 0 means both; exit 2 means the import is sound and the
 	// approval was refused.
-	const approved = engine([
+	const approved = runEngine([
 		'sector-intelligence',
 		'approve',
 		`--slug=${recordSlug}`,
 		`--version=${row.id}`,
 		'--reviewer=disposable-proof'
-	]);
+	], url);
 
 	if (approved.code !== 0) {
 		const reason = approved.out.trim().split('\n').filter(Boolean).pop() ?? '(no reason given)';

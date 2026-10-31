@@ -27,97 +27,68 @@ After completing the code, ask the user if they want a playground link. Only cal
 `output_version` holds delivered report bytes; rows are append-only by trigger.
 Never run the migration runner or the import against the operator's local stack.
 
-```bash
-# Disposable proof of import, hashes, tenancy, share and download reads
-docker run -d --rm --name montsel-import-verify \
-  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_diagnostic_import_verify \
-  -p 127.0.0.1:55440:5432 postgres:16
-MONTSEL_IMPORT_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55440/montsel_diagnostic_import_verify \
-  bun scripts/diagnostic/verify-import.ts
-```
+### Verifying anything
 
-Artefact bytes are staged in the gitignored `.local-state/diagnostic-import/`,
-named by their SHA-256. `scripts/diagnostic/hestia-artefacts.json` records the
-engine's receipts; the import refuses any file whose hash differs.
+Every proof runs against a throwaway Postgres. `bun run verify` starts it, waits
+until it accepts connections, runs the proof and removes it again. Do not
+memorise container commands.
 
 ```bash
-# Disposable proof of the engagement model, envelope and route immutability
-docker run -d --rm --name montsel-engagement-verify \
-  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_diagnostic_engagement_verify \
-  -p 127.0.0.1:55441:5432 postgres:16
-MONTSEL_ENGAGEMENT_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55441/montsel_diagnostic_engagement_verify \
-  bun scripts/diagnostic/verify-engagement.ts
+bun run verify              # list the proofs and what each establishes
+bun run verify all          # every proof that needs no argument
+bun run verify schemas      # the diagnostic and content schema container
+bun run verify drain        # the G11 queue-drain check
+bun run verify engagement   # the engagement model, payment gate and envelope
+bun run verify import       # published report bytes against their recorded hash
+bun run verify signal       # the Signal delivery lifecycle against a fake engine
+bun run verify sector-import --candidate=<file.json>
+bun run verify sectors      # every sector synthesis: importable and approvable?
 ```
 
-Both scripts share `scripts/diagnostic/disposable-db.ts`, which refuses any
-database not named exactly as the caller declares and not on loopback.
+`--keep` leaves the container running so a failure can be inspected.
 
-```bash
-# Disposable proof of the Signal delivery lifecycle against a fake engine.
-# No Stripe, no customer data, no production database, no real engine.
-docker run -d --rm --name montsel-signal-verify   -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_signal_delivery_verify   -p 127.0.0.1:55442:5432 postgres:16
-MONTSEL_SIGNAL_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55442/montsel_signal_delivery_verify   bunx vitest run src/lib/modules/diagnostic/server/__tests__/diagnostic-delivery.integration.test.ts --project server
-```
+Each proof declares the database name it expects, and
+`scripts/diagnostic/disposable-db.ts` refuses any database not named exactly as
+declared and not on loopback. Nothing here can reach the operator's stack. The
+sector proof drives the engine's importer as a subprocess with
+`MONTSEL_LOAD_DOTENV=0`, so the engine's own `.env` cannot win.
 
-The suite skips when that variable is absent, so the default test run is
-unaffected. It needs a **fresh** database each time; drop and recreate it
-between runs. The fake engine is a loopback HTTP server inside the test, so
-`DIAGNOSTIC_ENGINE_URL` is pointed at it for the duration and never at a real
-engine.
+### Sector synthesis import
 
-```bash
-# Disposable proof of the Phase 1 schema container: the `diagnostic` and
-# `content` schemas exist, are empty, and cannot shadow an app table.
-docker run -d --rm --name montsel-schema-verify \
-  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_schema_verify \
-  -p 127.0.0.1:55443:5432 postgres:16
-MONTSEL_SCHEMA_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55443/montsel_schema_verify \
-  bun scripts/diagnostic/verify-schemas.ts
-```
+`bun run verify sectors` compiles every `Sector-Intelligence-Synthesis.md` in the
+research tree, imports it, and asks the approval gate. **Exit 0** means every
+sector imports and can be approved; **exit 2** means some cannot, with the gate's
+reason printed per sector.
 
-The `diagnostic` schema carries the engine's own ledger
-(`diagnostic.schema_migrations`), separate from the application's
-`public.schema_migrations`; `content` carries none, because Directus owns its
-migration state. Neither schema joins the application's `search_path`.
+Importability and approvability are different questions, which is why the command
+answers both: a file can import cleanly — 100+ context items — and still be
+refused because its `deployment_status` or `document_status` is not one the gate
+accepts. Retained copies under `history/`, `archive/` and `validation/` are
+excluded, and the summary counts sectors rather than files.
 
-```bash
-# G11: the queue-drain check. Run immediately before cutover and again before
-# any rollback, with the output captured.
-BETTER_DATABASE_URL=... bun scripts/diagnostic/drain-check.ts --out migration-log.md
-BETTER_DATABASE_URL=... bun scripts/diagnostic/drain-check.ts --rollback --out migration-log.md
-```
-
-It exits 0 only when every check is empty. A missing `diagnostic.job` table
-blocks rather than passing: an unverifiable queue is not a drained one. When an
-engagement is in flight the report prints its row, because A9.2 requires it
-recorded as stranded — the old path resumes work through `engine_job_id`.
-
-```bash
-# Disposable proof of the drain check's three states and its exit codes.
-docker run -d --rm --name montsel-drain-verify \
-  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_drain_verify \
-  -p 127.0.0.1:55444:5432 postgres:16
-MONTSEL_DRAIN_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55444/montsel_drain_verify \
-  bun scripts/diagnostic/verify-drain-check.ts
-```
-
-```bash
-# Disposable proof of a sector synthesis import, and of the approval gate's
-# verdict on that file. Runs the engine's own importer as a subprocess, so no
-# engine file changes.
-docker run -d --rm --name montsel-sector-import-verify \
-  -e POSTGRES_PASSWORD=verify -e POSTGRES_DB=montsel_sector_import_verify \
-  -p 127.0.0.1:55445:5432 postgres:16
-MONTSEL_SECTOR_IMPORT_VERIFY_DATABASE_URL=postgresql://postgres:verify@127.0.0.1:55445/montsel_sector_import_verify \
-  MONTSEL_CANDIDATE_FILE=/path/to/candidate.json \
-  bun scripts/diagnostic/verify-sector-import.ts
-```
-
-Exit 0 means the file imports **and** the approval gate accepts it. Exit 2 means
-the import is sound but approval was refused, with the gate's reason printed —
-importability and approvability are different questions and the operator needs
-both. A sector synthesis Markdown compiles to that JSON with the engine's
+A single candidate: `bun run verify sector-import --candidate=<file.json>`.
+Markdown compiles to that JSON with the engine's own
 `compile sector-synthesis --file=<synthesis.md> --out=<record.json>`.
 
+### What the proofs establish
 
-
+- **schemas** — `diagnostic` and `content` exist, are empty, hold no PUBLIC
+  privilege, and a same-named `diagnostic` table cannot shadow `public."output"`.
+  The `diagnostic` schema carries the engine's own ledger, separate from
+  `public.schema_migrations`; `content` carries none, because Directus owns its
+  migration state. Neither schema joins the application's `search_path`.
+- **drain** — the two queries A9.2 names. A missing `diagnostic.job` table blocks
+  rather than passing: an unverifiable queue is not a drained one. In-flight rows
+  are printed because A9.2 requires them recorded as stranded. The cutover run is
+  `bun scripts/diagnostic/drain-check.ts --out <log>` against the real database,
+  and `--rollback` for the second capture.
+- **engagement** — intake validation, idempotent resume, the payment gate, a
+  frozen delivery route, cross-brand denial, and the three-fact engine envelope.
+- **import** — bytes that do not match their recorded hash write nothing;
+  identical bytes never land twice; artefact bytes are staged in the gitignored
+  `.local-state/diagnostic-import/`, named by SHA-256, with
+  `scripts/diagnostic/hestia-artefacts.json` recording the engine's receipts.
+- **signal** — the delivery lifecycle against a loopback fake engine. No Stripe,
+  no customer data, no real engine; `DIAGNOSTIC_ENGINE_URL` is pointed at the
+  fake for the duration. The suite skips when its variable is absent, so the
+  default test run is unaffected.

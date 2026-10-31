@@ -22,7 +22,8 @@
     "test": "npm run test:unit -- --run",
     "check:modules": "node scripts/check-module-boundaries.mjs",
     "strategy:worker:build": "node scripts/strategy/build-worker.mjs",
-    "strategy:resources": "node scripts/strategy/build-resources.mjs"
+    "strategy:resources": "node scripts/strategy/build-resources.mjs",
+    "verify": "bun scripts/diagnostic/verify.ts"
   },
   "dependencies": {
     "@better-auth/core": "^1.7.12",
