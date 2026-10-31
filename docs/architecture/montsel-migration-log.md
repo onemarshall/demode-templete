@@ -25,9 +25,11 @@ of it.
 | Schemas dumped to R2 | **not done** — needs R2 credentials |
 
 The engine is a **subdirectory of the `_04_Langfell` workspace repository**, which
-also holds the Library, the book and the brand operating systems. That is the
-single largest structural obstacle to A0: a tag on the engine is a tag on the
-whole workspace.
+also holds the Library, the book and the brand operating systems. That affects what
+a tag can mean, but it does not block the port: the engine is being absorbed into
+this application (decision 1) and decommissioned (Phase 10), so all A0 needs from
+the engine is a commit that cannot move and a host to run the old build on. See
+§6.1.
 
 ---
 
@@ -123,22 +125,30 @@ nullable additions. The previous release's `SELECT` lists do not mention them.
 
 ## 6. Open decisions
 
-### 6.1 The engine must become its own repository before it can be tagged
+### 6.1 The engine is absorbed, not kept — A0 needs a frozen reference, not a new repository
 
-`pre-port-<date>` is supposed to identify the build that serves as the G10 reader.
-While the engine shares a repository with the Library and the book, that tag
-identifies the whole workspace, and "deploy the tag to staging" means deploying a
-workspace.
+This section previously recommended splitting the engine into its own repository.
+That was wrong: it contradicted decision 1, which ratifies absorbing the engine
+into the application on the strategy pattern, and Phase 10, which decommissions
+it. The destination is `src/lib/modules/diagnostic/` in this repository.
 
-Three ways out, in order of preference:
+What A0's "tag `pre-port-<date>` and keep it deployed" is actually for is narrower
+than a repository split: the port must read from a state that cannot move under
+it, and a rollback must be able to run the old version to prove it can still read
+new rows. Both are satisfied by a recorded commit and a freeze:
 
-1. **Split the engine into its own repository** and tag it there. Cleanest for
-   A0, G10 and the eventual decommission, and it makes "the engine is frozen"
-   enforceable with a branch rule.
-2. **Tag the workspace anyway** and accept that the G10 reader is a checkout of
-   the whole workspace. Works today; misleads later.
-3. **Subtree-split on demand** for the staging deploy without changing the
-   repository. Least durable.
+- **Reference.** The engine's HEAD `1ccc2970a` is already immutable. The port
+  reads from it; the tag is a convenience label, not a new home.
+- **Freeze.** No engine commit during the port. A branch rule or a note in the
+  engine's `STATUS.md` is enough to enforce it.
+- **G10 reader.** The pre-port build is a Bun CLI. Running it later means checking
+  out `1ccc2970a` and starting it — which needs a host, not a repository.
+
+So the blocker is not structural. It is: record the commit, agree the freeze, and
+have somewhere to run the old build. If a tag is wanted for legibility, tagging
+the workspace repository is acceptable provided the tag name says what it points
+at (`diagnostic/pre-port-2026-10-31`), because it names a workspace commit rather
+than an engine-only one.
 
 ### 6.2 `sector-synthesis` must be split before Phase 2
 
@@ -208,9 +218,9 @@ display them. That is the reason G10 is a gate rather than a check.
 Each item is blocked by something specific, and the block is named so it can be
 removed rather than worked around.
 
-1. **Separate the engine into its own repository** (§6.1). Everything downstream
-   of A0 waits on this. No code change is possible on the engine until it is
-   done, because a tag has to mean one product.
+1. **Record the engine's pre-port commit and agree the freeze** (§6.1). The commit
+   is `1ccc2970a`; the freeze is a rule, not a build. Nothing structural stands in
+   the way of the port.
 2. **Take the engine's baseline test count on a disposable database.** The suite
    has never been run here; it reaches the operator's local stack, which the
    product forbids. This is a half-day for whoever owns the harness.
